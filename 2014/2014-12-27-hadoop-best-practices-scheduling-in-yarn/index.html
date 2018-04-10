@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="YARN,Scheduling,HADOOP," />
+
+
+<meta name="description" content="这篇文章基本上是对《Hadoop: The Definitive Guide, 4th Edition》第 4 章的转述，版权归作者所有。 YARN 提供了三种任务调度策略：FIFO Scheduler，Capacity Scheduler 和 Fair Scheduler，下面会分别详细介绍。 FIFO Scheduler顾名思义，FIFO Scheduler 就是将所有 application">
+<meta name="keywords" content="YARN,Scheduling,HADOOP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop Best Practices: Scheduling in YARN">
+<meta property="og:url" content="http://hyperj.github.com/2014/2014-12-27-hadoop-best-practices-scheduling-in-yarn/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="这篇文章基本上是对《Hadoop: The Definitive Guide, 4th Edition》第 4 章的转述，版权归作者所有。 YARN 提供了三种任务调度策略：FIFO Scheduler，Capacity Scheduler 和 Fair Scheduler，下面会分别详细介绍。 FIFO Scheduler顾名思义，FIFO Scheduler 就是将所有 application">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/12/27/hadoop-best-practices-scheduling-in-yarn/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/12/27/hadoop-best-practices-scheduling-in-yarn/002.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.902Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hadoop Best Practices: Scheduling in YARN">
+<meta name="twitter:description" content="这篇文章基本上是对《Hadoop: The Definitive Guide, 4th Edition》第 4 章的转述，版权归作者所有。 YARN 提供了三种任务调度策略：FIFO Scheduler，Capacity Scheduler 和 Fair Scheduler，下面会分别详细介绍。 FIFO Scheduler顾名思义，FIFO Scheduler 就是将所有 application">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2014/12/27/hadoop-best-practices-scheduling-in-yarn/001.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2014/2014-12-27-hadoop-best-practices-scheduling-in-yarn/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>Hadoop Best Practices: Scheduling in YARN | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2014/2014-12-27-hadoop-best-practices-scheduling-in-yarn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Hadoop Best Practices: Scheduling in YARN</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2014-12-27T00:00:00+08:00">2014-12-27</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Scheduling/" itemprop="url" rel="index"><span itemprop="name">Scheduling</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这篇文章基本上是对<a href="https://www.safaribooksonline.com/library/view/hadoop-the-definitive/9781491901687/ch04.html#YARNScheduling" target="_blank" rel="noopener">《Hadoop: The Definitive Guide, 4th Edition》第 4 章</a>的转述，版权归作者所有。</p>
+<p>YARN 提供了三种任务调度策略：FIFO Scheduler，Capacity Scheduler 和 Fair Scheduler，下面会分别详细介绍。</p>
+<h1 id="FIFO-Scheduler"><a href="#FIFO-Scheduler" class="headerlink" title="FIFO Scheduler"></a>FIFO Scheduler</h1><p>顾名思义，FIFO Scheduler 就是将所有 application 按照提交顺序来执行，这些 application 都放在一个队列里，只有在执行完一个之后，才会继续执行下一个。</p>
+<p>这种调度策略很容易理解，但缺点也很明显。耗时的长任务会导致后提交的任务一直处于等待状态，如果这个集群是多人共享的，显然不太合理。因此 YARN 提供了另外两种调度策略，更加适合共享集群。下图是 FIFO Scheduler 执行过程的示意图：</p>
+<p><img src="/assets/images/2014/12/27/hadoop-best-practices-scheduling-in-yarn/001.png" alt=""></p>
+<h1 id="Capacity-Scheduler"><a href="#Capacity-Scheduler" class="headerlink" title="Capacity Scheduler"></a>Capacity Scheduler</h1><p>既然需要多人共享，那 Capacity Scheduler 就为每个人分配一个队列，每个队列占用的集群资源是固定的，但是可以不同，队列内部还是采用 FIFO 调度的策略。下图是 Capacity Scheduler 执行过程的示意图：</p>
+<p><img src="/assets/images/2014/12/27/hadoop-best-practices-scheduling-in-yarn/002.png" alt=""></p>
+<p>可以看到，队列 A 和 B 享有独立的资源，但是 A 所占的资源比重更多。如果任务在被执行的时候，集群恰好有空闲资源，比如队列 B 为空，那么调度器就可能分配更多的资源给队列 A，以更好地利用空闲资源。这种处理方式被叫做「queue elasticity」（弹性队列）。</p>
+<p>但是弹性队列也有一些副作用，如果此时队列 B 有了新任务，之前被队列 A 占用的资源并不会立即释放，只能等到队列 A 的任务执行完。为了防止某个队列过多占用集群资源，YARN 提供了一个设置可以控制某个队列能够占用的最大资源。但这其实又是跟弹性队列冲突的，因此这里有一个权衡的问题，这个最大值设为多少需要不断试验和尝试。</p>
+<p>Capacity Scheduler 的队列是支持层级关系的，即有子队列的概念。下面是一个示例配置文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.queues<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>prod,dev<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.dev.queues<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>eng,science<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.prod.capacity<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>40<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.dev.capacity<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>60<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.dev.maximum-capacity<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>75<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.dev.eng.capacity<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>50<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.scheduler.capacity.root.dev.science.capacity<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>50<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>所有队列的根队列叫做 root，这里一共有两个队列：dev 和 prod，dev 队列之下又有两个子队列：eng 和 science。dev 和 prod 分别占用了 60% 和 40% 的资源比重，同时限制了 dev 队列能够伸缩到的最大资源比重是 75%，换句话说，prod 队列至少能有 25% 的资源分配。eng 和 science 队列各占 50%，但因为没有设置最大值，所以有可能出现某个队列占用整个父队列资源的情况。</p>
+<p>除了设置队列层级关系和资源分配比重之外，Capacity Scheduler 还提供了诸如控制每个用户或者任务最大占用资源、同时执行的最大任务数，以及队列的 ACL 等配置，详细请参考<a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/CapacityScheduler.html" target="_blank" rel="noopener">官方文档</a>。</p>
+<h2 id="队列放置"><a href="#队列放置" class="headerlink" title="队列放置"></a>队列放置</h2><p>分配好了队列，要怎么控制任务在指定队列执行呢？如果是 MapReduce 程序，那么可以通过 mapreduce.job.queuename 来设置执行队列，默认情况是在 default 队列执行。注意指定的队列名不需要包含父队列，即不能写成 root.dev.eng，而应该写 eng。</p>
+<h1 id="Fair-Scheduler"><a href="#Fair-Scheduler" class="headerlink" title="Fair Scheduler"></a>Fair Scheduler</h1><p>Fair Scheduler 试图为每个任务均匀分配资源，比如当前只有任务 1 在执行，那么它拥有整个集群资源，此时任务 2 被提交，那任务 1 和任务 2 将平分集群资源，以此类推。</p>
+<p>当然 Fair Scheduler 也支持队列的概念，下图是执行过程的示意图：</p>
+<p><img src="" alt=""></p>
+<p>队列 A 首先执行任务，任务 1 拥有整个集群资源，随后队列 B 增加任务 2，这两个队列均分资源，接着任务 3 被提交到队列 B，但这并不会影响队列 A，任务 3 将会跟任务 2 一起均分资源。</p>
+<h2 id="开启-Fair-Scheduler"><a href="#开启-Fair-Scheduler" class="headerlink" title="开启 Fair Scheduler"></a>开启 Fair Scheduler</h2><p>设置 yarn.resourcemanager.scheduler.class 为 org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler（在 yarn-site.xml），如果你使用的是 CDH，那默认就是 Fair Scheduler<del>（事实上，CDH 也不支持 Capacity Scheduler）</del>。</p>
+<h2 id="队列设置"><a href="#队列设置" class="headerlink" title="队列设置"></a>队列设置</h2><p>Fair Scheduler 通过 fair-scheduler.xml 文件来进行各种设置，这个文件的位置可以通过 yarn.scheduler.fair.allocation.file 属性来控制（在 yarn-site.xml）。如果没有这个文件，Fair Scheduler 采取的策略将是：每个任务都放在以当前用户命名的队列中，如果这个队列不存在，将会自动创建。</p>
+<p>Fair Scheduler 也支持显式定义队列，就像 Capacity Scheduler 那样，下面是示例文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span><span class="meta">?&gt;</span></span></span><br><span class="line"><span class="tag">&lt;<span class="name">allocations</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">defaultQueueSchedulingPolicy</span>&gt;</span>fair<span class="tag">&lt;/<span class="name">defaultQueueSchedulingPolicy</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">queue</span> <span class="attr">name</span>=<span class="string">"prod"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>40<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">schedulingPolicy</span>&gt;</span>fifo<span class="tag">&lt;/<span class="name">schedulingPolicy</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">queue</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">queue</span> <span class="attr">name</span>=<span class="string">"dev"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">weight</span>&gt;</span>60<span class="tag">&lt;/<span class="name">weight</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">queue</span> <span class="attr">name</span>=<span class="string">"eng"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">queue</span> <span class="attr">name</span>=<span class="string">"science"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">queue</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">queuePlacementPolicy</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rule</span> <span class="attr">name</span>=<span class="string">"specified"</span> <span class="attr">create</span>=<span class="string">"false"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rule</span> <span class="attr">name</span>=<span class="string">"primaryGroup"</span> <span class="attr">create</span>=<span class="string">"false"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rule</span> <span class="attr">name</span>=<span class="string">"default"</span> <span class="attr">queue</span>=<span class="string">"dev.eng"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">queuePlacementPolicy</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">allocations</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里自定义了两个队列：prod 和 dev，权重比是 40:60，也就是说不采用均分的策略。每个队列可以有不同的调度策略，默认都是 fair，此外还有 FIFO、Dominant Resource Fairness（drf，后面会讲到）。详细的配置信息可以查看<a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/FairScheduler.html" target="_blank" rel="noopener">官方文档</a>。</p>
+<h2 id="队列放置-1"><a href="#队列放置-1" class="headerlink" title="队列放置"></a>队列放置</h2><p>不同于 Capacity Scheduler，Fair Scheduler 是通过规则来决定放置的队列，即前面配置文件中的 queuePlacementPolicy 设置。第一个规则 specified 代表如果任务自己指定了队列，就放置到这个队列，如果没有指定，或者指定的队列不存在，就采用下一条规则。primaryGroup 规则的意思是试图将任务放置到当前用户的主要 Unix 组，如果这个队列不存在则继续下一条规则。default 规则会匹配所有任务，示例文件的意思是放置到 dev.eng 队列中。</p>
+<p>queuePlacementPolicy 可以省略，如果不设置，那么默认的规则如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">queuePlacementPolicy</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">rule</span> <span class="attr">name</span>=<span class="string">"specified"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">rule</span> <span class="attr">name</span>=<span class="string">"user"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">queuePlacementPolicy</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>也就是说除非显式指定队列，那么将会使用当前用户名作为队列，并且如果队列不存在将会自动创建。</p>
+<h2 id="中断（Preempt）"><a href="#中断（Preempt）" class="headerlink" title="中断（Preempt）"></a>中断（Preempt）</h2><p>当一个任务被提交到一个空队列，但是集群不太空闲的时候，这个任务不会被立即执行，需要等待其它任务执行完毕让出资源。为了等待时间更加可控，Fair Scheduler 支持「中断」（preemption）。</p>
+<p>中断的意思是调度器会通过强行结束 container 执行的方式来释放资源，在满足某些条件的情况下。注意中断是以牺牲集群性能为代价的一种做法，因为被强行结束的 container 需要重新执行。</p>
+<p>通过设置 yarn.scheduler.fair.preemption 为 true 来开启中断（在 yarn-site.xml），同时还需要设置另外两个超时属性中的至少一个（在 fair-scheduler.xml），超时的单位都是秒。</p>
+<p>defaultMinSharePreemptionTimeout 或 minSharePreemptionTimeout：如果一个队列等待当前设置的超时时间之后还是没有分配到应该分配的最小资源，那么调度器就会去中断其它 container。<br>defaultFairSharePreemptionTimeout 或 fairSharePreemptionTimeout：如果一个队列等待当前设置的超时时间之后还是没有分配到应该分配的资源的一半以上，那么调度器就会去中断其它 container。defaultFairSharePreemptionThreshold 或 fairSharePreemptionThreshold 可以用来调节阈值，默认是 0.5。</p>
+<h1 id="延迟调度"><a href="#延迟调度" class="headerlink" title="延迟调度"></a>延迟调度</h1><p>以上三种调度都遵从 locality 原则。在一个繁忙的集群里，当一个任务请求一个节点的时候有很大概率这个节点正被其它 container 占用，比较显而易见的做法可能是立即寻找同一机柜里的其它节点。但是经过实际观察，如果稍微等待一段时间（秒级），分配到当前请求节点的概率将显著增加。这种策略叫做「延迟调度」（delay scheduling），Capacity Scheduler 和 Fair Scheduler 都支持这种策略。</p>
+<p>每一个 node manager 会定期发送心跳给 resource manager，这其中就包含了该 node manager 正在运行的 container 数量以及可以分配给新 container 的资源。当采用延迟调度策略时，调度器并不会立即使用收集到的信息，而会等待一段时间，以达到遵从 locality 的目的。</p>
+<p>Capacity Scheduler 的延迟调度通过 yarn.scheduler.capacity.node-locality-delay 来配置，这是一个正整数，假设是 n，表示调度器将会放弃前 n 条心跳信息。</p>
+<p>Fair Scheduler 的延迟调度通过 yarn.scheduler.fair.locality.threshold.node 来设置，这是一个 0~1 之间的浮点数，例如是 0.5，表示调度器将会等待超过一半的节点发送心跳信息之后再决定。</p>
+<h1 id="Dominant-Resource-Fairness-DRF"><a href="#Dominant-Resource-Fairness-DRF" class="headerlink" title="Dominant Resource Fairness (DRF)"></a>Dominant Resource Fairness (DRF)</h1><p>如果只有一种资源类型需要调度，例如内存，那资源容量的概念将会很简单，比如均分资源，就代表均分内存。但是如果有多种资源类型，例如再加上 CPU，事情就变得复杂了。如果一个任务需要很多的 CPU，但是很少的内存，而另一个任务需要很少的 CPU，很多的内存，这两个任务要如何比较呢？</p>
+<p>Dominant Resource Fairness（DRF）就是用来干这种事情的，下面举例说明是什么意思。</p>
+<p>假设一个集群总共有 100 个 CPU，10 TB 内存。任务 A 需要 2 个 CPU，300 GB 内存。任务 B 需要 6 个 CPU，100 GB 内存。那么 A 所需资源占集群的比重是 2% 和 3%，因为内存的比重更大，那么就可以以 3% 这个比重来整体衡量 A。同理，比较之后 B 的最终比重是 6%。因此任务 B 需要两倍于任务 A 的资源（6% 比 3%），如果是均分（fair）策略，那么 B 的 container 数量将会是 A 的一半。</p>
+<p>DRF 没有默认使用，因此在计算资源的时候只考虑了内存，而忽略了 CPU。Capacity Scheduler 需要设置 yarn.scheduler.capacity.resource-calculator 为 org.apache.hadoop.yarn.util.resource.DominantResourceCalculator（在 capacity-scheduler.xml）；Fair Scheduler 需要设置 defaultQueueSchedulingPolicy 为 drf。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>FIFO Scheduler 显然不适用于生产环境；Capacity Scheduler 概念简单，但缺乏灵活性；Fair Scheduler 最复杂，但具有足够的灵活性以及更好的资源利用率。</p>
+<hr>
+<ul>
+<li>Author: <a href="http://blog.xiaogaozi.org/" target="_blank" rel="noopener">Freedom</a></li>
+<li>Link: <a href="http://blog.xiaogaozi.org/2014/12/27/hadoop-best-practices-scheduling-in-yarn/" target="_blank" rel="noopener">Hadoop Best Practices: Scheduling in YARN</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/YARN/" rel="tag"># YARN</a>
+          
+            <a href="/tags/Scheduling/" rel="tag"># Scheduling</a>
+          
+            <a href="/tags/HADOOP/" rel="tag"># HADOOP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-09-30-virtualization-performance-analysis-xen-kvm-lxc/" rel="next" title="虚拟化性能分析（XEN/KVM/LXC) ">
+                <i class="fa fa-chevron-left"></i> 虚拟化性能分析（XEN/KVM/LXC) 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-01-21-history-and-principle-data-compression-algorithm/" rel="prev" title="数据压缩的历史、原理及常用算法">
+                数据压缩的历史、原理及常用算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FIFO-Scheduler"><span class="nav-text">FIFO Scheduler</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Capacity-Scheduler"><span class="nav-text">Capacity Scheduler</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#队列放置"><span class="nav-text">队列放置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fair-Scheduler"><span class="nav-text">Fair Scheduler</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#开启-Fair-Scheduler"><span class="nav-text">开启 Fair Scheduler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#队列设置"><span class="nav-text">队列设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#队列放置-1"><span class="nav-text">队列放置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中断（Preempt）"><span class="nav-text">中断（Preempt）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#延迟调度"><span class="nav-text">延迟调度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Dominant-Resource-Fairness-DRF"><span class="nav-text">Dominant Resource Fairness (DRF)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

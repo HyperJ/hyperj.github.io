@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hadoop,Security," />
+
+
+<meta name="description" content="前言在2014年初，我们将线上使用的 Hadoop 1.0 集群切换到 Hadoop 2.2.0 稳定版， 与此同时部署了 Hadoop 的安全认证。本文主要介绍在 Hadoop 2.2.0 上部署安全认证的方案调研实施以及相应的解决方法。 背景集群安全措施相对薄弱最早部署Hadoop集群时并没有考虑安全问题，随着集群的不断扩大， 各部门对集群的使用需求增加，集群安全问题就显得颇为重要。说到安全问">
+<meta name="keywords" content="Hadoop,Security">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop安全实践">
+<meta property="og:url" content="http://hyperj.github.com/2014/2014-03-24-hadoop-security-practice/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="前言在2014年初，我们将线上使用的 Hadoop 1.0 集群切换到 Hadoop 2.2.0 稳定版， 与此同时部署了 Hadoop 的安全认证。本文主要介绍在 Hadoop 2.2.0 上部署安全认证的方案调研实施以及相应的解决方法。 背景集群安全措施相对薄弱最早部署Hadoop集群时并没有考虑安全问题，随着集群的不断扩大， 各部门对集群的使用需求增加，集群安全问题就显得颇为重要。说到安全问">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/24/hadoop-security-practice/yarn-mr.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.899Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hadoop安全实践">
+<meta name="twitter:description" content="前言在2014年初，我们将线上使用的 Hadoop 1.0 集群切换到 Hadoop 2.2.0 稳定版， 与此同时部署了 Hadoop 的安全认证。本文主要介绍在 Hadoop 2.2.0 上部署安全认证的方案调研实施以及相应的解决方法。 背景集群安全措施相对薄弱最早部署Hadoop集群时并没有考虑安全问题，随着集群的不断扩大， 各部门对集群的使用需求增加，集群安全问题就显得颇为重要。说到安全问">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2014/03/24/hadoop-security-practice/yarn-mr.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2014/2014-03-24-hadoop-security-practice/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>Hadoop安全实践 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2014/2014-03-24-hadoop-security-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Hadoop安全实践</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2014-03-24T00:00:00+08:00">2014-03-24</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Hadoop/" itemprop="url" rel="index"><span itemprop="name">Hadoop</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在2014年初，我们将线上使用的 Hadoop 1.0 集群切换到 <a href="http://hadoop.apache.org/releases.html#15+October%2C+2013%3A+Release+2.2.0+available" target="_blank" rel="noopener">Hadoop 2.2.0 稳定版</a>， 与此同时部署了 Hadoop 的安全认证。本文主要介绍在 Hadoop 2.2.0 上部署安全认证的方案调研实施以及相应的解决方法。</p>
+<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h4 id="集群安全措施相对薄弱"><a href="#集群安全措施相对薄弱" class="headerlink" title="集群安全措施相对薄弱"></a>集群安全措施相对薄弱</h4><p>最早部署Hadoop集群时并没有考虑安全问题，随着集群的不断扩大， 各部门对集群的使用需求增加，集群安全问题就显得颇为重要。说到安全问题，一般包括如下方面:</p>
+<ul>
+<li><p>用户认证(Authentication)</p>
+<p> 即是对用户身份进行核对， 确认用户即是其声明的身份， 这里包括用户和服务的认证。</p>
+</li>
+<li><p>用户授权(Authorization)</p>
+<p> 即是权限控制，对特定资源， 特定访问用户进行授权或拒绝访问。用户授权是建立再用户认证的基础上， 没有可靠的用户认证谈不上用户授权。</p>
+</li>
+</ul>
+<p>未开启安全认证时，Hadoop 是以客户端提供的用户名作为用户凭证， 一般即是发起任务的Unix 用户。一般线上机器部署服务会采用统一账号，当以统一账号部署集群时，所有执行 Hadoop 任务的用户都是集群的超级管理员，容易发生误操作。即便是以管理员账号部署集群，恶意用户在客户端仍然可以冒充管理员账号执行。</p>
+<h4 id="集群整体升级到-hadoop-2-0"><a href="#集群整体升级到-hadoop-2-0" class="headerlink" title="集群整体升级到 hadoop 2.0"></a>集群整体升级到 hadoop 2.0</h4><p>2013年10月份 Hadoop 2.2.0 发布，作为 Apache Hadoop 2.X 的 GA 版本。我们考虑将集群整体升级 Hadoop 2.2.0，进入 yarn 时代。与此同时，我们计划在升级过程中一并把集群安全工作做到位，主要基于以下考虑:</p>
+<ul>
+<li><p>与升级工作一样，安全同样是基础工作，把安全搞好会方便我们后续的工作，否则会成为下一个阻碍。</p>
+</li>
+<li><p>所谓基础工作，就是越往后改动越难的工作，目前不做，将来依赖更多，开展代价更大。</p>
+</li>
+</ul>
+<p>综上，我们的需求是在低版本hadoop升级到Yarn的过程中部署Hadoop安全认证，做好认证之后我们可以在此之上开启适当的权限控制(hdfs， 队列)。</p>
+<h3 id="方案调研"><a href="#方案调研" class="headerlink" title="方案调研"></a>方案调研</h3><p>在方案调研之前先明确以下安全实践的原则，如下:</p>
+<ul>
+<li><p>做为一个后端服务平台，部署安全的主要目的是防止用户误操作导致的事故(比如误删数据，误操作等)</p>
+</li>
+<li><p>做安全是为了开放，开放的前提是保证基本的安全，数据安全与平台安全</p>
+</li>
+<li><p>在保证安全的前提下，尽量简化运维</p>
+</li>
+</ul>
+<p>分析我们遇到的问题，这里我们需要调研:</p>
+<ul>
+<li><p>账号拆分与相应管理方案</p>
+</li>
+<li><p>开启 Hadoop 安全认证</p>
+</li>
+<li><p>客户端针对安全认证的相应调整</p>
+</li>
+</ul>
+<h4 id="账号拆分与相应管理方案"><a href="#账号拆分与相应管理方案" class="headerlink" title="账号拆分与相应管理方案"></a>账号拆分与相应管理方案</h4><h5 id="集群账号管理"><a href="#集群账号管理" class="headerlink" title="集群账号管理"></a>集群账号管理</h5><p>原先我们使用单一账号作为集群管理员，且这一账号为线上统一登录账号， 这存在极大的安全隐患。我们需要使用特殊账号来管理集群。这里涉及的问题是，我们需要几个运维账号呢?</p>
+<p>一种简单的做法是使用一个特殊运维账号(比如 hadoop)， <a href="https://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_3_2.html" target="_blank" rel="noopener">CDH</a> 和 <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html" target="_blank" rel="noopener">Apache官方</a> 都推荐按服务划分分账号来启动集群:</p>
+<table>
+<thead>
+<tr>
+<th>User:Group</th>
+<th>Daemons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hdfs:hadoop</td>
+<td>NameNode， Secondary NameNode， Checkpoint Node， Backup Node， DataNode</td>
+</tr>
+<tr>
+<td>yarn:hadoop</td>
+<td>ResourceManager， NodeManager</td>
+</tr>
+<tr>
+<td>mapred:hadoop</td>
+<td>MapReduce JobHistory Server</td>
+</tr>
+</tbody>
+</table>
+<p>考虑到精细化控制可以有效避免误操作，这里我们遵循官方的建议使用多账号。</p>
+<p>在从单一运维账号迁移到多个账号部署时，需要考虑相关文件权限问题，包括本地以及hdfs两部分，这可以在安全部署上线时完成相应改动。</p>
+<h5 id="用户账号管理"><a href="#用户账号管理" class="headerlink" title="用户账号管理"></a>用户账号管理</h5><p>美团很多小组都有使用 Hadoop 来进行大数据处理需求， 故需要一定程度的 <a href="http://en.wikipedia.org/wiki/Multitenancy" target="_blank" rel="noopener">多租户环境</a>， 这里主要考虑其中的数据和操作的权限问题。hdfs 本身仅提供类 Unix 的权限系统， 默认的组概念也相对鸡肋。鉴于此，在多用户的管理上可以有简单粗暴的方案:</p>
+<blockquote>
+<p>不同组有各自的根目录，使用不同的账号，对组内文件有全部权限。不同组之间相互不能访问数据(除非手动修改)。</p>
+</blockquote>
+<p>在一个集中的数据仓库环境下，又要生产各个部门的统计数据的话，上述策略不够灵活。目前Cloudera 有一个精细化权限控制的解决方案 <a href="http://www.ibm.com/developerworks/security/library/se-hadoop/index.html" target="_blank" rel="noopener">Sentry</a>， 支持 Role based 的权限管理。由于其定制化较高，不方便使用， 故暂未考虑。</p>
+<h4 id="开启-Hadoop-安全认证"><a href="#开启-Hadoop-安全认证" class="headerlink" title="开启 Hadoop 安全认证"></a>开启 Hadoop 安全认证</h4><p>Hadoop 的安全认证是基于 <a href="http://web.mit.edu/kerberos/" target="_blank" rel="noopener">Kerberos</a> 实现的。 Kerberos 是一个网络身份验证协议，用户只需输入身份验证信息，验证通过获取票据即可访问多个接入 Kerberos 的服务， 机器的单点登录也可以基于此协议完成的。 Hadoop 本身并不创建用户账号，而是使用 Kerberos 协议来进行用户身份验证，从Kerberos凭证中的用户信息获取用户账号， 这样一来跟实际用户运行的账号也无关。</p>
+<p>这里我们从 YARN 上的 MR 任务提交过程简单说明一下:</p>
+<p><img src="/assets/images/2014/03/24/hadoop-security-practice/yarn-mr.png" alt=""></p>
+<ul>
+<li><p>用户执行任务前，先通过KDC认证自己，获取TGT(Ticket Granting Ticket)。KDC是 Kerberos 认证的中心服务，存储用户和服务的认证信息。</p>
+</li>
+<li><p>用户通过 TGT 向 KDC 请求访问服务的Ticket， KDC 生成 session key 后一并发给客户端。</p>
+</li>
+<li><p>客户端通过 service ticket 向服务认证自己，完成身份认证。</p>
+</li>
+<li><p>完成身份认证后客户端向服务请求若干token供后续任务执行认证使用(比如 HDFS NameNode Delegation Token, YARN ResourceManager Delegation Token)</p>
+</li>
+<li><p>客户端连同获取到的 token 一并提交任务，后续任务执行使用 token 进行来自服务的认证</p>
+</li>
+</ul>
+<p>从上可以看出，出于性能的考虑，Hadoop 安全认证体系中仅在用户跟服务通信以及各个服务之间通信适用 Kerberos 认证，在用户认证后任务执行，访问服务，读取/写入数据等均采用 <a href="http://hortonworks.com/blog/the-role-of-delegation-tokens-in-apache-hadoop-security/" target="_blank" rel="noopener">特定服务(NameNode， Resource Manager)发起访问token，让需求方凭借 token 访问相应服务和数据</a>。这里 token 的传递，认证以及更新不做深入讨论。</p>
+<p>关于开启 Hadoop 安全认证， <a href="https://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_3.html" target="_blank" rel="noopener">Cloudera</a> 有详细的文档介绍。由于自身环境以及部署运维的考虑，最终的部署方案有些许出入， 一一说明。</p>
+<h5 id="Kerberos-部署"><a href="#Kerberos-部署" class="headerlink" title="Kerberos 部署"></a>Kerberos 部署</h5><p>Hadoop 安全认证需要一个 Kerberos 集群， <a href="http://techpubs.spinlocksolutions.com/dklar/kerberos.html" target="_blank" rel="noopener">部署 Kerberos</a> 需要部署KDC。 由于我们的环境中使用 <a href="http://www.freeipa.org/page/About" target="_blank" rel="noopener">freeIPA</a> 进行主机认证相关的权限控制，已经集成 Kerberos 服务， 故不需要另外部署。</p>
+<p>Kerberos 相关的运维操作， 比如添加用户，服务，导出keytab，均可以通过 ipa 相关接口来进行。</p>
+<h5 id="Container-的选择"><a href="#Container-的选择" class="headerlink" title="Container 的选择"></a>Container 的选择</h5><p>从上图可以看出用户发起的任务是在特定的容器(Container)内执行的， 一开始我们考虑使用DefaultContainer 而不是官方推荐的 LinuxContainer， 缺点是对任务之间的物理隔离以及防范恶意任务方面会有缺陷， 不过方便部署，使用LinuxContainer需要在集群各台机器上部署用户账号。</p>
+<p>实际测试发现由于<a href="https://issues.apache.org/jira/browse/MAPREDUCE-5208" target="_blank" rel="noopener">MAPREDUCE-5208</a>的引入，在 hadoop 2.2.0 上开启安全认证后<a href="https://issues.apache.org/jira/browse/YARN-1432" target="_blank" rel="noopener">无法使用 DefaultContainer</a>。</p>
+<p>这里不希望对代码有过多定制化的修改，我们考虑还是使用 LinuxContainer， 需要解决一下问题:</p>
+<ul>
+<li><p>用户账号创建</p>
+<p> 我们需要在集群内添加所有可能的任务发起用户账号。借助 freeipa 的统一的用户管理 ， 我们只需要在 freeipa 上添加相应用户即可。</p>
+</li>
+<li><p>container-executor 和 container-executor.cfg 的部署</p>
+<p> <a href="https://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_18.html?scroll=topic_18_unique_2" target="_blank" rel="noopener">container-executor</a> 作为Yarn 的 container 执行程序，有一系列的权限要求:</p>
+<blockquote>
+<p>Be owned by root<br>Be owned by a group that contains only the user running the YARN daemons<br>Be setuid<br>Be group readable and executable</p>
+</blockquote>
+</li>
+</ul>
+<p>配置 container-executor.cfg 不仅需要是owned by root，且其所在目录同样需要 owned by root。这两者都给自动化部署带来不便，鉴于此部分比较独立且基本不会改变，我们可以将其加入集群机器的 puppet 管理当中。</p>
+<h5 id="DataNode-启动方式"><a href="#DataNode-启动方式" class="headerlink" title="DataNode 启动方式"></a>DataNode 启动方式</h5><p>CDH 推荐的datanode 的启动方式需要使用低端口并且使用jsvc发布， 在运维方面也不太方便。这里我们通过配置ignore.secure.ports.for.testing=true来启动datanode， 规避这些约束。</p>
+<h4 id="客户端针对安全认证的相应调整"><a href="#客户端针对安全认证的相应调整" class="headerlink" title="客户端针对安全认证的相应调整"></a>客户端针对安全认证的相应调整</h4><p>集群开启安全认证之后， 依赖集群的客户端(脚本， 服务)都需要做相应修改，不过改动基本无异。大部分服务都已包括对 Kerberos 认证的相应处理， 基本不需要修改。</p>
+<p>这里首先得说明一下开启安全认证后的认证方式:</p>
+<ul>
+<li><p>使用密码认证</p>
+<p> 使用用户密码通过kinit认证， 获取到的TGT存在本地凭证缓存当中， 供后续访问服务认证使用。一般在交互式访问中使用。</p>
+</li>
+<li><p>使用 <a href="http://kb.iu.edu/data/aumh.html**" target="_blank" rel="noopener">keytab</a> 认证</p>
+<p> 用户通过导出的keytab 可以免密码进行用户认证， 后续步骤一致。一般在应用程序中配置使用。</p>
+</li>
+</ul>
+<p>Kerberos 凭证(ticket) 有两个属性， ticket_lifetime 和 renew_lifetime。其中 ticket_lifetime 表明凭证生效的时限，一般为24小时。在凭证失效前部分凭证可以延期失效时间(即Renewable)， renew_lifetime 表明凭证最长可以被延期的时限，一般为一个礼拜。当凭证过期之后，对安全认证的服务的后续访问则会失败。这里第一个问题就是如何处理凭证过期。</p>
+<h5 id="凭证过期处理策略"><a href="#凭证过期处理策略" class="headerlink" title="凭证过期处理策略"></a>凭证过期处理策略</h5><p>在最早的 <a href="https://issues.apache.org/jira/browse/HADOOP-4487" target="_blank" rel="noopener">Security features for Hadoop</a> 设计中提出这样的假设:</p>
+<blockquote>
+<p>A Hadoop job will run no longer than 7 days (configurable) on a MapReduce cluster or accessing HDFS from the job will fail.</p>
+</blockquote>
+<p>对于一般的任务， 24小时甚至延迟到一周的凭证时限是足够充分的。所以大部分时间我们只需要在执行操作之前使用 kinit 认证一遍，再起后台任务进行周期性凭证更新即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">while true ; do kinit -R; sleep $((3600 * 6)) ; done &amp;</span><br></pre></td></tr></table></figure>
+<p>不过对于需要常驻的访问Hadoop集群的服务来说，上述假设就不成立了。这时候我们可以</p>
+<ul>
+<li><p>扩大 ticket_lifetime 和 renew_lifetime 时限</p>
+<p> 扩大凭证存活时限可以解决此问题，但由于Kerberos跟我们线上用户登陆认证绑定，会带来安全隐患，故不方便修改。</p>
+</li>
+<li><p>定期重新进行kinit 认证更新凭证。</p>
+<p> 不仅仅是定期延长认证时间，可以直接定期重新认证以延长凭证有限期限。一般我们需要导出 keytab 来进行定期认证的操作。</p>
+</li>
+</ul>
+<p>Hadoop 将 Kerberos 认证部分进行了一定的封装，实际上并不需要那么复杂， 这里重点可以看看 UserGroupInformation 这个类。</p>
+<h5 id="UserGroupInformation"><a href="#UserGroupInformation" class="headerlink" title="UserGroupInformation"></a>UserGroupInformation</h5><p>UserGroupInformation 这个类在 <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/jaas/JAASRefGuide.html#Core" target="_blank" rel="noopener">JAAS</a> 框架上封装了 Hadoop 的用户信息， 更确切地说是对 Subject 做了一层封装。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">UserGroupInformation(Subject subject) &#123;</span><br><span class="line">  <span class="keyword">this</span>.subject = subject;</span><br><span class="line">  <span class="keyword">this</span>.user = subject.getPrincipals(User.class).iterator().next();</span><br><span class="line">  <span class="keyword">this</span>.isKeytab = !subject.getPrivateCredentials(KerberosKey.class).isEmpty();</span><br><span class="line">  <span class="keyword">this</span>.isKrbTkt = !subject.getPrivateCredentials(KerberosTicket.class).isEmpty();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JAAS 是 Java 认证和授权服务（Java Authentication and Authorization Service）的缩写， 主要包含以下几个实体:</p>
+<ul>
+<li><p>Subject</p>
+<p> Subject 是一个不可继承的实体类，它标志一个请求的来源， 包含相关的凭证标识(Principal) 和 公开和私有的凭据(Credential)。</p>
+</li>
+<li><p>Principal</p>
+<p> 凭证标识，认证成功后，一个 Subject 可以被关联多个Principal。</p>
+</li>
+<li><p>Credential</p>
+<p> 凭据，有公有凭据以及私有凭据。</p>
+</li>
+</ul>
+<p>JAAS的认证过程如下:</p>
+<blockquote>
+<p>An application instantiates a LoginContext.<br>The LoginContext consults a Configuration to load all of the LoginModules configured for that application.<br>The application invokes the LoginContext’s login method.<br>The login method invokes all of the loaded LoginModules. Each LoginModule attempts to authenticate the subject. Upon success， LoginModules associate relevant Principals and credentials with a Subject object that represents the subject being authenticated.<br>The LoginContext returns the authentication status to the application.<br>If authentication succeeded， the application retrieves the Subject from the LoginContext.</p>
+</blockquote>
+<p>需要认证的代码片段可以包装在 <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/doprivileged.html" target="_blank" rel="noopener">doPrivileged</a> 当中， 可以直接使用 Subject.doAs 方法，支持嵌套。</p>
+<p>在安全模式下，UGI 支持不同LoginContext 配置， 均是通过 HadoopConfiguration 类动态产生:</p>
+<ul>
+<li><p>hadoop-user-kerberos</p>
+<p> 使用kerberos缓存凭证登陆的配置， useTicketCache 置为 true.</p>
+</li>
+<li><p>hadoop-keytab-kerberos</p>
+<p> 使用keytab登陆的配置， useKeyTab 置为 true.</p>
+</li>
+</ul>
+<p>UGI 当中有多处认证， getLoginUser 方法使用 hadoop-user-kerberos 配置认证:</p>
+<ul>
+<li><p>通过配置生成 LoginContext</p>
+</li>
+<li><p>调用 LoginContext.login 方法完成登陆， 通过 ticket cache 中凭证完成登陆</p>
+</li>
+<li><p><a href="https://issues.apache.org/jira/browse/HADOOP-8561" target="_blank" rel="noopener">判断是否需要其他用户身份(proxy user)执行</a></p>
+</li>
+<li><p>将 HADOOP_TOKEN_FILE_LOCATION 中的 token 加入 Credentials 集合当中</p>
+</li>
+<li><p>另起一个线程做周期性的凭证更新 spawnAutoRenewalThreadForUserCreds</p>
+</li>
+</ul>
+<p>步骤5可以看出当我们存在凭证后并不需要主动做周期性地凭证更新。</p>
+<p>而 loginUserFromKeytab 方法使用 hadoop-kerberos 配置认证:</p>
+<ul>
+<li><p>通过配置生成 LoginContext</p>
+</li>
+<li><p>调用 LoginContext.login 方法完成登陆， 使用keytab完成登陆</p>
+</li>
+</ul>
+<p>loginUserFromKeytab 没有对凭证做周期的更新， 那怎么保证凭证不会过期呢?</p>
+<ul>
+<li><p>在访问集群执行相关操作前， 可以调用 checkTGTAndReloginFromKeytab 来尝试更新凭证(实际上是重新登陆了)</p>
+</li>
+<li><p>在凭证过期时，创建 IPC 失败会触发调用 reloginFromKeytab 来重新登陆</p>
+</li>
+</ul>
+<p>Client.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">handleSaslConnectionFailure</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">final</span> <span class="keyword">int</span> currRetries， <span class="keyword">final</span> <span class="keyword">int</span> maxRetries， <span class="keyword">final</span> Exception ex，</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">final</span> Random rand， <span class="keyword">final</span> UserGroupInformation ugi)</span> <span class="keyword">throws</span> IOException，</span></span><br><span class="line"><span class="function">    InterruptedException </span>&#123;</span><br><span class="line">  ugi.doAs(<span class="keyword">new</span> PrivilegedExceptionAction&lt;Object&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> IOException， InterruptedException </span>&#123;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">short</span> MAX_BACKOFF = <span class="number">5000</span>;</span><br><span class="line">      closeConnection();</span><br><span class="line">      disposeSasl();</span><br><span class="line">      <span class="keyword">if</span> (shouldAuthenticateOverKrb()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (currRetries &lt; maxRetries) &#123;</span><br><span class="line">          <span class="keyword">if</span>(LOG.isDebugEnabled()) &#123;</span><br><span class="line">            LOG.debug(<span class="string">"Exception encountered while connecting to "</span></span><br><span class="line">                + <span class="string">"the server : "</span> + ex);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="comment">// try re-login</span></span><br><span class="line">          <span class="keyword">if</span> (UserGroupInformation.isLoginKeytabBased()) &#123;</span><br><span class="line">            UserGroupInformation.getLoginUser().reloginFromKeytab();</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            UserGroupInformation.getLoginUser().reloginFromTicketCache();</span><br><span class="line">          &#125;</span><br></pre></td></tr></table></figure>
+<p>可见如果是使用 keytab 认证的话，认证是长期有效的。</p>
+<p>从上述代码中可以看到，不论是否是keytab认证，创建IPC失败均会尝试重新登陆。</p>
+<h5 id="基于keytab-的Kerberos认证方式"><a href="#基于keytab-的Kerberos认证方式" class="headerlink" title="基于keytab 的Kerberos认证方式"></a>基于keytab 的Kerberos认证方式</h5><p>为了让用户免于记忆密码，我们可以考虑导出并交付keytab给相关用户(前提是用户数量可控， 比如是以虚拟用户为单位)。</p>
+<p>这样，用户的Hadoop任务认证方式可以有:</p>
+<ul>
+<li><p>直接使用 keytab kinit 之后访问</p>
+</li>
+<li><p>或者调用 loginUserFromKeytab 完成登录，然后将代码片段包裹在 UGI 的 doAs 方法当中执行</p>
+</li>
+</ul>
+<h3 id="上线部署"><a href="#上线部署" class="headerlink" title="上线部署"></a>上线部署</h3><p>确定了部署方案之后， 我们在升级 hadoop 版本的同时完成了安全认证的部署。在部署和使用中我们遇到若干问题，这里一一说明。</p>
+<h4 id="JCE-部署"><a href="#JCE-部署" class="headerlink" title="JCE 部署"></a>JCE 部署</h4><p>开启安全认证时发现 Kerberos 认证不通过:</p>
+<blockquote>
+<p>Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Checksum failed)]</p>
+</blockquote>
+<p>由于我们部署的Kerberos默认使用 AES-256 加密， 需要在Hadoop环境(集群以及客户端)上安装 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="noopener">Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy File</a>， 否则Kerberos认证不通过。可以通过此 <a href="https://gist.github.com/jehrhardt/5167854" target="_blank" rel="noopener">gist</a> 验证改动是否生效。此步骤可以添加到puppet当中。</p>
+<h4 id="SNN-getimage-返回-NPE"><a href="#SNN-getimage-返回-NPE" class="headerlink" title="SNN getimage 返回 NPE"></a>SNN getimage 返回 NPE</h4><p>开启安全认证发现 SNN 持续由于 getimage 报错NPE 退出， 相关错误如下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">2013-12-29 23:56:19，572 DEBUG org.apache.hadoop.security.authentication.server.AuthenticationFilter: Request [http://XXX.com:50070/getimage?getimage=1&amp;txid=8627&amp;storageInfo=-47:200271</span><br><span class="line">8265:0:CID-3dce02cb-a1c2-4ab8-8b12-f23bbefd7bcc] triggering authentication</span><br><span class="line">2013-12-29 23:56:19，580 WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: Authentication exception: GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified</span><br><span class="line"> version of key is not available (44))</span><br><span class="line">org.apache.hadoop.security.authentication.client.AuthenticationException: GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))</span><br><span class="line">        at org.apache.hadoop.security.authentication.server.KerberosAuthenticationHandler.authenticate(KerberosAuthenticationHandler.java:360)</span><br><span class="line">        at org.apache.hadoop.security.authentication.server.AuthenticationFilter.doFilter(AuthenticationFilter.java:349)</span><br></pre></td></tr></table></figure>
+<p>根据报错信息 Specified version of key is not available 发现是由于同一个 HTTP 凭证被导出多遍导致之前的keytab中的凭证失效了，重新生成部署所需的 keytab 即可。</p>
+<p>这里的提醒就是不要重复导出相同的凭证， 以防止已经分发使用的keytab中的凭证失效。</p>
+<h4 id="Balancer-执行过长导致认证过期"><a href="#Balancer-执行过长导致认证过期" class="headerlink" title="Balancer 执行过长导致认证过期"></a>Balancer 执行过长导致认证过期</h4><p>在部署安全认证之后， 我们对hdfs数据进行 balance 就需要预先认证一下再执行， 这样就会遇到我们之前说的认证期限的问题。</p>
+<p>这里有两种方式可以解决此问题:</p>
+<ul>
+<li><p>添加外部定时任务重新认证， 刷新凭证缓存， 延迟凭证有效期限。</p>
+</li>
+<li><p>可以写一个小代码对 balance 的入口 org.apache.hadoop.hdfs.server.balancer.Balancer 进行一点封装，将其封装在一个 doAs 当中， 类似 <a href="http://grepcode.com/file/repository.cloudera.com/content/repositories/releases/com.cloudera.hue/sudo-shell/1.2.0-cdh3u0/com/cloudera/hue/SudoFsShell.java?av=f" target="_blank" rel="noopener">hue 中的 SudoFsShell 一样的思路</a></p>
+</li>
+</ul>
+<h4 id="sssd-服务认证异常"><a href="#sssd-服务认证异常" class="headerlink" title="sssd 服务认证异常"></a>sssd 服务认证异常</h4><p><a href="https://issues.apache.org/jira/browse/HADOOP-10041" target="_blank" rel="noopener">sssd</a> 是指我们用于线上登陆认证的一个底层服务，在过去一段时间内经常出现问题退出，导致用户登录动作hang住，进而导致相关任务执行失败。部署Hadoop安全认证之后相关 kerberos 认证也走这个服务，增大了服务异常退出的概率。目前看起来sssd服务问题是由于系统版本过低sssd服务代码有bug导致，解决方案最方便的是升级系统或切换服务到新的机器。</p>
+<h4 id="“KDC-can’t-fulfill-requested-option-while-renewing-credentials”"><a href="#“KDC-can’t-fulfill-requested-option-while-renewing-credentials”" class="headerlink" title="“KDC can’t fulfill requested option while renewing credentials”"></a>“KDC can’t fulfill requested option while renewing credentials”</h4><p>应用执行日志偶尔会报如下错误:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2014-03-12 21:30:03，593 WARN  security.UserGroupInformation (UserGroupInformation.java:run(794)) - Exception encountered <span class="keyword">while</span> running the renewal <span class="built_in">command</span>. Aborting renew thread. org.apache.hadoop.util.Shell<span class="variable">$ExitCodeException</span>: kinit(v5): KDC can<span class="string">'t fulfill requested option while renewing credentials</span></span><br></pre></td></tr></table></figure>
+<p>表示 UGI的凭证更新线程失败退出了。目前<a href="https://issues.apache.org/jira/browse/HADOOP-10041" target="_blank" rel="noopener">HADOOP-10041</a> 记录了此问题，主要原因是由于凭证无法更新导致， 一般不需要特殊处理。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><p>Hadoop， Hbase， Zookeeper安全实践</p>
+</li>
+<li><p>YARN &amp; HDFS2 安装和配置Kerberos</p>
+</li>
+<li><p>CDH4 Security Guide</p>
+</li>
+<li><p>Kerberos ， the network authentication protocol</p>
+</li>
+<li><p>Kerberos Overview</p>
+</li>
+<li><p>Hadoop Kerberos安全机制介绍</p>
+</li>
+<li><p>Security Hadoop is here</p>
+</li>
+<li><p>Hadoop Security Analysis</p>
+</li>
+<li><p>The Role of Delegation Tokens in Apache Hadoop Security</p>
+</li>
+</ul>
+<hr>
+<ul>
+<li>原文链接：<a href="http://tech.meituan.com/hadoop-security-practice.html" target="_blank" rel="noopener">Hadoop安全实践</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag"># Hadoop</a>
+          
+            <a href="/tags/Security/" rel="tag"># Security</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-02-14-hive-sql-to-mapreduce/" rel="next" title="Hive SQL 的编译过程">
+                <i class="fa fa-chevron-left"></i> Hive SQL 的编译过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/2014-03-24-array-linked-list-and-implementation/" rel="prev" title="数组、单链表和双链表介绍 以及 双向链表的C/C++/Java实现">
+                数组、单链表和双链表介绍 以及 双向链表的C/C++/Java实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#集群安全措施相对薄弱"><span class="nav-text">集群安全措施相对薄弱</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集群整体升级到-hadoop-2-0"><span class="nav-text">集群整体升级到 hadoop 2.0</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案调研"><span class="nav-text">方案调研</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#账号拆分与相应管理方案"><span class="nav-text">账号拆分与相应管理方案</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#集群账号管理"><span class="nav-text">集群账号管理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#用户账号管理"><span class="nav-text">用户账号管理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开启-Hadoop-安全认证"><span class="nav-text">开启 Hadoop 安全认证</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Kerberos-部署"><span class="nav-text">Kerberos 部署</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Container-的选择"><span class="nav-text">Container 的选择</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DataNode-启动方式"><span class="nav-text">DataNode 启动方式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端针对安全认证的相应调整"><span class="nav-text">客户端针对安全认证的相应调整</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#凭证过期处理策略"><span class="nav-text">凭证过期处理策略</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#UserGroupInformation"><span class="nav-text">UserGroupInformation</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于keytab-的Kerberos认证方式"><span class="nav-text">基于keytab 的Kerberos认证方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上线部署"><span class="nav-text">上线部署</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JCE-部署"><span class="nav-text">JCE 部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SNN-getimage-返回-NPE"><span class="nav-text">SNN getimage 返回 NPE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Balancer-执行过长导致认证过期"><span class="nav-text">Balancer 执行过长导致认证过期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sssd-服务认证异常"><span class="nav-text">sssd 服务认证异常</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#“KDC-can’t-fulfill-requested-option-while-renewing-credentials”"><span class="nav-text">“KDC can’t fulfill requested option while renewing credentials”</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

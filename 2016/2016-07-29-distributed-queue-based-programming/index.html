@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Queue,Distributed," />
+
+
+<meta name="description" content="介绍作为一种基础的抽象数据结构，队列被广泛应用在各类编程中。大数据时代对跨进程、跨机器的通讯提出了更高的要求，和以往相比，分布式队列编程的运用几乎已无处不在。但是，这种常见的基础性的事物往往容易被忽视，使用者往往会忽视两点：  使用分布式队列的时候，没有意识到它是队列。  有具体需求的时候，忘记了分布式队列的存在。   文章首先从最基础的需求出发，详细剖析分布式队列编程模型的需求来源、定义、结构以">
+<meta name="keywords" content="Queue,Distributed">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式队列编程：模型、实战">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-07-29-distributed-queue-based-programming/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="介绍作为一种基础的抽象数据结构，队列被广泛应用在各类编程中。大数据时代对跨进程、跨机器的通讯提出了更高的要求，和以往相比，分布式队列编程的运用几乎已无处不在。但是，这种常见的基础性的事物往往容易被忽视，使用者往往会忽视两点：  使用分布式队列的时候，没有意识到它是队列。  有具体需求的时候，忘记了分布式队列的存在。   文章首先从最基础的需求出发，详细剖析分布式队列编程模型的需求来源、定义、结构以">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/point2point.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/producer-consumer.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/pubsub.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/mvc.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/infomation-collector.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/cache-replacement.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/distributed-cache-replacement.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/ticket-generation.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.921Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式队列编程：模型、实战">
+<meta name="twitter:description" content="介绍作为一种基础的抽象数据结构，队列被广泛应用在各类编程中。大数据时代对跨进程、跨机器的通讯提出了更高的要求，和以往相比，分布式队列编程的运用几乎已无处不在。但是，这种常见的基础性的事物往往容易被忽视，使用者往往会忽视两点：  使用分布式队列的时候，没有意识到它是队列。  有具体需求的时候，忘记了分布式队列的存在。   文章首先从最基础的需求出发，详细剖析分布式队列编程模型的需求来源、定义、结构以">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/07/29/distributed_queue_based_programming/point2point.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-07-29-distributed-queue-based-programming/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>分布式队列编程：模型、实战 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-07-29-distributed-queue-based-programming/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">分布式队列编程：模型、实战</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-29T00:00:00+08:00">2016-07-29</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Distributed/" itemprop="url" rel="index"><span itemprop="name">Distributed</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>作为一种基础的抽象数据结构，队列被广泛应用在各类编程中。大数据时代对跨进程、跨机器的通讯提出了更高的要求，和以往相比，分布式队列编程的运用几乎已无处不在。但是，这种常见的基础性的事物往往容易被忽视，使用者往往会忽视两点：</p>
+<ul>
+<li><p>使用分布式队列的时候，没有意识到它是队列。</p>
+</li>
+<li><p>有具体需求的时候，忘记了分布式队列的存在。</p>
+</li>
+</ul>
+<p>文章首先从最基础的需求出发，详细剖析分布式队列编程模型的需求来源、定义、结构以及其变化多样性。通过这一部分的讲解，作者期望能在两方面帮助读者：一方面，提供一个系统性的思考方法，使读者能够将具体需求关联到分布式队列编程模型，具备进行分布式队列架构的能力；另一方面，通过全方位的讲解，让读者能够快速识别工作中碰到的各种分布式队列编程模型。</p>
+<p>文章的第二部分实战篇。根据作者在新美大实际工作经验，给出了队列式编程在分布式环境下的一些具体应用。这些例子的基础模型并非首次出现在互联网的文档中，但是所有的例子都是按照挑战、构思、架构三个步骤进行讲解的。这种讲解方式能给读者一个“从需求出发去构架分布式队列编程”的旅程。</p>
+<h2 id="分布式队列编程模型"><a href="#分布式队列编程模型" class="headerlink" title="分布式队列编程模型"></a>分布式队列编程模型</h2><p>模型篇从基础的需求出发，去思考何时以及如何使用分布式队列编程模型。建模环节非常重要，因为大部分中高级工程师面临的都是具体的需求，接到需求后的第一个步骤就是建模。通过本篇的讲解，希望读者能够建立起从需求到分布式队列编程模型之间的桥梁。</p>
+<h3 id="何时选择分布式队列"><a href="#何时选择分布式队列" class="headerlink" title="何时选择分布式队列"></a>何时选择分布式队列</h3><p>通讯是人们最基本的需求，同样也是计算机最基本的需求。对于工程师而言，在编程和技术选型的时候，更容易进入大脑的概念是RPC、RESTful、Ajax、Kafka。在这些具体的概念后面，最本质的东西是“通讯”。所以，大部分建模和架构都需要从“通讯”这个基本概念开始。当确定系统之间有通讯需求的时候，工程师们需要做很多的决策和平衡，这直接影响工程师们是否会选择分布式队列编程模型作为架构。从这个角度出发，影响建模的因素有四个：When、Who、Where、How。</p>
+<h4 id="When：同步VS异步"><a href="#When：同步VS异步" class="headerlink" title="When：同步VS异步"></a>When：同步VS异步</h4><p>通讯的一个基本问题是：发出去的消息什么时候需要被接收到？这个问题引出了两个基础概念：“同步通讯”和“异步通讯”。根据理论抽象模型，同步通讯和异步通讯最本质的差别来自于时钟机制的有无。同步通讯的双方需要一个校准的时钟，异步通讯的双方不需要时钟。现实的情况是，没有完全校准的时钟，所以没有绝对的同步通讯。同样，绝对异步通讯意味着无法控制一个发出去的消息被接收到的时间点，无期限的等待一个消息显然毫无实际意义。所以，实际编程中所有的通讯既不是“同步通讯”也不是“异步通讯”；或者说，既是“同步通讯”也是“异步通讯”。特别是对于应用层的通讯，其底层架构可能既包含“同步机制”也包含“异步机制”。判断“同步”和“异步”消息的标准问题太深，而不适合继续展开。作者这里给一些启发式的建议：</p>
+<ul>
+<li><p>发出去的消息是否需要确认，如果不需要确认，更像是异步通讯，这种通讯有时候也称为单向通讯（One-Way Communication）。</p>
+</li>
+<li><p>如果需要确认，可以根据需要确认的时间长短进行判断。时间长的更像是异步通讯，时间短的更像是同步通讯。当然时间长短的概念是纯粹的主观概念，不是客观标准。</p>
+</li>
+<li><p>发出去的消息是否阻塞下一个指令的执行，如果阻塞，更像是同步，否则，更像是异步。</p>
+</li>
+</ul>
+<p>无论如何，工程师们不能生活在混沌之中，不做决定往往是最坏的决定。当分析一个通讯需求或者进行通讯构架的时候，工程师们被迫作出“同步”还是“异步”的决定。当决策的结论是“异步通讯”的时候，分布式队列编程模型就是一个备选项。</p>
+<h4 id="Who：发送者接收者解耦"><a href="#Who：发送者接收者解耦" class="headerlink" title="Who：发送者接收者解耦"></a>Who：发送者接收者解耦</h4><p>在进行通讯需求分析的时候，需要回答的另外一个基本问题是：消息的发送方是否关心谁来接收消息，或者反过来，消息接收方是否关心谁来发送消息。如果工程师的结论是：消息的发送方和接收方不关心对方是谁、以及在哪里，分布式队列编程模型就是一个备选项。因为在这种场景下，分布式队列架构所带来的解耦能给系统架构带来这些好处：</p>
+<ul>
+<li><p>无论是发送方还是接收方，只需要跟消息中间件通讯，接口统一。统一意味着降低开发成本。</p>
+</li>
+<li><p>在不影响性能的前提下，同一套消息中间件部署，可以被不同业务共享。共享意味着降低运维成本。</p>
+</li>
+<li><p>发送方或者接收方单方面的部署拓扑的变化不影响对应的另一方。解藕意味着灵活和可扩展。</p>
+</li>
+</ul>
+<h4 id="Where：消息暂存机制"><a href="#Where：消息暂存机制" class="headerlink" title="Where：消息暂存机制"></a>Where：消息暂存机制</h4><p>在进行通讯发送方设计的时候，令工程师们苦恼的问题是：如果消息无法被迅速处理掉而产生堆积怎么办、能否被直接抛弃？如果根据需求分析，确认存在消息积存，并且消息不应该被抛弃，就应该考虑分布式队列编程模型构架，因为队列可以暂存消息。</p>
+<h4 id="How：如何传递"><a href="#How：如何传递" class="headerlink" title="How：如何传递"></a>How：如何传递</h4><p>对通讯需求进行架构，一系列的基础挑战会迎面而来，这包括：</p>
+<ul>
+<li><p>可用性，如何保障通讯的高可用。</p>
+</li>
+<li><p>可靠性，如何保证消息被可靠地传递。</p>
+</li>
+<li><p>持久化，如何保证消息不会丢失。</p>
+</li>
+<li><p>吞吐量和响应时间。</p>
+</li>
+<li><p>跨平台兼容性。<br> 除非工程师对造轮子有足够的兴趣，并且有充足的时间，采用一个满足各项指标的分布式队列编程模型就是一个简单的选择。</p>
+</li>
+</ul>
+<h3 id="分布式队列编程定义"><a href="#分布式队列编程定义" class="headerlink" title="分布式队列编程定义"></a>分布式队列编程定义</h3><p>很难给出分布式队列编程模型的精确定义，由于本文偏重于应用，作者并不打算完全参照某个标准的模型。总体而言：分布式队列编程模型包含三类角色：发送者（Sender）、分布式队列（Queue）、接收者（Receiver）。发送者和接收者分别指的是生产消息和接收消息的应用程序或服务。</p>
+<p>需要重点明确的概念是分布式队列，它是提供以下功能的应用程序或服务：1. 接收“发送者”产生的消息实体；2. 传输、暂存该实体；3. 为“接收者”提供读取该消息实体的功能。特定的场景下，它当然可以是Kafka、RabbitMQ等消息中间件。但它的展现形式并不限于此，例如：</p>
+<ul>
+<li><p>队列可以是一张数据库的表，发送者将消息写入表，接收者从数据表里读消息。</p>
+</li>
+<li><p>如果一个程序把数据写入Redis等内存Cache里面，另一个程序从Cache里面读取，缓存在这里就是一种分布式队列。</p>
+</li>
+<li><p>流式编程里面的的数据流传输也是一种队列。</p>
+</li>
+<li><p>典型的MVC（Model–view–controller）设计模式里面，如果Model的变化需要导致View的变化，也可以通过队列进行传输。这里的分布式队列可以是数据库，也可以是某台服务器上的一块内存。</p>
+</li>
+</ul>
+<h3 id="抽象模型"><a href="#抽象模型" class="headerlink" title="抽象模型"></a>抽象模型</h3><p>最基础的分布式队列编程抽象模型是点对点模型，其他抽象构架模型居于改基本模型上各角色的数量和交互变化所导致的不同拓扑图。具体而言，不同数量的发送者、分布式队列以及接收者组合形成了不同的分布式队列编程模型。记住并理解典型的抽象模型结构对需求分析和建模而言至关重要，同时也会有助于学习和深入理解开源框架以及别人的代码。</p>
+<h4 id="点对点模型（Point-to-point）"><a href="#点对点模型（Point-to-point）" class="headerlink" title="点对点模型（Point-to-point）"></a>点对点模型（Point-to-point）</h4><p>基础模型中，只有一个发送者、一个接收者和一个分布式队列。如下图所示：</p>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/point2point.png" alt=""></p>
+<h4 id="生产者消费者模型（Producer–consumer）"><a href="#生产者消费者模型（Producer–consumer）" class="headerlink" title="生产者消费者模型（Producer–consumer）"></a>生产者消费者模型（Producer–consumer）</h4><p>如果发送者和接收者都可以有多个部署实例，甚至不同的类型；但是共用同一个队列，这就变成了标准的生产者消费者模型。在该模型，三个角色一般称之为生产者（Producer）、分布式队列（Queue）、消费者（Consumer）。</p>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/producer-consumer.png" alt=""></p>
+<h4 id="发布订阅模型（PubSub）"><a href="#发布订阅模型（PubSub）" class="headerlink" title="发布订阅模型（PubSub）"></a>发布订阅模型（PubSub）</h4><p>如果只有一类发送者，发送者将产生的消息实体按照不同的主题（Topic）分发到不同的逻辑队列。每种主题队列对应于一类接收者。这就变成了典型的发布订阅模型。在该模型，三个角色一般称之为发布者（Publisher），分布式队列（Queue），订阅者（Subscriber）。</p>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/pubsub.png" alt=""></p>
+<h4 id="MVC模型"><a href="#MVC模型" class="headerlink" title="MVC模型"></a>MVC模型</h4><p>如果发送者和接收者存在于同一个实体中，但是共享一个分布式队列。这就很像经典的MVC模型。</p>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/mvc.png" alt=""></p>
+<h3 id="编程模型"><a href="#编程模型" class="headerlink" title="编程模型"></a>编程模型</h3><p>为了让读者更好地理解分布式队列编程模式概念，这里将其与一些容易混淆的概念做一些对比 。</p>
+<h4 id="分布式队列模型编程和异步编程"><a href="#分布式队列模型编程和异步编程" class="headerlink" title="分布式队列模型编程和异步编程"></a>分布式队列模型编程和异步编程</h4><p>分布式队列编程模型的通讯机制一般是采用异步机制，但是它并不等同于异步编程。</p>
+<p>首先，并非所有的异步编程都需要引入队列的概念，例如：大部分的操作系统异步I/O操作都是通过硬件中断（ Hardware Interrupts）来实现的。</p>
+<p>其次，异步编程并不一定需要跨进程，所以其应用场景并不一定是分布式环境。</p>
+<p>最后，分布式队列编程模型强调发送者、接收者和分布式队列这三个角色共同组成的架构。这三种角色与异步编程没有太多关联。</p>
+<h4 id="分布式队列模式编程和流式编程"><a href="#分布式队列模式编程和流式编程" class="headerlink" title="分布式队列模式编程和流式编程"></a>分布式队列模式编程和流式编程</h4><p>随着Spark Streaming，Apache Storm等流式框架的广泛应用，流式编程成了当前非常流行的编程模式。但是本文所阐述的分布式队列编程模型和流式编程并非同一概念。</p>
+<p>首先，本文的队列编程模式不依赖于任何框架，而流式编程是在具体的流式框架内的编程。</p>
+<p>其次，分布式队列编程模型是一个需求解决方案，关注如何根据实际需求进行分布式队列编程建模。流式框架里的数据流一般都通过队列传递，不过，流式编程的关注点比较聚焦，它关注如何从流式框架里获取消息流，进行map、reduce、 join等转型（Transformation）操作、生成新的数据流，最终进行汇总、统计。</p>
+<h2 id="分布式队列编程实战篇"><a href="#分布式队列编程实战篇" class="headerlink" title="分布式队列编程实战篇"></a>分布式队列编程实战篇</h2><p>这里所有的项目都是作者在新美大工作的真实案例。实战篇的关注点是训练建模思路，所以这些例子都按照挑战、构思、架构三个步骤进行讲解。受限于保密性要求，有些细节并未给出，但这些细节并不影响讲解的完整性。另一方面，特别具体的需求容易让人费解，为了使讲解更加顺畅，作者也会采用一些更通俗易懂的例子。通过本篇的讲解，希望和读者一起去实践“如何从需求出发去构架分布式队列编程模型”。</p>
+<p>需要声明的是，这里的解决方案并不是所处场景的最优方案。但是，任何一个稍微复杂的问题，都没有最优解决方案，更谈不上唯一的解决方案。实际上，工程师每天所追寻的只是在满足一定约束条件下的可行方案。当然不同的约束会导致不同的方案，约束的松弛度决定了工程师的可选方案的宽广度。</p>
+<h3 id="信息采集处理"><a href="#信息采集处理" class="headerlink" title="信息采集处理"></a>信息采集处理</h3><p>信息采集处理应用广泛，例如：广告计费、用户行为收集等。作者碰到的具体项目是为广告系统设计一套高可用的采集计费系统。</p>
+<p>典型的广告CPC、CPM计费原理是：收集用户在客户端或者网页上的点击和浏览行为，按照点击和浏览进行计费。计费业务有如下典型特征：</p>
+<ul>
+<li><p>采集者和处理者解耦，采集发生在客户端，而计费发生在服务端。</p>
+</li>
+<li><p>计费与钱息息相关。</p>
+</li>
+<li><p>重复计费意味着灾难。</p>
+</li>
+<li><p>计费是动态实时行为，需要接受预算约束，如果消耗超过预算，则广告投放需要停止。</p>
+</li>
+<li><p>用户的浏览和点击量非常大。</p>
+</li>
+</ul>
+<h4 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h4><p>计费业务的典型特征给我们带来了如下挑战：</p>
+<ul>
+<li><p>高吞吐量－－广告的浏览和点击量非常巨大，我们需要设计一个高吞吐量的采集架构。</p>
+</li>
+<li><p>高可用性－－计费信息的丢失意味着直接的金钱损失。任何处理服务器的崩溃不应该导致系统不可用。</p>
+</li>
+<li><p>高一致性要求－－计费是一个实时动态处理过程，但要受到预算的约束。收集到的浏览和点击行为如果不能快速处理，可能会导致预算花超，或者点击率预估不准确。所以采集到的信息应该在最短的时间内传输到计费中心进行计费。</p>
+</li>
+<li><p>完整性约束－－这包括反作弊规则，单个用户行为不能重复计费等。这要求计费是一个集中行为而非分布式行为。</p>
+</li>
+<li><p>持久化要求－－计费信息需要持久化，避免因为机器崩溃而导致收集到的数据产生丢失。</p>
+</li>
+</ul>
+<h4 id="构思"><a href="#构思" class="headerlink" title="构思"></a>构思</h4><p>采集的高可用性意味着我们需要多台服务器同时采集，为了避免单IDC故障，采集服务器需要部署在多IDC里面。</p>
+<p>实现一个高可用、高吞吐量、高一致性的信息传递系统显然是一个挑战，为了控制项目开发成本，采用开源的消息中间件进行消息传输就成了必然选择。</p>
+<p>完整性约束要求集中进行计费，所以计费系统发生在核心IDC。</p>
+<p>计费服务并不关心采集点在哪里，采集服务也并不关心谁进行计费。</p>
+<p>根据以上构思，我们认为采集计费符合典型的“生产者消费者模型”。</p>
+<p>架构</p>
+<p>采集计费系统架构图如下：</p>
+<ul>
+<li><p>用户点击浏览收集服务（Click/View Collector）作为生产者部署在多个机房里，以提高收集服务可用性。</p>
+</li>
+<li><p>每个机房里采集到的数据通过消息队列中间件发送到核心机房IDC_Master。</p>
+</li>
+<li><p>Billing服务作为消费者部署在核心机房集中计费。</p>
+</li>
+</ul>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/infomation-collector.png" alt=""></p>
+<p>采用此架构，我们可以在如下方面做进一步优化：</p>
+<ul>
+<li><p>提高可扩展性，如果一个Billing部署实例在性能上无法满足要求，可以对采集的数据进行主题分区（Topic Partition）计费，即采用发布订阅模式以提高可扩展性（Scalability）。</p>
+</li>
+<li><p>全局排重和反作弊。采用集中计费架构解决了点击浏览排重的问题，另一方面，这也给反作弊提供了全局信息。</p>
+</li>
+<li><p>提高计费系统的可用性。采用下文单例服务优化策略，在保障计费系统集中性的同时，提高计费系统可用性。</p>
+</li>
+</ul>
+<h3 id="分布式缓存更新（Distributed-Cache-Replacement）"><a href="#分布式缓存更新（Distributed-Cache-Replacement）" class="headerlink" title="分布式缓存更新（Distributed Cache Replacement）"></a>分布式缓存更新（Distributed Cache Replacement）</h3><p>缓存是一个非常宽泛的概念，几乎存在于系统各个层级。典型的缓存访问流程如下：</p>
+<ul>
+<li><p>接收到请求后，先读取缓存，如果命中则返回结果。</p>
+</li>
+<li><p>如果缓存不命中，读取DB或其它持久层服务，更新缓存并返回结果。</p>
+</li>
+</ul>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/cache-replacement.png" alt=""></p>
+<p>对于已经存入缓存的数据，其更新时机和更新频率是一个经典问题，即缓存更新机制（Cache Replacement Algorithms ）。典型的缓存更新机制包括：近期最少使用算法（LRU）、最不经常使用算法（LFU）。这两种缓存更新机制的典型实现是：启动一个后台进程，定期清理最近没有使用的，或者在一段时间内最少使用的数据。由于存在缓存驱逐机制，当一个请求在没有命中缓存时，业务层需要从持久层中获取信息并更新缓存，提高一致性。</p>
+<h4 id="挑战-1"><a href="#挑战-1" class="headerlink" title="挑战"></a>挑战</h4><p>分布式缓存给缓存更新机制带来了新的问题：</p>
+<ul>
+<li><p>数据一致性低。分布式缓存中键值数量巨大，从而导致LRU或者LFU算法更新周期很长。在分布式缓存中，拿LRU算法举例，其典型做法是为每个Key值设置一个生存时间（TTL），生存时间到期后将该键值从缓存中驱逐除去。考虑到分布式缓存中庞大的键值数量，生存时间往往会设置的比较长，这就导致缓存和持久层数据不一致时间很长。如果生存时间设置过短，大量请求无法命中缓存被迫读取持久层，系统响应时间会急剧恶化。</p>
+</li>
+<li><p>新数据不可用。在很多场景下，由于分布式缓存和持久层的访问性能相差太大，在缓存不命中的情况下，一些应用层服务不会尝试读取持久层，而直接返回空结果。漫长的缓存更新周期意味着新数据的可用性就被牺牲了。从统计的角度来讲，新键值需要等待半个更新周期才会可用。</p>
+</li>
+</ul>
+<h4 id="构思-1"><a href="#构思-1" class="headerlink" title="构思"></a>构思</h4><p>根据上面的分析，分布式缓存需要解决的问题是：在保证读取性能的前提下，尽可能地提高老数据的一致性和新数据的可用性。如果仍然假定最近被访问的键值最有可能被再次访问（这是LRU或者LFU成立的前提），键值每次被访问后触发一次异步更新就是提高可用性和一致性最早的时机。无论是高性能要求还是业务解耦都要求缓存读取和缓存更新分开，所以我们应该构建一个单独的集中的缓存更新服务。集中进行缓存更新的另外一个好处来自于频率控制。由于在一段时间内，很多类型访问键值的数量满足高斯分布，短时间内重复对同一个键值进行更新Cache并不会带来明显的好处，甚至造成缓存性能的下降。通过控制同一键值的更新频率可以大大缓解该问题，同时有利于提高整体数据的一致性，参见“排重优化”。</p>
+<p>综上所述，业务访问方需要把请求键值快速传输给缓存更新方，它们之间不关心对方的业务。要快速、高性能地实现大量请求键值消息的传输，高性能分布式消息中间件就是一个可选项。这三方一起组成了一个典型的分布式队列编程模型。</p>
+<h4 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h4><p>如下图，所有的业务请求方作为生产者，在返回业务代码处理之前将请求键值写入高性能队列。Cache Updater作为消费者从队列中读取请求键值，将持久层中数据更新到缓存中。</p>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/distributed-cache-replacement.png" alt=""></p>
+<p>采用此架构，我们可以在如下方面做进一步优化：</p>
+<ul>
+<li><p>提高可扩展性，如果一个Cache Updater在性能上无法满足要求，可以对键值进行主题分区（Topic Partition）进行并行缓存更新，即采用发布订阅模式以提高可扩展性（Scalability）。</p>
+</li>
+<li><p>更新频率控制。缓存更新都集中处理，对于发布订阅模式，同一类主题（Topic）的键值集中处理。Cache Updater可以控制对同一键值的在短期内的更新频率（参见下文排重优化）。</p>
+</li>
+</ul>
+<h3 id="后台任务处理"><a href="#后台任务处理" class="headerlink" title="后台任务处理"></a>后台任务处理</h3><p>典型的后台任务处理应用包括工单处理、火车票预订系统、机票选座等。我们所面对的问题是为运营人员创建工单。一次可以为多个运营人员创建多个工单。这个应用场景和火车票购买非常类似。工单相对来说更加抽象，所以，下文会结合火车票购买和运营人员工单分配这两种场景同时讲解。典型的工单创建要经历两个阶段：数据筛选阶段、工单创建阶段。例如，在火车票预订场景，数据筛选阶段用户选择特定时间、特定类型的火车，而在工单创建阶段，用户下单购买火车票。</p>
+<h4 id="挑战-2"><a href="#挑战-2" class="headerlink" title="挑战"></a>挑战</h4><p>工单创建往往会面临如下挑战：</p>
+<ul>
+<li><p>数据一致性问题。以火车票预订为例，用户筛选火车票和最终购买之间往往有一定的时延，意味着两个操作之间数据是不一致的。在筛选阶段，工程师们需决定是否进行车票锁定，如果不锁定，则无法保证出票成功。反之，如果在筛选地时候锁定车票，则会大大降低系统效率和出票吞吐量。</p>
+</li>
+<li><p>约束问题。工单创建需要满足很多约束，主要包含两种类型：动态约束，与操作者的操作行为有关，例如购买几张火车票的决定往往发生在筛选最后阶段。隐性约束，这种约束很难通过界面进行展示，例如一个用户购买了5张火车票，这些票应该是在同一个车厢的临近位置。</p>
+</li>
+<li><p>优化问题。工单创建往往是约束下的优化，这是典型的统筹优化问题，而统筹优化往往需要比较长的时间。</p>
+</li>
+<li><p>响应时间问题。对于多任务工单，一个请求意味着多个任务产生。这些任务的创建往往需要遵循事务性原则，即All or Nothing。在数据层面，这意味着工单之间需要满足串行化需求（Serializability）。大数据量的串行化往往意味着锁冲突延迟甚至失败。无论是延迟机制所导致的长时延，还是高创建失败率，都会大大伤害用户体验。</p>
+</li>
+</ul>
+<h4 id="构思-2"><a href="#构思-2" class="headerlink" title="构思"></a>构思</h4><p>如果将用户筛选的最终规则做为消息存储下来，并发送给工单创建系统。此时，工单创建系统将具备创建工单所需的全局信息，具备在满足各种约束的条件下进行统筹优化的能力。如果工单创建阶段采用单实例部署，就可以避免数据锁定问题，同时也意味着没有锁冲突，所以也不会有死锁或任务延迟问题。</p>
+<p>居于以上思路，在多工单处理系统的模型中，筛选阶段的规则创建系统将充当生产者角色，工单创建系统将充当消费者角色，筛选规则将作为消息在两者之间进行传递。这就是典型的分布式队列编程架构。根据工单创建量的不同，可以采用数据库或开源的分布式消息中间件作为分布式队列。</p>
+<h4 id="架构-1"><a href="#架构-1" class="headerlink" title="架构"></a>架构</h4><p>该架构流程如下图：</p>
+<ul>
+<li><p>用户首选进行规则创建，这个过程主要是一些搜索筛选操作；</p>
+</li>
+<li><p>用户点击工单创建，TicketRule Generator将把所有的筛选性组装成规则消息并发送到队列里面去；</p>
+</li>
+<li><p>Ticket Generator作为一个消费者，实时从队列中读取工单创建请求，开始真正创建工单。</p>
+</li>
+</ul>
+<p><img src="/assets/images/2016/07/29/distributed_queue_based_programming/ticket-generation.png" alt=""></p>
+<p>采用该架构，我们在数据锁定、运筹优化、原子性问题都能得到比较好成果：</p>
+<ul>
+<li><p>数据锁定推迟到工单创建阶段，可以减少数据锁定范围，最大程度的降低工单创建对其他在线操作的影响范围。</p>
+</li>
+<li><p>如果需要进行统筹优化，可以将Ticket Generator以单例模式进行部署（参见单例服务优化）。这样，Ticket Generator可以读取一段时间内的工单请求，进行全局优化。例如，在我们的项目中，在某种条件下，运营人员需要满足分级公平原则，即相同级别的运营人员的工单数量应该接近，不同级别的运营人员工单数量应该有所区分。如果不集中进行统筹优化，实现这种优化规则将会很困难。</p>
+</li>
+<li><p>保障了约束完整性。例如，在我们的场景里面，每个运营人员每天能够处理的工单是有数量限制的，如果采用并行处理的方式，这种完整性约束将会很难实施。</p>
+</li>
+</ul>
+<h2 id="预告"><a href="#预告" class="headerlink" title="预告"></a>预告</h2><p>下周我们会推出优化篇，重点阐述在工程师在运用分布式队列编程构架的时候，在生产者、分布式队列以及消费者这三个环节的注意点以及优化建议，欢迎关注！</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>[1] RabbitMQ, <a href="https://www.rabbitmq.com/ha.html" target="_blank" rel="noopener">Highly Available Queues</a>.<br>[2] IBM Knowledge Center, <a href="https://www.ibm.com/support/knowledgecenter/SSFKSJ_8.0.0/com.ibm.mq.pro.doc/q002620_.htm" target="_blank" rel="noopener">Introduction to message queuing</a>.<br>[3] Wikipedia, <a href="https://en.wikipedia.org/wiki/Serializability" target="_blank" rel="noopener">Serializability</a>.<br>[4] Hadoop, <a href="https://zookeeper.apache.org/doc/trunk/recipes.html#sc_leaderElection" target="_blank" rel="noopener">ZooKeeper Recipes and Solutions</a>.<br>[5] <a href="http://kafka.apache.org/documentation.html#introduction" target="_blank" rel="noopener">Apache Kafka</a>.<br>[6] Lamport L, <a href="http://research.microsoft.com/en-us/um/people/lamport/pubs/paxos-simple.pdf" target="_blank" rel="noopener">Paxos Made Simple</a>.</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://tech.meituan.com/distributed_queue_based_programming.html" target="_blank" rel="noopener">分布式队列编程：模型、实战</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Queue/" rel="tag"># Queue</a>
+          
+            <a href="/tags/Distributed/" rel="tag"># Distributed</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-07-18-approaching-almost-any-machine-learning-problem/" rel="next" title="Approaching (Almost) Any Machine Learning Problem">
+                <i class="fa fa-chevron-left"></i> Approaching (Almost) Any Machine Learning Problem
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-08-01-deep-learning-activation-function-guide/" rel="prev" title="深度学习中的激活函数导引">
+                深度学习中的激活函数导引 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式队列编程模型"><span class="nav-text">分布式队列编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#何时选择分布式队列"><span class="nav-text">何时选择分布式队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#When：同步VS异步"><span class="nav-text">When：同步VS异步</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Who：发送者接收者解耦"><span class="nav-text">Who：发送者接收者解耦</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Where：消息暂存机制"><span class="nav-text">Where：消息暂存机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#How：如何传递"><span class="nav-text">How：如何传递</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式队列编程定义"><span class="nav-text">分布式队列编程定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象模型"><span class="nav-text">抽象模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#点对点模型（Point-to-point）"><span class="nav-text">点对点模型（Point-to-point）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生产者消费者模型（Producer–consumer）"><span class="nav-text">生产者消费者模型（Producer–consumer）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发布订阅模型（PubSub）"><span class="nav-text">发布订阅模型（PubSub）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MVC模型"><span class="nav-text">MVC模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程模型"><span class="nav-text">编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式队列模型编程和异步编程"><span class="nav-text">分布式队列模型编程和异步编程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式队列模式编程和流式编程"><span class="nav-text">分布式队列模式编程和流式编程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式队列编程实战篇"><span class="nav-text">分布式队列编程实战篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#信息采集处理"><span class="nav-text">信息采集处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#挑战"><span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#构思"><span class="nav-text">构思</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式缓存更新（Distributed-Cache-Replacement）"><span class="nav-text">分布式缓存更新（Distributed Cache Replacement）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#挑战-1"><span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#构思-1"><span class="nav-text">构思</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#架构"><span class="nav-text">架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后台任务处理"><span class="nav-text">后台任务处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#挑战-2"><span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#构思-2"><span class="nav-text">构思</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#架构-1"><span class="nav-text">架构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预告"><span class="nav-text">预告</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

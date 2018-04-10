@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Algorithm,SplayTree," />
+
+
+<meta name="description" content="概要前面分别通过C和C++实现了伸展树，本章给出伸展树的Java版本。基本算法和原理都与前两章一样。  伸展树的介绍 伸展树的Java实现(完整源码) 伸展树的Java测试程序   伸展树的介绍伸展树(Splay Tree)是特殊的二叉查找树。 它的特殊是指，它除了本身是棵二叉查找树之外，它还具备一个特点: 当某个节点被访问时，伸展树会通过旋转使该节点成为树根。这样做的好处是，下次要访问该节点时，">
+<meta name="keywords" content="Algorithm,SplayTree">
+<meta property="og:type" content="article">
+<meta property="og:title" content="伸展树Java实现">
+<meta property="og:url" content="http://hyperj.github.com/2014/2014-04-01-splay-tree-java-implementation/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="概要前面分别通过C和C++实现了伸展树，本章给出伸展树的Java版本。基本算法和原理都与前两章一样。  伸展树的介绍 伸展树的Java实现(完整源码) 伸展树的Java测试程序   伸展树的介绍伸展树(Splay Tree)是特殊的二叉查找树。 它的特殊是指，它除了本身是棵二叉查找树之外，它还具备一个特点: 当某个节点被访问时，伸展树会通过旋转使该节点成为树根。这样做的好处是，下次要访问该节点时，">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/001.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/002.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/003.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/004.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/005.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/006.jpg">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.900Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="伸展树Java实现">
+<meta name="twitter:description" content="概要前面分别通过C和C++实现了伸展树，本章给出伸展树的Java版本。基本算法和原理都与前两章一样。  伸展树的介绍 伸展树的Java实现(完整源码) 伸展树的Java测试程序   伸展树的介绍伸展树(Splay Tree)是特殊的二叉查找树。 它的特殊是指，它除了本身是棵二叉查找树之外，它还具备一个特点: 当某个节点被访问时，伸展树会通过旋转使该节点成为树根。这样做的好处是，下次要访问该节点时，">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2014/04/01/splay-tree-java-implementation/001.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2014/2014-04-01-splay-tree-java-implementation/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>伸展树Java实现 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2014/2014-04-01-splay-tree-java-implementation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">伸展树Java实现</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2014-04-01T00:00:00+08:00">2014-04-01</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>前面分别通过C和C++实现了伸展树，本章给出伸展树的Java版本。基本算法和原理都与前两章一样。</p>
+<ol>
+<li>伸展树的介绍</li>
+<li>伸展树的Java实现(完整源码)</li>
+<li>伸展树的Java测试程序 </li>
+</ol>
+<h2 id="伸展树的介绍"><a href="#伸展树的介绍" class="headerlink" title="伸展树的介绍"></a>伸展树的介绍</h2><p>伸展树(Splay Tree)是特殊的二叉查找树。</p>
+<p>它的特殊是指，它除了本身是棵二叉查找树之外，它还具备一个特点: 当某个节点被访问时，伸展树会通过旋转使该节点成为树根。这样做的好处是，下次要访问该节点时，能够迅速的访问到该节点。 </p>
+<h2 id="伸展树的Java实现"><a href="#伸展树的Java实现" class="headerlink" title="伸展树的Java实现"></a>伸展树的Java实现</h2><h3 id="1-基本定义"><a href="#1-基本定义" class="headerlink" title="1. 基本定义"></a>1. 基本定义</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplayTree</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> SplayTreeNode&lt;T&gt; mRoot;    <span class="comment">// 根结点</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplayTreeNode</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">        T key;                <span class="comment">// 关键字(键值)</span></span><br><span class="line">        SplayTreeNode&lt;T&gt; left;    <span class="comment">// 左孩子</span></span><br><span class="line">        SplayTreeNode&lt;T&gt; right;    <span class="comment">// 右孩子</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SplayTreeNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.left = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">this</span>.right = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SplayTreeNode</span><span class="params">(T key, SplayTreeNode&lt;T&gt; left, SplayTreeNode&lt;T&gt; right)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.left = left;</span><br><span class="line">            <span class="keyword">this</span>.right = right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SplayTree是伸展树，而SplayTreeNode是伸展树节点。在此，我将SplayTreeNode定义为SplayTree的内部类。在伸展树SplayTree中包含了伸展树的根节点mRoot。SplayTreeNode包括的几个组成元素:</p>
+<p>   (01) key – 是关键字，是用来对伸展树的节点进行排序的。<br>   (02) left – 是左孩子。<br>   (03) right – 是右孩子。</p>
+<h3 id="2-旋转"><a href="#2-旋转" class="headerlink" title="2. 旋转"></a>2. 旋转</h3><p>旋转是伸展树中需要重点关注的，它的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * 旋转key对应的节点为根节点，并返回根节点。</span></span><br><span class="line"><span class="comment"> * 注意：</span></span><br><span class="line"><span class="comment"> *   (a)：伸展树中存在"键值为key的节点"。</span></span><br><span class="line"><span class="comment"> *          将"键值为key的节点"旋转为根节点。</span></span><br><span class="line"><span class="comment"> *   (b)：伸展树中不存在"键值为key的节点"，并且key &lt; tree.key。</span></span><br><span class="line"><span class="comment"> *      b-1 "键值为key的节点"的前驱节点存在的话，将"键值为key的节点"的前驱节点旋转为根节点。</span></span><br><span class="line"><span class="comment"> *      b-2 "键值为key的节点"的前驱节点存在的话，则意味着，key比树中任何键值都小，那么此时，将最小节点旋转为根节点。</span></span><br><span class="line"><span class="comment"> *   (c)：伸展树中不存在"键值为key的节点"，并且key &gt; tree.key。</span></span><br><span class="line"><span class="comment"> *      c-1 "键值为key的节点"的后继节点存在的话，将"键值为key的节点"的后继节点旋转为根节点。</span></span><br><span class="line"><span class="comment"> *      c-2 "键值为key的节点"的后继节点不存在的话，则意味着，key比树中任何键值都大，那么此时，将最大节点旋转为根节点。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">splay</span><span class="params">(SplayTreeNode&lt;T&gt; tree, T key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tree == <span class="keyword">null</span>) </span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    SplayTreeNode&lt;T&gt; N = <span class="keyword">new</span> SplayTreeNode&lt;T&gt;();</span><br><span class="line">    SplayTreeNode&lt;T&gt; l = N;</span><br><span class="line">    SplayTreeNode&lt;T&gt; r = N;</span><br><span class="line">    SplayTreeNode&lt;T&gt; c;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">int</span> cmp = key.compareTo(tree.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tree.left == <span class="keyword">null</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span> (key.compareTo(tree.left.key) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                c = tree.left;                           <span class="comment">/* rotate right */</span></span><br><span class="line">                tree.left = c.right;</span><br><span class="line">                c.right = tree;</span><br><span class="line">                tree = c;</span><br><span class="line">                <span class="keyword">if</span> (tree.left == <span class="keyword">null</span>) </span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            r.left = tree;                               <span class="comment">/* link right */</span></span><br><span class="line">            r = tree;</span><br><span class="line">            tree = tree.left;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (tree.right == <span class="keyword">null</span>) </span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span> (key.compareTo(tree.right.key) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                c = tree.right;                          <span class="comment">/* rotate left */</span></span><br><span class="line">                tree.right = c.left;</span><br><span class="line">                c.left = tree;</span><br><span class="line">                tree = c;</span><br><span class="line">                <span class="keyword">if</span> (tree.right == <span class="keyword">null</span>) </span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            l.right = tree;                              <span class="comment">/* link left */</span></span><br><span class="line">            l = tree;</span><br><span class="line">            tree = tree.right;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    l.right = tree.left;                                <span class="comment">/* assemble */</span></span><br><span class="line">    r.left = tree.right;</span><br><span class="line">    tree.left = N.right;</span><br><span class="line">    tree.right = N.left;</span><br><span class="line">    <span class="keyword">return</span> tree;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">splay</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">    mRoot = splay(mRoot, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码的作用：将”键值为key的节点”旋转为根节点，并返回根节点。它的处理情况共包括：</p>
+<p>(a)：伸展树中存在”键值为key的节点”。<br>   将”键值为key的节点”旋转为根节点。</p>
+<p>(b)：伸展树中不存在”键值为key的节点”，并且key &lt; tree-&gt;key。<br>   b-1) “键值为key的节点”的前驱节点存在的话，将”键值为key的节点”的前驱节点旋转为根节点。<br>   b-2) “键值为key的节点”的前驱节点存在的话，则意味着，key比树中任何键值都小，那么此时，将最小节点旋转为根节点。</p>
+<p>(c)：伸展树中不存在”键值为key的节点”，并且key &gt; tree-&gt;key。<br>   c-1) “键值为key的节点”的后继节点存在的话，将”键值为key的节点”的后继节点旋转为根节点。<br>   c-2) “键值为key的节点”的后继节点不存在的话，则意味着，key比树中任何键值都大，那么此时，将最大节点旋转为根节点。</p>
+<p>下面列举个例子分别对a进行说明。</p>
+<p>在下面的伸展树中查找10，，共包括”右旋” –&gt; “右链接” –&gt; “组合”这3步。</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/001.jpg" alt=""></p>
+<h4 id="01-右旋"><a href="#01-右旋" class="headerlink" title="01, 右旋"></a>01, 右旋</h4><p>对应代码中的”rotate right”部分</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/002.jpg" alt=""></p>
+<h4 id="02-右链接"><a href="#02-右链接" class="headerlink" title="02, 右链接"></a>02, 右链接</h4><p>对应代码中的”link right”部分</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/003.jpg" alt=""></p>
+<h4 id="03-组合"><a href="#03-组合" class="headerlink" title="03. 组合"></a>03. 组合</h4><p>对应代码中的”assemble”部分</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/004.jpg" alt=""></p>
+<p>提示：如果在上面的伸展树中查找”70”，则正好与”示例1”对称，而对应的操作则分别是”rotate left”, “link left”和”assemble”。</p>
+<p>其它的情况，例如”查找15是b-1的情况，查找5是b-2的情况”等等，这些都比较简单，大家可以自己分析。</p>
+<h3 id="3-插入"><a href="#3-插入" class="headerlink" title="3. 插入"></a>3. 插入</h3><p>插入代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * 将结点插入到伸展树中，并返回根节点</span></span><br><span class="line"><span class="comment"> * 参数说明：</span></span><br><span class="line"><span class="comment"> *     tree 伸展树的</span></span><br><span class="line"><span class="comment"> *     z 插入的结点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">insert</span><span class="params">(SplayTreeNode&lt;T&gt; tree, SplayTreeNode&lt;T&gt; z)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> cmp;</span><br><span class="line">    SplayTreeNode&lt;T&gt; y = <span class="keyword">null</span>;</span><br><span class="line">    SplayTreeNode&lt;T&gt; x = tree;</span><br><span class="line">    <span class="comment">// 查找z的插入位置</span></span><br><span class="line">    <span class="keyword">while</span> (x != <span class="keyword">null</span>) &#123;</span><br><span class="line">        y = x;</span><br><span class="line">        cmp = z.key.compareTo(x.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">            x = x.left;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)</span><br><span class="line">            x = x.right;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.printf(<span class="string">"不允许插入相同节点(%d)!\n"</span>, z.key);</span><br><span class="line">            z=<span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">return</span> tree;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (y==<span class="keyword">null</span>)</span><br><span class="line">        tree = z;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        cmp = z.key.compareTo(y.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">            y.left = z;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            y.right = z;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> tree;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">    SplayTreeNode&lt;T&gt; z=<span class="keyword">new</span> SplayTreeNode&lt;T&gt;(key,<span class="keyword">null</span>,<span class="keyword">null</span>);</span><br><span class="line">    <span class="comment">// 如果新建结点失败，则返回。</span></span><br><span class="line">    <span class="keyword">if</span> ((z=<span class="keyword">new</span> SplayTreeNode&lt;T&gt;(key,<span class="keyword">null</span>,<span class="keyword">null</span>)) == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line">    <span class="comment">// 插入节点</span></span><br><span class="line">    mRoot = insert(mRoot, z);</span><br><span class="line">    <span class="comment">// 将节点(key)旋转为根节点</span></span><br><span class="line">    mRoot = splay(mRoot, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>insert(key)是提供给外部的接口，它的作用是新建节点(节点的键值为key)，并将节点插入到伸展树中；然后，将该节点旋转为根节点。</p>
+<p>insert(tree, z)是内部接口，它的作用是将节点z插入到tree中。insert(tree, z)在将z插入到tree中时，仅仅只将tree当作是一棵二叉查找树，而且不允许插入相同节点。</p>
+<h3 id="4-删除"><a href="#4-删除" class="headerlink" title="4. 删除"></a>4. 删除</h3><p>删除代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">/* </span><br><span class="line"> * 删除结点(z)，并返回被删除的结点</span><br><span class="line"> * 参数说明：</span><br><span class="line"> *     bst 伸展树</span><br><span class="line"> *     z 删除的结点</span><br><span class="line"> */</span><br><span class="line">private SplayTreeNode&lt;T&gt; remove(SplayTreeNode&lt;T&gt; tree, T key) &#123;</span><br><span class="line">    SplayTreeNode&lt;T&gt; x;</span><br><span class="line">    if (tree == null) </span><br><span class="line">        return null;</span><br><span class="line">    // 查找键值为key的节点，找不到的话直接返回。</span><br><span class="line">    if (search(tree, key) == null)</span><br><span class="line">        return tree;</span><br><span class="line">    // 将key对应的节点旋转为根节点。</span><br><span class="line">    tree = splay(tree, key);</span><br><span class="line">    if (tree.left != null) &#123;</span><br><span class="line">        // 将&quot;tree的前驱节点&quot;旋转为根节点</span><br><span class="line">        x = splay(tree.left, key);</span><br><span class="line">        // 移除tree节点</span><br><span class="line">        x.right = tree.right;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">        x = tree.right;</span><br><span class="line">    tree = null;</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br><span class="line">public void remove(T key) &#123;</span><br><span class="line">    mRoot = remove(mRoot, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>remove(key)是外部接口，remove(tree, key)是内部接口。</p>
+<p>remove(tree, key)的作用是：删除伸展树中键值为key的节点。</p>
+<p>它会先在伸展树中查找键值为key的节点。若没有找到的话，则直接返回。若找到的话，则将该节点旋转为根节点，然后再删除该节点。</p>
+<p>关于”前序遍历”、”中序遍历”、”后序遍历”、”最大值”、”最小值”、”查找”、”打印伸展树”、”销毁伸展树”等接口就不再单独介绍了，Please RTFSC(Read The Fucking Source Code)！这些接口，与前面介绍的”二叉查找树”、”AVL树”的相关接口都是类似的。</p>
+<h2 id="伸展树的Java实现-完整源码"><a href="#伸展树的Java实现-完整源码" class="headerlink" title="伸展树的Java实现(完整源码)"></a>伸展树的Java实现(完整源码)</h2><p>伸展树的实现文件(SplayTree.java)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java 语言: 伸展树</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> skywang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2014/02/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplayTree</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SplayTreeNode&lt;T&gt; mRoot;    <span class="comment">// 根结点</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplayTreeNode</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">        T key;                <span class="comment">// 关键字(键值)</span></span><br><span class="line">        SplayTreeNode&lt;T&gt; left;    <span class="comment">// 左孩子</span></span><br><span class="line">        SplayTreeNode&lt;T&gt; right;    <span class="comment">// 右孩子</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SplayTreeNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.left = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">this</span>.right = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SplayTreeNode</span><span class="params">(T key, SplayTreeNode&lt;T&gt; left, SplayTreeNode&lt;T&gt; right)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.left = left;</span><br><span class="line">            <span class="keyword">this</span>.right = right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SplayTree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mRoot=<span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 前序遍历"伸展树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">preOrder</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">            preOrder(tree.left);</span><br><span class="line">            preOrder(tree.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">preOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        preOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 中序遍历"伸展树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">inOrder</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line">            inOrder(tree.left);</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">            inOrder(tree.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">inOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        inOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 后序遍历"伸展树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postOrder</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            postOrder(tree.left);</span><br><span class="line">            postOrder(tree.right);</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        postOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * (递归实现)查找"伸展树x"中键值为key的节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">search</span><span class="params">(SplayTreeNode&lt;T&gt; x, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (x==<span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> x;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> cmp = key.compareTo(x.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> search(x.left, key);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> search(x.right, key);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SplayTreeNode&lt;T&gt; <span class="title">search</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> search(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * (非递归实现)查找"伸展树x"中键值为key的节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">iterativeSearch</span><span class="params">(SplayTreeNode&lt;T&gt; x, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (x!=<span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> cmp = key.compareTo(x.key);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) </span><br><span class="line">                x = x.left;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) </span><br><span class="line">                x = x.right;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> x;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SplayTreeNode&lt;T&gt; <span class="title">iterativeSearch</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> iterativeSearch(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 查找最小结点：返回tree为根结点的伸展树的最小结点。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">minimum</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tree.left != <span class="keyword">null</span>)</span><br><span class="line">            tree = tree.left;</span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">minimum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SplayTreeNode&lt;T&gt; p = minimum(mRoot);</span><br><span class="line">        <span class="keyword">if</span> (p != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> p.key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 查找最大结点：返回tree为根结点的伸展树的最大结点。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">maximum</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tree.right != <span class="keyword">null</span>)</span><br><span class="line">            tree = tree.right;</span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">maximum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        SplayTreeNode&lt;T&gt; p = maximum(mRoot);</span><br><span class="line">        <span class="keyword">if</span> (p != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> p.key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 旋转key对应的节点为根节点，并返回根节点。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 注意：</span></span><br><span class="line"><span class="comment">     *   (a)：伸展树中存在"键值为key的节点"。</span></span><br><span class="line"><span class="comment">     *          将"键值为key的节点"旋转为根节点。</span></span><br><span class="line"><span class="comment">     *   (b)：伸展树中不存在"键值为key的节点"，并且key &lt; tree.key。</span></span><br><span class="line"><span class="comment">     *      b-1 "键值为key的节点"的前驱节点存在的话，将"键值为key的节点"的前驱节点旋转为根节点。</span></span><br><span class="line"><span class="comment">     *      b-2 "键值为key的节点"的前驱节点存在的话，则意味着，key比树中任何键值都小，那么此时，将最小节点旋转为根节点。</span></span><br><span class="line"><span class="comment">     *   (c)：伸展树中不存在"键值为key的节点"，并且key &gt; tree.key。</span></span><br><span class="line"><span class="comment">     *      c-1 "键值为key的节点"的后继节点存在的话，将"键值为key的节点"的后继节点旋转为根节点。</span></span><br><span class="line"><span class="comment">     *      c-2 "键值为key的节点"的后继节点不存在的话，则意味着，key比树中任何键值都大，那么此时，将最大节点旋转为根节点。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">splay</span><span class="params">(SplayTreeNode&lt;T&gt; tree, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>) </span><br><span class="line">            <span class="keyword">return</span> tree;</span><br><span class="line"></span><br><span class="line">        SplayTreeNode&lt;T&gt; N = <span class="keyword">new</span> SplayTreeNode&lt;T&gt;();</span><br><span class="line">        SplayTreeNode&lt;T&gt; l = N;</span><br><span class="line">        SplayTreeNode&lt;T&gt; r = N;</span><br><span class="line">        SplayTreeNode&lt;T&gt; c;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> cmp = key.compareTo(tree.key);</span><br><span class="line">            <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (tree.left == <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (key.compareTo(tree.left.key) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                    c = tree.left;                           <span class="comment">/* rotate right */</span></span><br><span class="line">                    tree.left = c.right;</span><br><span class="line">                    c.right = tree;</span><br><span class="line">                    tree = c;</span><br><span class="line">                    <span class="keyword">if</span> (tree.left == <span class="keyword">null</span>) </span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                r.left = tree;                               <span class="comment">/* link right */</span></span><br><span class="line">                r = tree;</span><br><span class="line">                tree = tree.left;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (tree.right == <span class="keyword">null</span>) </span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (key.compareTo(tree.right.key) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    c = tree.right;                          <span class="comment">/* rotate left */</span></span><br><span class="line">                    tree.right = c.left;</span><br><span class="line">                    c.left = tree;</span><br><span class="line">                    tree = c;</span><br><span class="line">                    <span class="keyword">if</span> (tree.right == <span class="keyword">null</span>) </span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                l.right = tree;                              <span class="comment">/* link left */</span></span><br><span class="line">                l = tree;</span><br><span class="line">                tree = tree.right;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        l.right = tree.left;                                <span class="comment">/* assemble */</span></span><br><span class="line">        r.left = tree.right;</span><br><span class="line">        tree.left = N.right;</span><br><span class="line">        tree.right = N.left;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">splay</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        mRoot = splay(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 将结点插入到伸展树中，并返回根节点</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 参数说明：</span></span><br><span class="line"><span class="comment">     *     tree 伸展树的</span></span><br><span class="line"><span class="comment">     *     z 插入的结点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">insert</span><span class="params">(SplayTreeNode&lt;T&gt; tree, SplayTreeNode&lt;T&gt; z)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> cmp;</span><br><span class="line">        SplayTreeNode&lt;T&gt; y = <span class="keyword">null</span>;</span><br><span class="line">        SplayTreeNode&lt;T&gt; x = tree;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 查找z的插入位置</span></span><br><span class="line">        <span class="keyword">while</span> (x != <span class="keyword">null</span>) &#123;</span><br><span class="line">            y = x;</span><br><span class="line">            cmp = z.key.compareTo(x.key);</span><br><span class="line">            <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">                x = x.left;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)</span><br><span class="line">                x = x.right;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                System.out.printf(<span class="string">"不允许插入相同节点(%d)!\n"</span>, z.key);</span><br><span class="line">                z=<span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">return</span> tree;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (y==<span class="keyword">null</span>)</span><br><span class="line">            tree = z;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            cmp = z.key.compareTo(y.key);</span><br><span class="line">            <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">                y.left = z;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                y.right = z;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        SplayTreeNode&lt;T&gt; z=<span class="keyword">new</span> SplayTreeNode&lt;T&gt;(key,<span class="keyword">null</span>,<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果新建结点失败，则返回。</span></span><br><span class="line">        <span class="keyword">if</span> ((z=<span class="keyword">new</span> SplayTreeNode&lt;T&gt;(key,<span class="keyword">null</span>,<span class="keyword">null</span>)) == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 插入节点</span></span><br><span class="line">        mRoot = insert(mRoot, z);</span><br><span class="line">        <span class="comment">// 将节点(key)旋转为根节点</span></span><br><span class="line">        mRoot = splay(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 删除结点(z)，并返回被删除的结点</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 参数说明：</span></span><br><span class="line"><span class="comment">     *     bst 伸展树</span></span><br><span class="line"><span class="comment">     *     z 删除的结点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> SplayTreeNode&lt;T&gt; <span class="title">remove</span><span class="params">(SplayTreeNode&lt;T&gt; tree, T key)</span> </span>&#123;</span><br><span class="line">        SplayTreeNode&lt;T&gt; x;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>) </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 查找键值为key的节点，找不到的话直接返回。</span></span><br><span class="line">        <span class="keyword">if</span> (search(tree, key) == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> tree;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将key对应的节点旋转为根节点。</span></span><br><span class="line">        tree = splay(tree, key);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (tree.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 将"tree的前驱节点"旋转为根节点</span></span><br><span class="line">            x = splay(tree.left, key);</span><br><span class="line">            <span class="comment">// 移除tree节点</span></span><br><span class="line">            x.right = tree.right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            x = tree.right;</span><br><span class="line"></span><br><span class="line">        tree = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        mRoot = remove(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 销毁伸展树</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">(SplayTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree==<span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (tree.left != <span class="keyword">null</span>)</span><br><span class="line">            destroy(tree.left);</span><br><span class="line">        <span class="keyword">if</span> (tree.right != <span class="keyword">null</span>)</span><br><span class="line">            destroy(tree.right);</span><br><span class="line"></span><br><span class="line">        tree=<span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        destroy(mRoot);</span><br><span class="line">        mRoot = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 打印"伸展树"</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * key        -- 节点的键值 </span></span><br><span class="line"><span class="comment">     * direction  --  0，表示该节点是根节点;</span></span><br><span class="line"><span class="comment">     *               -1，表示该节点是它的父结点的左孩子;</span></span><br><span class="line"><span class="comment">     *                1，表示该节点是它的父结点的右孩子。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(SplayTreeNode&lt;T&gt; tree, T key, <span class="keyword">int</span> direction)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(direction==<span class="number">0</span>)    <span class="comment">// tree是根节点</span></span><br><span class="line">                System.out.printf(<span class="string">"%2d is root\n"</span>, tree.key);</span><br><span class="line">            <span class="keyword">else</span>                <span class="comment">// tree是分支节点</span></span><br><span class="line">                System.out.printf(<span class="string">"%2d is %2d's %6s child\n"</span>, tree.key, key, direction==<span class="number">1</span>?<span class="string">"right"</span> : <span class="string">"left"</span>);</span><br><span class="line"></span><br><span class="line">            print(tree.left, tree.key, -<span class="number">1</span>);</span><br><span class="line">            print(tree.right,tree.key,  <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mRoot != <span class="keyword">null</span>)</span><br><span class="line">            print(mRoot, mRoot.key, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>伸展树的测试程序(SplayTreeTest.java)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java 语言: 伸展树</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> skywang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2014/02/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplayTreeTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> arr[] = &#123;<span class="number">10</span>,<span class="number">50</span>,<span class="number">40</span>,<span class="number">30</span>,<span class="number">20</span>,<span class="number">60</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i, ilen;</span><br><span class="line">        SplayTree&lt;Integer&gt; tree=<span class="keyword">new</span> SplayTree&lt;Integer&gt;();</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">"== 依次添加: "</span>);</span><br><span class="line">        ilen = arr.length;</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">0</span>; i&lt;ilen; i++) &#123;</span><br><span class="line">            System.out.print(arr[i]+<span class="string">" "</span>);</span><br><span class="line">            tree.insert(arr[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">"\n== 前序遍历: "</span>);</span><br><span class="line">        tree.preOrder();</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">"\n== 中序遍历: "</span>);</span><br><span class="line">        tree.inOrder();</span><br><span class="line"></span><br><span class="line">        System.out.print(<span class="string">"\n== 后序遍历: "</span>);</span><br><span class="line">        tree.postOrder();</span><br><span class="line">        System.out.println();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"== 最小值: "</span>+ tree.minimum());</span><br><span class="line">        System.out.println(<span class="string">"== 最大值: "</span>+ tree.maximum());</span><br><span class="line">        System.out.println(<span class="string">"== 树的详细信息: "</span>);</span><br><span class="line">        tree.print();</span><br><span class="line"></span><br><span class="line">        i = <span class="number">30</span>;</span><br><span class="line">        System.out.printf(<span class="string">"\n== 旋转节点(%d)为根节点\n"</span>, i);</span><br><span class="line">        tree.splay(i);</span><br><span class="line">        System.out.printf(<span class="string">"== 树的详细信息: \n"</span>);</span><br><span class="line">        tree.print();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 销毁二叉树</span></span><br><span class="line">        tree.clear();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在二叉查找树的Java实现中，使用了泛型，也就意味着它支持任意类型；但是该类型必须要实现Comparable接口。</p>
+<h2 id="伸展树的Java测试程序"><a href="#伸展树的Java测试程序" class="headerlink" title="伸展树的Java测试程序"></a>伸展树的Java测试程序</h2><p>伸展树的测试程序运行结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">== 依次添加: 10 50 40 30 20 60 </span><br><span class="line">== 前序遍历: 60 30 20 10 50 40 </span><br><span class="line">== 中序遍历: 10 20 30 40 50 60 </span><br><span class="line">== 后序遍历: 10 20 40 50 30 60 </span><br><span class="line">== 最小值: 10</span><br><span class="line">== 最大值: 60</span><br><span class="line">== 树的详细信息: </span><br><span class="line">60 is root</span><br><span class="line">30 is 60&apos;s   left child</span><br><span class="line">20 is 30&apos;s   left child</span><br><span class="line">10 is 20&apos;s   left child</span><br><span class="line">50 is 30&apos;s  right child</span><br><span class="line">40 is 50&apos;s   left child</span><br><span class="line"></span><br><span class="line">== 旋转节点(30)为根节点</span><br><span class="line">== 树的详细信息: </span><br><span class="line">30 is root</span><br><span class="line">20 is 30&apos;s   left child</span><br><span class="line">10 is 20&apos;s   left child</span><br><span class="line">60 is 30&apos;s  right child</span><br><span class="line">50 is 60&apos;s   left child</span><br><span class="line">40 is 50&apos;s   left child</span><br></pre></td></tr></table></figure>
+<p>测试程序的主要流程是：新建伸展树，然后向伸展树中依次插入10,50,40,30,20,60。插入完毕这些数据之后，伸展树的节点是60；此时，再旋转节点，使得30成为根节点。</p>
+<p>依次插入10,50,40,30,20,60示意图如下：</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/005.jpg" alt=""></p>
+<p>将30旋转为根节点的示意图如下：</p>
+<p><img src="/assets/images/2014/04/01/splay-tree-java-implementation/006.jpg" alt=""></p>
+<hr>
+<ul>
+<li>Author: <a href="http://www.cnblogs.com/skywang12345/" target="_blank" rel="noopener">如果天空不死</a></li>
+<li>Source: <a href="http://www.cnblogs.com" target="_blank" rel="noopener">博客园</a></li>
+<li>Link: <a href="http://www.cnblogs.com/skywang12345/p/3604286.html" target="_blank" rel="noopener">伸展树(三)之 Java的实现</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" rel="tag"># Algorithm</a>
+          
+            <a href="/tags/SplayTree/" rel="tag"># SplayTree</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-03-30-avl-tree-implementation/" rel="next" title="AVL树(三)之 Java的实现">
+                <i class="fa fa-chevron-left"></i> AVL树(三)之 Java的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/2014-04-08-data-mask/" rel="prev" title="美团数据仓库-数据脱敏">
+                美团数据仓库-数据脱敏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概要"><span class="nav-text">概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伸展树的介绍"><span class="nav-text">伸展树的介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伸展树的Java实现"><span class="nav-text">伸展树的Java实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-基本定义"><span class="nav-text">1. 基本定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-旋转"><span class="nav-text">2. 旋转</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#01-右旋"><span class="nav-text">01, 右旋</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#02-右链接"><span class="nav-text">02, 右链接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#03-组合"><span class="nav-text">03. 组合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-插入"><span class="nav-text">3. 插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-删除"><span class="nav-text">4. 删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伸展树的Java实现-完整源码"><span class="nav-text">伸展树的Java实现(完整源码)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伸展树的Java测试程序"><span class="nav-text">伸展树的Java测试程序</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

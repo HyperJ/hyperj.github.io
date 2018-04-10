@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Distributed,Session,Tracking," />
+
+
+<meta name="description" content="本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。 美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。 目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“美团点评技术团队”。 这期沙龙主要内容有：分布式服务通信框架及服务治理系统、分布式监控系统实践、分布">
+<meta name="keywords" content="Distributed,Session,Tracking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式会话跟踪系统架构设计与实践">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。 美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。 目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“美团点评技术团队”。 这期沙龙主要内容有：分布式服务通信框架及服务治理系统、分布式监控系统实践、分布">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace1.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace2.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace3.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace4.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace5.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace6.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace7.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace8.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace9.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace10.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.925Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式会话跟踪系统架构设计与实践">
+<meta name="twitter:description" content="本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。 美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。 目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“美团点评技术团队”。 这期沙龙主要内容有：分布式服务通信框架及服务治理系统、分布式监控系统实践、分布">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace1.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>分布式会话跟踪系统架构设计与实践 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">分布式会话跟踪系统架构设计与实践</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-14T00:00:00+08:00">2016-10-14</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Distributed/" itemprop="url" rel="index"><span itemprop="name">Distributed</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。</strong></p>
+<p>美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。</p>
+<p>目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“美团点评技术团队”。</p>
+<p>这期沙龙主要内容有：分布式服务通信框架及服务治理系统、分布式监控系统实践、分布式会话跟踪系统架构设计与实践，特邀美恰CTO讲解时下热门话题“微服务”。其中既包括关键系统设计、在美团点评内部的实践经验，也包括一些项目在业界开源的运营实践。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>随着美团点评的业务发展，公司的分布式系统变得越来越复杂，我们亟需一个工具能够梳理内部服务之间的关系，感知上下游服务的形态。比如一次请求的流量从哪个服务而来、最终落到了哪个服务中去？服务之间是RPC调用，还是HTTP调用？一次分布式请求中的瓶颈节点是哪一个，等等。</p>
+<p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace1.png" alt=""></p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>MTrace，美团点评内部的分布式会话跟踪系统，其核心理念就是调用链：通过一个全局的ID将分布在各个服务节点上的同一次请求串联起来，还原原有的调用关系、追踪系统问题、分析调用数据、统计系统指标。这套系统借鉴了2010年Google发表的一篇论文《dapper》，并参考了Twitter的Zipkin以及阿里的Eagle Eye的实现。</p>
+<p>那么我们先来看一下什么是调用链，调用链其实就是将一次分布式请求还原成调用链路。显式的在后端查看一次分布式请求的调用情况，比如各个节点上的耗时、请求具体打到了哪台机器上、每个服务节点的请求状态，等等。它能反映出一次请求中经历了多少个服务以及服务层级等信息（比如你的系统A调用B，B调用C，那么这次请求的层级就是3），如果你发现有些请求层级大于10，那这个服务很有可能需要优化了。</p>
+<h2 id="网络优化"><a href="#网络优化" class="headerlink" title="网络优化"></a>网络优化</h2><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace2.png" alt=""></p>
+<p>如上图所示，红框内显示了一次分布式请求经过各个服务节点的具体IP，通过该IP就可以查询一次分布式请求是否有跨机房调用等信息，优化调用链路的网络结构。</p>
+<h2 id="瓶颈查询"><a href="#瓶颈查询" class="headerlink" title="瓶颈查询"></a>瓶颈查询</h2><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace3.png" alt=""></p>
+<p>再比如上图，红框部分显示的是系统调用的瓶颈节点，由于该节点的耗时，导致了整个系统调用的耗时延长，因此该节点需要进行优化，进而优化整个系统的效率。这种问题通过调用链路能很快发现下游服务的瓶颈节点；但是假如没有这样的系统，我们会怎样做呢？首先我会发现下游服务超时造成了我的服务超时，这时我会去找这个下游服务的负责人，然后该负责人发现也不是他自己服务的问题，而是他们调用了其他人的接口造成的问题，紧接着他又去找下游的服务负责人。我们都知道跨部门之间的沟通成本很高的，这么找下去会花费大量的不必要时间，而有了MTrace之后，你只需要点开链路就能发现超时问题的瓶颈所在。</p>
+<h2 id="优化链路"><a href="#优化链路" class="headerlink" title="优化链路"></a>优化链路</h2><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace4.png" alt=""></p>
+<p>我们再来看下上面这张图，红框部分都是同一个接口的调用，一次请求调用相同的接口10几次甚至是几十次，这是我们不想看到的事情，那么整个系统能不能对这样的请求进行优化，比如改成批量接口或者提高整个系统调用的并行度？在美团点评内部我们会针对这样的链路进行筛选分析，然后提供给业务方进行优化。</p>
+<h2 id="异常log绑定"><a href="#异常log绑定" class="headerlink" title="异常log绑定"></a>异常log绑定</h2><p>通过MTrace不仅能做上述这些事情，通过它的特性，还能携带很多业务感兴趣的数据。因为MTrace可以做到数据和一次请求的绑定以及数据在一次请求的网络中传递。比如一些关键的异常log，一般服务的异常log很有可能是因为上游或者下游的异常造成的，那就需要我们手动地对各个不同服务的异常log做mapping。看这次的异常log对应到上游服务的哪个log上，是不是因为上游传递的一些参数造成了该次异常？而通过MTrace就可以将请求的参数、异常log等信息通过traceId进行绑定，很容易地就把这些信息聚合到了一起，方便业务端查询问题。</p>
+<h2 id="透明传输数据"><a href="#透明传输数据" class="headerlink" title="透明传输数据"></a>透明传输数据</h2><p>业务端往往有这样的需求，它希望一些参数能在一次分布式请求一直传递下去，并且可以在不同的RPC中间件间传递。MTrace对该类需求提供了两个接口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">put(map&lt;String, String&gt; data)</span><br><span class="line">putOnce(map&lt;String, String&gt; data)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>put 接口：参数可以在一次分布式请求中一直传递。</li>
+<li>putOnce 接口：参数在一次分布式请求中只传递一级。</li>
+</ul>
+<p>如下图所示</p>
+<p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace5.png" alt=""></p>
+<ul>
+<li>左侧绿色部分是put接口，service中调用了put接口传递了uid=123456这个参数，它会在网络中一直传递，可以在服务A中通过get(&quot;uid&quot;)的方式获取参数值，也可以在服务C中通过get(&quot;uid&quot;)的方式获取参数值。</li>
+<li>右侧蓝色部分是putOnce接口，service中调用了putOnce接口传递pid=11111，它只会传递一级，可以在服务B中通过get(&quot;pid&quot;)的方式获取参数值，但是在服务D中就获取不到pid的值了。</li>
+</ul>
+<p>以上的两种接口可以用于业务自定义传递数据，比如通过传递一个服务标识，用于AB test，下游的所有服务获取到test的标识就会走test的策略，即上游服务可以传递一些参数，控制所有下游服务的逻辑。当然业务也可以通过该接口传递一些临时性的数据。</p>
+<h1 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h1><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace6.png" alt=""></p>
+<p>主要分为三层：数据埋点上报、数据收集计算、数据前端展示。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace7.png" alt=""></p>
+<h3 id="traceId"><a href="#traceId" class="headerlink" title="traceId"></a>traceId</h3><p>全局唯一，64位整数，用于标识一次分布式请求，会在RPC调用的网络中传递。</p>
+<h3 id="spanId"><a href="#spanId" class="headerlink" title="spanId"></a>spanId</h3><p>签名方式生成:0, 0.1, 0.1.1, 0.2。用于标识一次RPC在分布式请求中的位置，比如0.2就是0节点服务调用的第二个服务。</p>
+<h3 id="annotation"><a href="#annotation" class="headerlink" title="annotation"></a>annotation</h3><p>业务端自定义埋点，业务感兴趣的想上传到后端的数据，比如该次请求的用户ID等。</p>
+<h2 id="数据埋点"><a href="#数据埋点" class="headerlink" title="数据埋点"></a>数据埋点</h2><h3 id="埋点SDK"><a href="#埋点SDK" class="headerlink" title="埋点SDK"></a>埋点SDK</h3><p>提供统一的SDK，在各个中间件中埋点，生成traceID等核心数据，上报服务的调用数据信息。</p>
+<ul>
+<li>生成调用上下文；</li>
+<li>同步调用上下文存放在ThreadLocal, 异步调用通过显式调用API的方式支持；</li>
+<li>网络中传输关键埋点数据，用于中间件间的数据传递，支持Thrift, HTTP协议。</li>
+</ul>
+<p>业内有些系统是使用注解的方式实现的埋点，这种方式看似很优雅，但是需要业务方显式依赖一些AOP库，这部分很容易出现问题，因为AOP方式太过透明，导致查问题很麻烦，而且业务方配置的东西越多越容易引起一些意想不到的问题，所以我们的经验是尽量在各个统一的中间件中进行显式埋点，虽然会导致代码间耦合度增加，但是方便后续定位问题。其次，为了整个框架的统一，MTrace并非仅支持Java一种语言，而AOP的特性很多语言是不支持的。</p>
+<p>Agent</p>
+<ul>
+<li>透传数据，用作数据转发；</li>
+<li>做流量控制；</li>
+<li>控制反转，很多策略可以通过agent实现，而不需要每次都升级业务代码中的SDK。</li>
+</ul>
+<p>Agent仅仅会转发数据，由Agent判断将数据转发到哪里，这样就可以通过Agent做数据路由、流量控制等操作。也正是由于Agent的存在，使得我们可以在Agent层实现一些功能，而不需要业务端做SDK的升级，要知道业务端SDK升级的过程是很缓慢的，这对于整个调用链的系统来说是不可接受的，因为MTrace整个系统是针对庞大的分布式系统而言的，有一环的服务缺失也会造成一定的问题。</p>
+<p>目前MTrace支持的中间件有:</p>
+<ul>
+<li>公司内部RPC中间件</li>
+<li>http中间件</li>
+<li>mysql中间件</li>
+<li>tair中间件</li>
+<li>mq中间件</li>
+</ul>
+<h3 id="数据埋点的四个阶段："><a href="#数据埋点的四个阶段：" class="headerlink" title="数据埋点的四个阶段："></a>数据埋点的四个阶段：</h3><ul>
+<li>Client Send: 客户端发起请求时埋点，需要传递一些参数，比如服务的方法名等</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Span span = Tracer.clientSend(param);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Server Recieve: 服务端接收请求时埋点，需要回填一些参数，比如traceId，spanId</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tracer.serverRecv(param);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ServerSend: 服务端返回请求时埋点，这时会将上下文数据传递到异步上传队列中</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tracer.serverSend();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Client Recieve: 客户端接收返回结果时埋点，这时会将上下文数据传递到异步上传队列中</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tracer.clientRecv();</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace8.png" alt=""></p>
+<h3 id="埋点上下文"><a href="#埋点上下文" class="headerlink" title="埋点上下文"></a>埋点上下文</h3><p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace9.png" alt=""></p>
+<p>上图CS、SR为创建上下文的位置，CR、SS为归档上下文的位置。</p>
+<h3 id="上下文归档"><a href="#上下文归档" class="headerlink" title="上下文归档"></a>上下文归档</h3><p>上下文归档，会把上下文数据异步上传到后端，为了减轻对业务端的影响，上下文上报采用的是异步队列的方式，数据不会落地，直接通过网络形式传递到后端服务，在传递之前会对数据做一层压缩，主要是压缩比很可观，可以达到10倍以上，所以就算牺牲一点CPU资源也是值得的。具体上报的数据如图所示：</p>
+<p><img src="/assets/images/2016/10/14/distributed-session-tracking-system-architecture-design-and-practice/mtrace10.png" alt=""></p>
+<p>我们之前在数据埋点时遇到了一些问题：</p>
+<ul>
+<li><p>异步调用</p>
+<ul>
+<li>异步IO造成的线程切换，不能通过ThreadLocal传递上下文。</li>
+<li>显式的通过API进行埋点传递，切换前保存，切换后还原。</li>
+<li>提供封装好的ThreadPool库。</li>
+</ul>
+</li>
+<li><p>数据量大，每天千亿级别的数据</p>
+<ul>
+<li>批量上报</li>
+<li>数据压缩</li>
+<li>极端情况下采样</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据存储"><a href="#数据存储" class="headerlink" title="数据存储"></a>数据存储</h2><h3 id="Kafka使用"><a href="#Kafka使用" class="headerlink" title="Kafka使用"></a>Kafka使用</h3><p>我们在SDK与后端服务之间加了一层Kafka，这样做既可以实现两边工程的解耦，又可以实现数据的延迟消费。我们不希望因为瞬时QPS过高而引起的数据丢失，当然为此也付出了一些实效性上的代价。</p>
+<h3 id="实时数据Hbase"><a href="#实时数据Hbase" class="headerlink" title="实时数据Hbase"></a>实时数据Hbase</h3><p>调用链路数据的实时查询主要是通过Hbase，使用traceID作为RowKey，能天然的把一整条调用链聚合在一起，提高查询效率。</p>
+<h3 id="离线数据Hive"><a href="#离线数据Hive" class="headerlink" title="离线数据Hive"></a>离线数据Hive</h3><p>离线数据主要是使用Hive，可以通过SQL进行一些结构化数据的定制分析。比如链路的离线形态，服务的出度入度(有多少服务调用了该服务，该服务又调用了多少下游服务)</p>
+<h2 id="前端展示"><a href="#前端展示" class="headerlink" title="前端展示"></a>前端展示</h2><p>前端展示，主要遇到的问题是NTP同步的问题，因为调用链的数据是从不同机器上收集上来的，那么聚合展示的时候就会有NTP时间戳不同步的问题，这个问题很难解决，于是我们采取的方式是前端做一层适配，通过SpanId定位调用的位置而不是时间，比如0.2一定是发生在0.1这个Span之后的调用，所以如果时间出现漂移，就会根据SpanId做一次校正。即判断时间顺序的优先级为最高是spanid,然后是时间戳。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>核心概念：调用链；</p>
+<p>用途：定位系统瓶颈，优化系统结构、统计系统指标、分析系统数据；</p>
+<p>架构：埋点上报、收集计算、展示分析。</p>
+<p>分布式会话跟踪系统主要的特点就是能关联服务之间的联动关系，通过这层关系可以延伸出来很多有意义的分析数据，统计数据。为优化系统结构，查询系统瓶颈问题带来了极大的便利。</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://tech.meituan.com/mt-mtrace.html" target="_blank" rel="noopener">分布式会话跟踪系统架构设计与实践</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Distributed/" rel="tag"># Distributed</a>
+          
+            <a href="/tags/Session/" rel="tag"># Session</a>
+          
+            <a href="/tags/Tracking/" rel="tag"># Tracking</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-10-10-bigdata-lambda-framework/" rel="next" title="深入浅出解析大数据Lambda架构">
+                <i class="fa fa-chevron-left"></i> 深入浅出解析大数据Lambda架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-10-14-model-local-government-finance-tax-revenue/" rel="prev" title="地方政府财政税收收入预测模型经验">
+                地方政府财政税收收入预测模型经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络优化"><span class="nav-text">网络优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#瓶颈查询"><span class="nav-text">瓶颈查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化链路"><span class="nav-text">优化链路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常log绑定"><span class="nav-text">异常log绑定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#透明传输数据"><span class="nav-text">透明传输数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#系统架构"><span class="nav-text">系统架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#traceId"><span class="nav-text">traceId</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spanId"><span class="nav-text">spanId</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#annotation"><span class="nav-text">annotation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据埋点"><span class="nav-text">数据埋点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#埋点SDK"><span class="nav-text">埋点SDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据埋点的四个阶段："><span class="nav-text">数据埋点的四个阶段：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#埋点上下文"><span class="nav-text">埋点上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文归档"><span class="nav-text">上下文归档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据存储"><span class="nav-text">数据存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka使用"><span class="nav-text">Kafka使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实时数据Hbase"><span class="nav-text">实时数据Hbase</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#离线数据Hive"><span class="nav-text">离线数据Hive</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端展示"><span class="nav-text">前端展示</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

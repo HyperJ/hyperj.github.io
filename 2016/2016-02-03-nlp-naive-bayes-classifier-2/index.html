@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="NLP,Naive-Bayes,Classifier," />
+
+
+<meta name="description" content="1.引言上一篇文章我们主要从理论上梳理了朴素贝叶斯方法进行文本分类的基本思路。这篇文章我们主要从实践上探讨一些应用过程中的tricks，并进一步分析贝叶斯方法，最后以情绪褒贬分析和拼写纠错为例展示这种简单强大的方法在自然语言处理问题上的具体应用。 2.为什么不直接匹配关键词来识别垃圾邮件？看了上一篇文章的一些同学可能会问：“何必费这么大劲算那么多词的概率？直接看邮件中有没有‘代开发票’、‘转售发票">
+<meta name="keywords" content="NLP,Naive-Bayes,Classifier">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用朴素贝叶斯进行文本分类(下)">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-02-03-nlp-naive-bayes-classifier-2/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="1.引言上一篇文章我们主要从理论上梳理了朴素贝叶斯方法进行文本分类的基本思路。这篇文章我们主要从实践上探讨一些应用过程中的tricks，并进一步分析贝叶斯方法，最后以情绪褒贬分析和拼写纠错为例展示这种简单强大的方法在自然语言处理问题上的具体应用。 2.为什么不直接匹配关键词来识别垃圾邮件？看了上一篇文章的一些同学可能会问：“何必费这么大劲算那么多词的概率？直接看邮件中有没有‘代开发票’、‘转售发票">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/hash.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/垃圾邮件区分.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/keyboard.jpg">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.913Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用朴素贝叶斯进行文本分类(下)">
+<meta name="twitter:description" content="1.引言上一篇文章我们主要从理论上梳理了朴素贝叶斯方法进行文本分类的基本思路。这篇文章我们主要从实践上探讨一些应用过程中的tricks，并进一步分析贝叶斯方法，最后以情绪褒贬分析和拼写纠错为例展示这种简单强大的方法在自然语言处理问题上的具体应用。 2.为什么不直接匹配关键词来识别垃圾邮件？看了上一篇文章的一些同学可能会问：“何必费这么大劲算那么多词的概率？直接看邮件中有没有‘代开发票’、‘转售发票">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/hash.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-02-03-nlp-naive-bayes-classifier-2/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>用朴素贝叶斯进行文本分类(下) | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-02-03-nlp-naive-bayes-classifier-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">用朴素贝叶斯进行文本分类(下)</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-03T00:00:00+08:00">2016-02-03</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="1-引言"><a href="#1-引言" class="headerlink" title="1.引言"></a>1.引言</h3><p>上一篇文章我们主要从理论上梳理了朴素贝叶斯方法进行文本分类的基本思路。这篇文章我们主要从实践上探讨一些应用过程中的tricks，并进一步分析贝叶斯方法，最后以情绪褒贬分析和拼写纠错为例展示这种简单强大的方法在自然语言处理问题上的具体应用。</p>
+<h3 id="2-为什么不直接匹配关键词来识别垃圾邮件？"><a href="#2-为什么不直接匹配关键词来识别垃圾邮件？" class="headerlink" title="2.为什么不直接匹配关键词来识别垃圾邮件？"></a>2.为什么不直接匹配关键词来识别垃圾邮件？</h3><p>看了上一篇文章的一些同学可能会问：“何必费这么大劲算那么多词的概率？直接看邮件中有没有‘代开发票’、‘转售发票’之类的关键词不就得了？如果关键词比较多就认为是垃圾邮件呗。”</p>
+<p>咳咳，其实关键词匹配的方法如果有效的话真不必用朴素贝叶斯。毕竟这种方法简单嘛，<strong>就是一个字符串匹配</strong>。从历史来看，之前没有贝叶斯方法的时候主要也是用关键词匹配。<strong>但是这种方法准确率太低</strong>。我们在工作项目中也尝试过用关键词匹配的方法去进行文本分类，发现大量误报。感觉就像扔到垃圾箱的邮件99%都是正常的！这样的效果不忍直视。而加一个朴素贝叶斯方法就可能把误报率拉低近一个数量级，体验好得不要不要的。</p>
+<p><strong>另一个原因是词语会随着时间不断变化</strong>。发垃圾邮件的人也不傻，当他们发现自己的邮件被大量屏蔽之后，也会考虑采用新的方式，<strong>如变换文字、词语、句式、颜色等方式来绕过反垃圾邮件系统</strong>。比如对于垃圾邮件“我司可办理正规发票，17%增值税发票点数优惠”,他们采用火星文：“<strong>涐司岢办理㊣規髮票，17%增値稅髮票嚸數優蕙</strong>”，那么字符串匹配的方法又要重新找出这些火星文，一个一个找出关键词，重新写一些匹配规则。更可怕的是，这些规则可能相互之间的耦合关系异常复杂，要把它们梳理清楚又是大一个数量级的工作量。等这些规则失效了又要手动更新新的规则……<strong>无穷无尽猫鼠游戏最终会把猫给累死</strong>。</p>
+<p>而朴素贝叶斯方法却显示出无比的优势。因为它是<strong>基于统计方法</strong>的，只要训练样本中有更新的垃圾邮件的新词语，哪怕它们是火星文，<strong>都能自动地把哪些更敏感的词语（如“髮”、“㊣”等）给凸显出来，并根据统计意义上的敏感性给他们分配适当的权重</strong>，这样就不需要什么人工了，非常省事。<strong>你只需要时不时地拿一些最新的样本扔到训练集中，重新训练一次即可</strong>。</p>
+<p>小补充一下，对于火星文、同音字等替代语言，一般的分词技术可能会分得不准，最终可能只把一个一个字给分出来，成为“分字”。当然也可以用过n-gram之类的语言模型(后续博客马上提到，尽请关注)，拿到最常见短语。对于英文等天生自带空格来间隔单词的语言，分词则不是什么问题，使用朴素贝叶斯方法将会更加顺畅。</p>
+<h3 id="3-工程上的一些tricks"><a href="#3-工程上的一些tricks" class="headerlink" title="3.工程上的一些tricks"></a>3.工程上的一些tricks</h3><p>应用朴素贝叶斯方法的过程中，一些tricks能显著帮助工程解决问题。我们毕竟经验有限，无法将它们全都罗列出来，只能就所知的一点点经验与大家分享，欢迎批评指正。</p>
+<h4 id="3-1-trick1：取对数"><a href="#3-1-trick1：取对数" class="headerlink" title="3.1 trick1：取对数"></a>3.1 trick1：取对数</h4><p>我们上一篇文章用来识别垃圾邮件的方法是比较以下两个概率的大小（字母S表示“垃圾邮件”,字母H表示“正常邮件”）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">C = P(“我”|S)P(“司”|S)P(“可”|S)P(“办理”|S)P(“正规发票”|S)</span><br><span class="line"> × P(“保真”|S)P(“增值税”|S)P(“发票”|S)P(“点数”|S)P(“优惠”|S)P(“垃圾邮件”)</span><br><span class="line">C¯ = P(“我”|H)P(“司”|H)P(“可”|H)P(“办理”|H)P(“正规发票”|H)</span><br><span class="line"> × P(“保真”|H)P(“增值税”|H)P(“发票”|H)P(“点数”|H)P(“优惠”|H)P(“正常邮件”)</span><br></pre></td></tr></table></figure>
+<p>但这里进行了<strong>很多乘法运算，计算的时间开销比较大</strong>。尤其是对于篇幅比较长的邮件，几万个数相乘起来还是非常花时间的。如果能<strong>把这些乘法变成加法则方便得多</strong>。刚好数学中的对数函数log就可以实现这样的功能。两边同时取对数（本文统一取底数为2），则上面的公式变为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logC = logP(“我”|S)+logP(“司”|S)+logP(“可”|S)+logP(“办理”|S)+logP(“正规发票”|S)+logP(“保真”|S)+logP(“增值税”|S)+logP(“发票”|S)+logP(“点数”|S)+logP(“优惠”|S)+logP(“垃圾邮件”)</span><br><span class="line">logC¯ = logP(“我”|H)+logP(“司”|H)+logP(“可”|H)+logP(“办理”|H)+logP(“正规发票”|H)+logP(“保真”|H)+logP(“增值税”|H)+logP(“发票”|H)+logP(“点数”|H)+logP(“优惠”|H)+logP(“正常邮件”)</span><br></pre></td></tr></table></figure>
+<p>有同学可能要叫了：“做对数运算岂不会也很花时间？”的确如此，但是可以在训练阶段直接计算logP，然后把他们存在一张大的hash表里。<strong>在判断的时候直接提取hash表中已经计算好的对数概率，然后相加即可。这样使得判断所需要的计算时间被转移到了训练阶段</strong>，实时运行的时候速度就比之前快得多，这可不止几个数量级的提升。</p>
+<h4 id="3-2-trick2：转换为权重"><a href="#3-2-trick2：转换为权重" class="headerlink" title="3.2 trick2：转换为权重"></a>3.2 trick2：转换为权重</h4><p>对于二分类，我们还可以继续提高判断的速度。既然要比较logC和logC¯的大小，那就可以直接将上下两式相减，并继续化简：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logCC¯=logP(“我”|S)P(“我”|H)+logP(“司”|S)P(“司”|H)+logP(“可”|S)P(“可”|H)+logP(“办理”|S)P(“办理”|H)+logP(“正规发票”|S)P(“正规发票”|H)</span><br><span class="line">+logP(“保真”|S)P(“保真”|H)+logP(“增值税”|S)P(“增值税”|H)+logP(“发票”|S)P(“发票”|H)+logP(“点数”|S)P(“点数”|H)+logP(“优惠”|S)P(“优惠”|H)+logP(“正常邮件”|S)P(“正常邮件”)</span><br></pre></td></tr></table></figure>
+<p><code>logCC¯</code><strong>如果大于0则属于垃圾邮件。我们可以把其中每一项作为其对应词语的权重</strong>，比如<code>logP(“发票”|S)/P(“发票”|H)</code>就可以作为词语“发票”的权重，权重越大就越说明“发票”更可能是与“垃圾邮件”相关的特征。<strong>这样可以根据权重的大小来评估和筛选显著的特征，比如关键词。而这些权重值可以直接提前计算好而存在hash表中</strong>。判断的时候直接将权重求和即可。</p>
+<p>关键词hash表的样子如下，左列是权重，右列是其对应的词语，权重越高的说明越“关键”：</p>
+<p><img src="/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/hash.jpg" alt=""></p>
+<h4 id="3-3-trick3：选取topk的关键词"><a href="#3-3-trick3：选取topk的关键词" class="headerlink" title="3.3 trick3：选取topk的关键词"></a>3.3 trick3：选取topk的关键词</h4><p>前文说过可以通过提前选取关键词来提高判断的速度。有一种方法可以省略提前选取关键词的步骤，<strong>就是直接选取一段文本中权重最高的K个词语，将其权重进行加和</strong>。比如Paul Graham在《黑客与画家》中是选取邮件中权重最高的15个词语计算的。</p>
+<p>通过权重hash表可知，如果是所有词语的权重，则权重有正有负。如果只选择权重最高的K个词语，则它们的权重基本都是正的。所以就不能像之前那样判断logCC¯¯是否大于0来区分邮件了。而这<strong>需要依靠经验选定一个正数的阈值（门槛值）</strong>，依据logCC¯¯与该门槛值的大小来识别垃圾邮件。</p>
+<p>如下图所示，蓝色点代表垃圾邮件，绿色点代表正常邮件，横坐标为计算出来的logCC¯¯值，中间的红线代表阈值。</p>
+<p><img src="/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/垃圾邮件区分.jpg" alt=""></p>
+<h4 id="3-4-trick4：分割样本"><a href="#3-4-trick4：分割样本" class="headerlink" title="3.4 trick4：分割样本"></a>3.4 trick4：分割样本</h4><p>选取topk个词语的方法对于篇幅变动不大的邮件样本比较有效。但是对篇幅过大或者过小的邮件则会有判断误差。</p>
+<p>比如这个垃圾邮件的例子：（“我”,“司”,“可”,“办理”,“正规发票”,“保真”,“增值税”,“发票”,“点数”,“优惠”)。分词出了10个词语，其中有“正规发票”、“发票”2个关键词。关键词的密度还是蛮大的，应该算是敏感邮件。但因为采用最高15个词语的权重求和，并且相应的阈值是基于15个词的情况有效，可能算出来的结果还小于之前的阈值，这就造成漏判了。</p>
+<p>类似的，如果一封税务主题的邮件有1000个词语，其中只有“正规发票”、“发票”、“避税方法”3个权重比较大的词语，它们只是在正文表述中顺带提到的内容。关键词的密度被较长的篇幅稀释了，应该算是正常邮件。但是却被阈值判断成敏感邮件，造成误判了。</p>
+<p><strong>这两种情况都说明topk关键词的方法需要考虑篇幅的影响</strong>。这里有许多种处理方式，<strong>它们的基本思想都是选取词语的个数及对应的阈值要与篇幅的大小成正比</strong>，本文只介绍其中一种方方法：</p>
+<ul>
+<li><p>对于长篇幅邮件，按一定的大小，比如每500字，将其分割成小的文本段落，再对小文本段落采用topk关键词的方法。只要其中有一个小文本段落超过阈值就判断整封邮件是垃圾邮件。</p>
+</li>
+<li><p>对于超短篇幅邮件，比如50字，可以按篇幅与标准比较篇幅的比例来选取topk，以确定应该匹配关键词语的个数。比如选取50/500×15≈2个词语进行匹配，相应的阈值可以是之前阈值的2/15。以此来判断则更合理。</p>
+</li>
+</ul>
+<h4 id="3-5-trick5：位置权重"><a href="#3-5-trick5：位置权重" class="headerlink" title="3.5 trick5：位置权重"></a>3.5 trick5：位置权重</h4><p>到目前为止，我们对词语权重求和的过程都没有考虑邮件篇章结构的因素。比如“正规发票”如果出现在标题中应该比它出现在正文中对判断整个邮件的影响更大；而出现在段首句中又比其出现在段落正文中对判断整个邮件的影响更大。<strong>所以可以根据词语出现的位置，对其权重再乘以一个放大系数，以扩大其对整封邮件的影响，提高识别准确度</strong>。</p>
+<p>比如一封邮件其标题是“正规发票”（假设标题的放大系数为2），段首句是“发票”,“点数”,“优惠”（假设段首的放大系数为1.5），剩下的句子是（“我”,“司”,“可”,“办理”,“保真”）。则计算logCC¯时的公式就可以调整为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logCC¯=2×logP(“正规发票”|S)/P(“正规发票”|H)+1.5×logP(“发票”|S)/P(“发票”|H)+1.5×logP(“点数”|S)/P(“点数”|H)+1.5×logP(“优惠”|S)/P(“优惠”|H)</span><br><span class="line">+logP(“我”|S)/P(“我”|H)+logP(“司”|S)/P(“司”|H)+logP(“可”|S)/P(“可”|H)+logP(“办理”|S)/P(“办理”|H)+logP(“保真”|S)/P(“保真”|H)+logP(“正常邮件”|S/)P(“正常邮件”)</span><br></pre></td></tr></table></figure>
+<h4 id="3-6-trick6：蜜罐"><a href="#3-6-trick6：蜜罐" class="headerlink" title="3.6 trick6：蜜罐"></a>3.6 trick6：蜜罐</h4><p>我们通过辛辛苦苦的统计与计算，好不容易得到了不同词语的权重。然而这并不是一劳永逸的。我们我们之前交代过，<strong>词语及其权重会随着时间不断变化，需要时不时地用最新的样本来训练以更新词语及其权重</strong>。</p>
+<p>而搜集最新垃圾邮件有一个技巧，就是随便注册一些邮箱，然后将它们公布在各大论坛上。接下来就坐等一个月，到时候收到的邮件就绝大部分都是垃圾邮件了（好奸诈）。再找一些正常的邮件，基本就能够训练了。这些用于自动搜集垃圾邮件的邮箱叫做“蜜罐”。<strong>“蜜罐”是网络安全领域常用的手段，因其原理类似诱捕昆虫的装有蜜的罐子而得名</strong>。比如杀毒软件公司会利用蜜罐来监视或获得计算机网络中的病毒样本、攻击行为等。</p>
+<h3 id="4-贝叶斯方法的思维方式"><a href="#4-贝叶斯方法的思维方式" class="headerlink" title="4.贝叶斯方法的思维方式"></a>4.贝叶斯方法的思维方式</h3><p>讲了这么多tricks，但这些手段都是建立在贝叶斯方法基础之上的。因此有必要探讨一下贝叶斯方法的思维方式，以便更好地应用这种方法解决实际问题。</p>
+<h4 id="4-1-逆概问题"><a href="#4-1-逆概问题" class="headerlink" title="4.1 逆概问题"></a>4.1 逆概问题</h4><p>我们重新看一眼贝叶斯公式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(Y|X) = \frac&#123;P(X|Y)P(Y)&#125;&#123;P(X)&#125;</span><br></pre></td></tr></table></figure>
+<p>先不考虑先验概率<code>P(Y)</code>与<code>P(X)</code>，观察两个后验概率<code>P(Y|X</code>)与<code>P(X|Y)</code>，可见贝叶斯公式能够揭示<strong>两个相反方向的条件概率之间的转换关系</strong>。</p>
+<p>从贝叶斯公式的发现历史来看，其就是为了处理所谓“逆概”问题而诞生的。比如<code>P(Y|X)</code>不能通过直接观测来得到结果，而<code>P(X|Y)</code>却容易通过直接观测得到结果，就可以通过贝叶斯公式<strong>从间接地观测对象去推断不可直接观测的对象的情况</strong>。</p>
+<p>好吧，我们说人话。基于邮件的文本内容判断其属于垃圾邮件的概率不好求（不可通过直接观测、统计得到），但是基于已经搜集好的垃圾邮件样本，去统计（直接观测）其文本内部各个词语的概率却非常方便。这就可以用贝叶斯方法。</p>
+<p>引申一步，基于样本特征去判断其所属标签的概率不好求，但是基于已经搜集好的打上标签的样本（有监督），却可以直接统计属于同一标签的样本内部各个特征的概率分布。因此贝叶斯方法的理论视角适用于一切分类问题的求解。</p>
+<h4 id="4-2-处理多分类问题"><a href="#4-2-处理多分类问题" class="headerlink" title="4.2 处理多分类问题"></a>4.2 处理多分类问题</h4><p>前面我们一直在探讨二分类（判断题）问题，现在可以引申到多分类（单选题）问题了。</p>
+<p>还是用邮件分类的例子，这是现在不只要判断垃圾邮件，还要将正常邮件细分为私人邮件、工作邮件。现在有这3类邮件各1万封作为样本。需要训练出一个贝叶斯分类器。这里依次用Y1,Y2,Y3表示这三类邮件，用X表示被判断的邮件。套用贝叶斯公式有：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P(Y1|X)=P(X|Y1)P(Y1)P(X)</span><br><span class="line">P(Y2|X)=P(X|Y2)P(Y2)P(X)</span><br><span class="line">P(Y3|X)=P(X|Y3)P(Y3)P(X)</span><br></pre></td></tr></table></figure>
+<p>通过比较3个概率值的大小即可得到X所属的分类。发现三个式子的分母P(X)一样，比较大小时可以忽略不计，于是就可以用下面这一个式子表达上面3式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">P(Yi|X)∝P(X|Yi)P(Yi)</span><br><span class="line">i=1,2,3</span><br></pre></td></tr></table></figure>
+<p>其中∝表示“正比于”。而<code>P(X|Yi)</code>则有个特别高逼格的名字叫做“<strong>似然函数</strong>”。我们上大学的时候也被这个名字搞得晕晕乎乎的，其实它也是个概率，直接理解成“<strong><code>P(Yi|X)</code> 的逆反条件概率</strong>” 就方便了。</p>
+<p>这里只是以垃圾邮件3分类问题举了个例子，<strong>对于任意多分类的问题都可以用这样的思路去理解。比如新闻分类、情感喜怒哀乐分类等等</strong>。</p>
+<h4 id="4-3-先验概率的问题"><a href="#4-3-先验概率的问题" class="headerlink" title="4.3 先验概率的问题"></a>4.3 先验概率的问题</h4><p>在垃圾邮件的例子中，先验概率都相等，<code>P(Y1)=P(Y2)=P(Y3)=10000/30000=1/3</code>，所以上面是式子又可以进一步化简：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">P(Yi|X)∝P(X|Yi)</span><br><span class="line">i=1,2,3</span><br></pre></td></tr></table></figure>
+<p>只需比较右边式子（也就是“似然函数”）的大小就可以了。这种方法就是传说中的<strong>最大似然法</strong>:不考虑先验概率而直接比较似然函数。</p>
+<p>关于选出最佳分类Yi是否要考虑先验概率P(Yi)的问题，曾经在频率学派和贝叶斯学派之间产生了激烈的教派冲突。统计学家（频率学派）说：我们让数据自己说话。言下之意就是要摒弃先验概率。而贝叶斯学派支持者则说：数据会有各种各样的偏差，而一个<strong>靠谱的先验概率</strong>则可以对这些随机噪音做到健壮。对此有兴趣的同学可以找更多资料进行了解，本文在此不做更多的引申，只基于垃圾邮件识别的例子进行探讨。</p>
+<p>比如我们在采集垃圾邮件样本的时候，不小心delete掉了一半的数据，就剩下5000封邮件。则计算出来的先验概率为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">P(Y1)=5000/25000=1/5，</span><br><span class="line">P(Y2)=P(Y3)=10000/25000=2/5</span><br></pre></td></tr></table></figure>
+<p>如果还用贝叶斯方法,就要在似然函数后面乘上先验概率。比如之前用最大似然法算出Y1垃圾邮件的概率大，但是因为<code>P(Y1)</code>特别小，用贝叶斯方法得出的结果是<code>Y2</code>私人邮件的概率大。那相信哪个呢？其实，我们删掉了部分带标签的样本，从计算结果看<code>P(Y1)</code>，<code>P(Y2)</code>，<code>P(Y3)</code>的概率分布变化了，但实际上<strong>这三个类别的真实分布应该是一个客观的状态，不应该因为我们的计算方法而发生变化</strong>。所以是我们计算出来的先验概率失真，应该放弃这样计算出来的先验概率，而用最大似然法。但即便我们不删掉一半垃圾邮件，这三类邮件的分布就真的是1:1:1那样平均吗？那也未必。<strong>我们只是按1:1:1这样的方式进行了抽样而已，真正在邮箱里收到的这三类邮件的分布可能并不是这样。也就是说，在我们对于先验概率一无所知时，只能假设每种猜测的先验概率是均等的（其实这也是人类经验的结果），这个时候就只有用最大似然了</strong>。在现实运用过程中如果发现最大似然法有偏差，可以考虑对不同的似然函数设定一些系数或者阈值，使其接近真实情况。</p>
+<p>但是，<strong>如果我们有足够的自信，训练集中这三类的样本分布的确很接近真实的情况，这时就应该用贝叶斯方法</strong>。难怪前面的贝叶斯学派强调的是“靠谱的先验概率”。所以说<strong>贝叶斯学派的适用范围更广，关键要先验概率靠谱，而频率学派有效的前提也是他们的先验概率同样是经验统计的结果</strong>。</p>
+<h3 id="5-朴素-贝叶斯方法的常见应用"><a href="#5-朴素-贝叶斯方法的常见应用" class="headerlink" title="5.(朴素)贝叶斯方法的常见应用"></a>5.(朴素)贝叶斯方法的常见应用</h3><p>说了这么多理论的问题，咱们就可以探讨一下(朴素)贝叶斯方法在自然语言处理中的一些常见应用了。以下只是从原理上进行探讨，对于具体的技术细节顾及不多。</p>
+<h4 id="5-1-褒贬分析"><a href="#5-1-褒贬分析" class="headerlink" title="5.1 褒贬分析"></a>5.1 褒贬分析</h4><p>一个比较常见的应用场景是情感褒贬分析。比如你要统计微博上人们对一个新上映电影的褒贬程度评价：好片还是烂片。但是一条一条地看微博是根本看不过来，只能用自动化的方法。我们可以有一个很粗略的思路：</p>
+<ul>
+<li>首先是用爬虫将微博上提到这个电影名字的微博全都抓取下来，比如有10万条。</li>
+<li>然后用训练好的朴素贝叶斯分类器分别判断这些微博对电影是好评还是差评。</li>
+<li>最后统计出这些好评的影评占所有样本中的比例，就能形成微博网友对这个电影综合评价的大致估计。</li>
+</ul>
+<p>接下来的核心问题就是训练出一个靠谱的分类器。首先需要有打好标签的文本。这个好找，豆瓣影评上就有大量网友对之前电影的评价，并且对电影进行1星到5星的评价。我们可以认为3星以上的评论都是好评，3星以下的评论都是差评。这样就分别得到了好评差评两类的语料样本。剩下就可以用朴素贝叶斯方法进行训练了。基本思路如下：</p>
+<ul>
+<li>训练与测试样本：豆瓣影评的网友评论，用爬虫抓取下100万条。</li>
+<li>标签：3星以上的是好评，3星以下的是差评。</li>
+<li>特征：豆瓣评论分词后的词语。一个简单的方法是只选择其中的形容词，网上有大量的情绪词库可以为我们所用。</li>
+<li>然后再用常规的朴素贝叶斯方法进行训练。</li>
+</ul>
+<p>但是由于自然语言的特点，在提取特征的过程当中，有一些tricks需要注意：</p>
+<ul>
+<li><strong>对否定句进行特别的处理</strong>。比如这句话“我不是很喜欢部电影，因为它让我开心不起来。”其中两个形容词“喜欢”、“开心”都是褒义词，但是因为句子的否定句，所以整体是贬义的。有一种比较简单粗暴的处理方式，就是“<strong>对否定词（“不”、“非”、“没”等）与句尾标点之间的所有形容词都采用其否定形式</strong>”。则这句话中提取出来的形容词就应该是“不喜欢”和“不开心”。</li>
+<li>一般说来，最相关的情感词在一些文本片段中仅仅出现一次，词频模型起得作用有限，甚至是负作用，<strong>则使用伯努利模型代替多项式模型</strong>。这种情况在微博这样的小篇幅文本中似乎不太明显，但是在博客、空间、论坛之类允许长篇幅文本出现的平台中需要注意。</li>
+<li>其实，副词对情感的评价有一定影响。“不很喜欢”与“很不喜欢”的程度就有很大差异。但如果是朴素贝叶斯方法的话比较难处理这样的情况。我们可以考虑用语言模型或者加入词性标注的信息进行综合判断。这些内容我们将在之后的文章进行探讨。</li>
+</ul>
+<p>当然经过以上的处理，情感分析还是会有一部分误判。这里涉及到许多问题，都是情感分析的难点：</p>
+<ul>
+<li><strong>情绪表达的含蓄微妙</strong>：“导演你出来，我保证不打死你。”你让机器怎么判断是褒还是贬？</li>
+<li><strong>转折性表达</strong>：“我非常喜欢这些大牌演员，非常崇拜这个导演，非常赞赏这个剧本，非常欣赏他们的预告片，我甚至为了这部影片整整期待了一年，最后进了电影院发现这是个噩梦。” 五个褒义的形容词、副词对一个不那么贬义的词。机器自然判断成褒义，但这句话是妥妥的贬义。</li>
+</ul>
+<h4 id="5-2-拼写纠错"><a href="#5-2-拼写纠错" class="headerlink" title="5.2 拼写纠错"></a>5.2 拼写纠错</h4><p>拼写纠错本质上也是一个分类问题。但按照错误类型不同，又分为两种情况：</p>
+<ul>
+<li>非词错误（Non-word Errors）：指那些拼写错误后的词本身就不合法，如将“wifi”写成“wify”；</li>
+<li>真词错误（Real-word Errors）：指那些拼写错误后的词仍然是合法的情况，如将“wifi”写成“wife”。</li>
+</ul>
+<p>真词错误复杂一些，我们将在接下来的文章中进行探讨。而对于非词错误，就可以直接采用贝叶斯方法，其基本思路如下：</p>
+<ul>
+<li>标签：通过计算错误词语的最小编辑距离（之前咱们提到过的），获取最相似的候选词，每个候选词作为一个分类。</li>
+<li>特征：拼写错误的词本身。因为它就一个特征，所以没有什么条件独立性假设、朴素贝叶斯啥的。它就是纯而又纯的贝叶斯方法。</li>
+<li><p>判别公式:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(候选词i|错误词)∝P(错误词|候选词i)P(候选词i)；i=1,2,3,...</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>训练样本1：该场景下的正常用词语料库，用于计算P(候选词i)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(候选词i)=候选词出现的次数所有词出现的次数</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>训练样本2：该场景下错误词与正确词对应关系的语料库，用于计算P(错误词|候选词i)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(错误词|候选词i)=候选词被拼写成该“错误词”的次数候选词出现的次数</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>由于自然语言的特点，有一些tricks需要注意：</p>
+<ul>
+<li>据统计，80%的拼写错误编辑距离为1，几乎所有的拼写错误编辑距离小于等于2。我们只选择编辑距离为1或2的词作为候选词，这样就可以减少大量不必要的计算。</li>
+<li>由于我们只选择编辑距离为1或2的词，其差别只是一两个字母级别差别。因此计算似然函数的时候，可以只统计字母层面的编辑错误，这样搜集的样本更多，更满足大数定律，也更简单。对于编辑距离为1的似然函数计算公式可以进化为：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P(错误词|候选词i)=⎧⎩⎨⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪⎪字母“xy”被拼写成“y”的次数字母“xy”出现的次数,字母“x”被拼写成“xy”的次数字母“x”出现的次数,字母“x”被拼写成“y”的次数字母“x”出现的次数,字母“xy”被拼写成“yx的次数字母“xy”出现的次数,</span><br></pre></td></tr></table></figure>
+<ul>
+<li>键盘上临近的按键更容易拼写错误，据此可以对上面这个条件概率进行加权。</li>
+</ul>
+<p><img src="/assets/images/2016/02/03/nlp-naive-bayes-classifier-2/keyboard.jpg" alt=""></p>
+<h3 id="6-小结"><a href="#6-小结" class="headerlink" title="6.小结"></a>6.小结</h3><p>从这两篇文章大家基本可以看出，工程应用不同于学术理论，有许多tricks需要考虑，而理论本质就是翻来倒去折腾贝叶斯公式，都快玩出花来了。但是如果只用朴素贝叶斯，很多情况还是无法应付，需要我们在贝叶斯公式上再折腾出一些花样。详细内容，请听下回分解。</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://blog.csdn.net/han_xiaoyang/article/details/50616559" target="_blank" rel="noopener">用朴素贝叶斯进行文本分类(下)</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NLP/" rel="tag"># NLP</a>
+          
+            <a href="/tags/Naive-Bayes/" rel="tag"># Naive-Bayes</a>
+          
+            <a href="/tags/Classifier/" rel="tag"># Classifier</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-02-01-nlp-naive-bayes-classifier-1/" rel="next" title="用朴素贝叶斯进行文本分类(上)">
+                <i class="fa fa-chevron-left"></i> 用朴素贝叶斯进行文本分类(上)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-02-14-high-availability-revelation/" rel="prev" title="High Availability启示录">
+                High Availability启示录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-引言"><span class="nav-text">1.引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-为什么不直接匹配关键词来识别垃圾邮件？"><span class="nav-text">2.为什么不直接匹配关键词来识别垃圾邮件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-工程上的一些tricks"><span class="nav-text">3.工程上的一些tricks</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-trick1：取对数"><span class="nav-text">3.1 trick1：取对数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-trick2：转换为权重"><span class="nav-text">3.2 trick2：转换为权重</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-trick3：选取topk的关键词"><span class="nav-text">3.3 trick3：选取topk的关键词</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-trick4：分割样本"><span class="nav-text">3.4 trick4：分割样本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-trick5：位置权重"><span class="nav-text">3.5 trick5：位置权重</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6-trick6：蜜罐"><span class="nav-text">3.6 trick6：蜜罐</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-贝叶斯方法的思维方式"><span class="nav-text">4.贝叶斯方法的思维方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-逆概问题"><span class="nav-text">4.1 逆概问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-处理多分类问题"><span class="nav-text">4.2 处理多分类问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-先验概率的问题"><span class="nav-text">4.3 先验概率的问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-朴素-贝叶斯方法的常见应用"><span class="nav-text">5.(朴素)贝叶斯方法的常见应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-褒贬分析"><span class="nav-text">5.1 褒贬分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-拼写纠错"><span class="nav-text">5.2 拼写纠错</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-小结"><span class="nav-text">6.小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Succinct," />
+
+
+<meta name="description" content="近年来，随着互联网数据的日益增长，管理分布式数据需求的日益增加，Bigtable[1]等一系列NoSQL数据库开始涌现。Bigtable是一个分布式的结构化数据存储系统，它被设计用来处理海量数据，其在提供Tablet服务时使用内存中的memtable和GFS[2]中的SSTable来相互配合着来存储数据更新，其中存储和更新的方法与日志结构的合并树[3]（Log-Structured Merge-T">
+<meta name="keywords" content="Succinct">
+<meta property="og:type" content="article">
+<meta property="og:title" content="日志结构的合并树（The Log-Structured Merge-Tree）">
+<meta property="og:url" content="http://hyperj.github.com/2013/2013-01-12-the-log-structured-merge-tree/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="近年来，随着互联网数据的日益增长，管理分布式数据需求的日益增加，Bigtable[1]等一系列NoSQL数据库开始涌现。Bigtable是一个分布式的结构化数据存储系统，它被设计用来处理海量数据，其在提供Tablet服务时使用内存中的memtable和GFS[2]中的SSTable来相互配合着来存储数据更新，其中存储和更新的方法与日志结构的合并树[3]（Log-Structured Merge-T">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/1.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/2.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/3.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/4.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/5.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/6.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/7.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/8.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/9.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/10.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/11.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/12.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/13.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/14.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/15.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/16.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/17.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.896Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="日志结构的合并树（The Log-Structured Merge-Tree）">
+<meta name="twitter:description" content="近年来，随着互联网数据的日益增长，管理分布式数据需求的日益增加，Bigtable[1]等一系列NoSQL数据库开始涌现。Bigtable是一个分布式的结构化数据存储系统，它被设计用来处理海量数据，其在提供Tablet服务时使用内存中的memtable和GFS[2]中的SSTable来相互配合着来存储数据更新，其中存储和更新的方法与日志结构的合并树[3]（Log-Structured Merge-T">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2013/01/12/the-log-structured-merge-tree/1.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2013/2013-01-12-the-log-structured-merge-tree/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>日志结构的合并树（The Log-Structured Merge-Tree） | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2013/2013-01-12-the-log-structured-merge-tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">日志结构的合并树（The Log-Structured Merge-Tree）</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2013-01-12T00:00:00+08:00">2013-01-12</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Succinct/" itemprop="url" rel="index"><span itemprop="name">Succinct</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>近年来，随着互联网数据的日益增长，管理分布式数据需求的日益增加，Bigtable[1]等一系列NoSQL数据库开始涌现。Bigtable是一个分布式的结构化数据存储系统，它被设计用来处理海量数据，其在提供Tablet服务时使用内存中的memtable和GFS[2]中的SSTable来相互配合着来存储数据更新，其中存储和更新的方法与日志结构的合并树[3]（Log-Structured Merge-Tree，LSM-tree）类似，并以其为基础。</p>
+<p>Log-Structured的思想最早由 Rosenblum和Ousterhout[4]于1992年在研究日志结构的文件系统时提出。他们将整个磁盘就看做是一个日志，在日志中存放永久性数据及其索引，每次都添加到日志的末尾；通过将很多小文件的存取转换为连续的大批量传输，使得对于文件系统的大多数存取都是顺序性的，从而提高磁盘带宽利用率，故障恢复速度快。 O’Neil[3]等人受到这种思想的启发，借鉴了Log不断追加（而不是修改）的特点，结合B-tree的数据结构，提出了一种延迟更新，批量写入硬盘的数据结构LSM-tree及其算法。LSM-tree努力地在读和写两方面寻找一个平衡点以最小化系统的存取性能的开销，特别适用于会产生大量插入操作的应用环境。</p>
+<p><strong>LSM-tree</strong></p>
+<p>LSM-tree是由两个或两个以上存储数据的结构组成的。最简单的LSM-tree由两个部件构成。一个部件常驻内存，称为C0树（或C0），可以为任何方便键值查找的数据结构，另一个部件常驻硬盘之中，称为C1树（或C1），其数据结构与B-tree类似。C1中经常被访问的结点也将会被缓存在内存中。如下图所示：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/1.png" alt=""></p>
+<p>图1：两部件的LSM-tree</p>
+<p>当插入一条新的数据条目时，首先会向日志文件中写入插入操作的日志，为以后的恢复做准备。然后将根据新条目的索引值将新条目插入到C0中。将新条目插入内存的C0中，不需要任何与硬盘的I/O操作，但内存的存储代价比硬盘的要高上不少，因此当C0的大小达到某一阈值时，内存存储的代价会比硬盘的I/O操作和存储代价还高。故每当C0的大小接近其阈值时，将有一部分的条目从C0滚动合并到硬盘中的C1，以减少C0的大小，降低内存存储数据的代价。<br>C1的结构与B-tree相似，但其结点中的条目是满的，结点的大小为一页，树根之下的所有单页结点合并到地址连续的多页块中。</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/2.png" alt=""></p>
+<p>图2：多页块的结构及其结点的结构</p>
+<p>事实上，除了在多页块中不必从左至右填充结点外，C1与SB-tree[5]几乎相同。如图所示。J-1层结点包含连续的指向J层结点（node1，node2，…nodeK）的指针（P1，P2，…，PK）和分割指针的键（S1，S2，…，SK-1）。J层结点连续存放在多页块的K页中，并且不必按照键的大小排列。如果J层的两个结点存放于同一个多页块中，那这两个结点的键值之间的所有结点也存放在多页块中。M是多页块分割的标记，表示直到下一个M标记或空结点之内的所有后续结点都存放在同一个多页块中。M中包含了多页块开始的硬盘页号和多页块中结点的数量。树根始终是以一个单页存储的。可以看出多页块可用于范围检索，而多页块中结点可用于精确的键值匹配的检索。<br>假设C0也是一种B-tree，设想在滚动合并时，C0和C1都有一个指向相等键值的游标，游标指向下一个将要合并的叶子结点中的条目。从根结点到达这个位置的路径将C1上所有正在进行滚动合并的多页块分成两部分。一部分是游标还未到达的结点，合并时读入清空块（emptying block），另一部分是游标已经过的结点，即滚动合并的结果，合并时写入填充块（filling block）。这样的过程如下：</p>
+<ul>
+<li>从C1中读入未合并的叶子结点，存储于内存的清空块中；</li>
+<li>从C0中读取叶子结点，并与清空块中的叶子结点进行合并排序；</li>
+<li>将合并排序的结果写入填充块中，并从C0中删除用于合并排序的旧叶子结点；</li>
+<li>不断地重复步骤2和3，当填充块被合并排序的结果填满时，将填充块追加到硬盘的新位置，并从C1中删除用于合并排序的旧叶子结点，当清空块被全部读取完时，再从C1中读入未合并的叶子结点；</li>
+<li>当C0和C1的所有叶子节点都被读入内存进行合并，并产生新的叶子结点之后，C0和C1的一次滚动合并就结束了。</li>
+</ul>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/3.png" alt=""></p>
+<p>图3：C0与C1之间的滚动合并</p>
+<p>C0并不将所有的条目都拿来滚动合并。由于C0存储在内存之中，所以C0可以保留最近插入或最常访问的那些数据，以提高访问速率并降低I/O操作的次数。C1的旧多页块可用于崩溃恢复，所以为了不覆盖旧多页块，滚动合并产生的新多页块将被写入硬盘的新空间。一般来说，每次合并之后，会剩下一些不满的没有写入硬盘的填充块，没有填入填充块的叶子结点，这些结点会和它们的目录结点一样暂时缓存在内存中，等待下次滚动合并时，再写入相应的填充块或者填满并写入硬盘。另外当设置检查点时，这些缓存的信息会被强制写入硬盘。叶子结点载入内存后，其父结点（目录结点）也会被缓存至内存中以减小滚动合并时所需的I/O操作。当滚动合并产生新的叶子结点产生后，会导致父结点（或者目录结点）发生相应的变化。当C1的父结点所属的多页块不满时，通常会停留在内存中一段时间，但其所指的叶子结点可以先写入硬盘之中。当发生下列情况时，目录结点及其多页块将被强制写入硬盘：</p>
+<ul>
+<li>一个包含目录结点的多页块已满；只将满的多页块写入硬盘。</li>
+<li>根结点分裂，C1树的深度增加；所有的多页块缓存都将被写入硬盘。</li>
+<li>设置检查点。所有的多页块都将被写入硬盘。</li>
+</ul>
+<p><strong>两部件LSM-tree的代价估计</strong></p>
+<p>为了对LSM-tree的代价进行简单地估计。首先定义硬盘和内存的代价符号如下：<br>COSTd=1M字节的硬盘存储的代价<br>COSTm=1M字节的内存存储的代价<br>COSTP=随机访问时，每秒读写一页的I/O操作所需硬盘臂移动的代价<br>COSTπ=多页块读写时，每秒读写一页的I/O操作所需硬盘臂移动的代价<br>这里需要注意的是，就目前而言，硬盘存储的代价要低于内存存储的代价，即COSTd&lt;COSTm。</p>
+<p><strong>LSM-tree与B-tree的插入代价比较</strong></p>
+<p>执行B-tree的插入操作需要首先找到条目要插入的位置，即要进行一次B-tree查找。假设插入的位置是随机的，那么之前插入所缓存的结点页面可能就无法重复使用了。由此定义：<br>De=使用B-tree进行随机访问时，在内存缓存中未找到的页数<br>为了执行一个插入操作，需要进行De次I/O操作以在B-tree叶结点中找到插入的位置，插入数据之后，再进行1次I/O操作将新数据写回。由于相关结点的分裂对开销作用不大，这里我们就不考虑结点的分裂问题了。那么B-tree的插入代价就是</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/4.png" alt=""></p>
+<p>LSM-tree的插入操作首先是直接作用在常驻内存的C0上的，然后是批量地从C0将条目滚动合并到C1中。滚动合并是以多页块作为单元进行合并的，合并时读取一页所需的I/O代价为COSTπ。为了评价滚动合并的延迟插入的效果，定义<br>M=从C0合并到C1的平均条目数<br>Se=条目的字节大小<br>Sp=硬盘页的字节大小<br>S0=C0的叶子层的大小（以兆字节为单位）<br>S1=C1的叶子层的大小（以兆字节为单位）<br>一个硬盘页（通常就是一个结点的大小）中所含的条目的数目约为Sp/Se，那么滚动合并时一页中来自于C0的条目约为S0/(S0 + S1)。那么M就可以估计为：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/5.png" alt=""></p>
+<p>当C0相对于C1的大小越大时，参数M也就越大。对于一次插入来说，LSM-tree在插入C0之后，滚动合并时需要读进C1的叶子结点，再写回C1。由于滚动合并是批量插入C0的条目的，所以一次插入的代价是滚动合并代价的1/M。所以LSM-tree的插入代价：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/6.png" alt=""></p>
+<p>将B-tree与LSM-tree的插入代价相比，即可得到：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/7.png" alt=""></p>
+<p>在实际应用中说，K1接近于一个常数。所以LSM-tree与B-tree之比取决于M和COSTπ/COSTP。由于C1的多页块在硬盘中是连续存储的，COSTπ一般会比COSTP来得小，故公式的大小其实取决于M。当一页中包含的条目数较多，C0的规模与C1差距不大时，LSM-tree在数据插入上是优于B-tree的。</p>
+<p><strong>代价与数据温度</strong></p>
+<p>从另一个角度看，B-tree往往限制在硬盘或内存中，而LSM-tree则是跨越硬盘和内存实现数据存取的优化。假设有一个应用程序使用B-tree有S兆字节数据存储（假设不变），并需要每秒随机访问硬盘中的数据H次。那么应用程序使用硬盘臂的代价就是H∙COSTB-ins，使用硬盘进行存储的代价就是S∙COSTd。在应用程序刚开始运行的时候，主要是加载应用程序的数据等初始化动作，这时随机访问硬盘的次数较少，H相当小，这时应用程序的开销主要是硬盘存储数据的开销，即是S∙COSTd。随着程序的不断运行，应用程序内的业务逻辑会需要访问之前存储的数据，随机访问硬盘的次数就会越来越大，H也就越来越大，随机访问的代价就无法忽略了。具体来说，就是S∙COSTd&gt;H∙COSTB-ins。应用程序的开销代价就变为H∙COSTP。随机访问的不断增加会使得硬盘磁盘臂的功率逐渐达到最大，但在访问硬盘的代价小于使用内存缓存（即H∙COSTB-ins&lt;S∙COSTm）之前，依然可以直接访问硬盘。当H∙COSTB-ins&gt;S∙COSTm时，将应用程序存储数据的B-tree全部缓存到内存中，可以使得应用程序的开销代价减小，这样应用程序的开销代价就是S∙COSTm。<br>综上所述，可以看出应用程序在两个地方发生的转折，一个是在随机访问的代价与存储的代价相等时，即</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/8.png" alt=""></p>
+<p>另一个是在随机访问的代价与缓存的代价相等时，即</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/9.png" alt=""></p>
+<p>由此，将H/S定义为数据的温度，将两个转折点之间的区域称温数据，两端的区域分别称为冷数据和热数据，同理可得使用LSM-tree存储S兆字节时，代价也会在两个地方发生转折，即</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/10.png" alt=""></p>
+<p>通常来说，De+1通常大于2，M大于1，并且随着H的增加，De+1和M都会不断变大。所以LSM-tree的两个转折点均要后于B-tree的转折点，而且LSM-tree的第二个转折点要远远在B-tree第二个转折点之后。应用程序的总体代价COSTTOT随H/S变化如下图所示：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/11.png" alt=""></p>
+<p>图4：存取1兆字节数据所需的代价随温度的变化</p>
+<p>冷数据区域的代价由硬盘的存储代价决定，不大能反映数据结构和算法的好坏。但越迟走出冷数据就越能反映对硬盘的利用率。热数据区域的代价主要集中在内存存储的代价上，同样也不大能反映数据结构和算法的好坏。但越迟进入就越能反映对内存的利用率。综合来看，LSM-tree的代价曲线在B-tree之下，可见LSM-tree对硬盘和内存的利用率都比B-tree要高。这主要是因为两点：</p>
+<p>滚动合并时批量写入新插入的数据，平摊单个条目插入的开销；<br>C1的各层结点存储在多页块中，合并时顺序读写多页块，减小磁盘臂的移动。<br>在热数据区域，无论是B-tree还是LSM-tree都将数据全部读到内存中，LSM-tree主要是增大C0的规模，使之与C1相当。此时的问题内存的开销就越来越大。由于内存的空间毕竟是有限的，一味地增加C0是不可取的。若减少C0的规模，由M的估计公式，M可能会下降。其实当某些比较大的条目需要不只一页来存放的时侯，M也可能会下降。这种情况下，从C0到C1的每次滚动合并需要从C1读入和写出多个页或多页块。特别地，当</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/12.png" alt=""></p>
+<p>时，多页块的读写优势将荡然无存，B树的插入性能将优于LSM-tree。为了避免M小于1，就又不得不增加C0的规模。<br>一个解决方法就是在日益增大的C1和有空间上限的C0之间加入一个C做为C0和C1的缓冲。这时LSM-tree就由三个部分（C1、C和C0）组成。这种LSM-tree称为多部件的LSM-tree。</p>
+<p><strong>多部件的LSM-tree</strong></p>
+<p>在数据不断增加的情况下，即使在C1和C0之间增加上一个C，C的规模也会不断增长。当C像过去C1那么大时，就需要在C和C0之间再增加一个C。以此类推，硬盘中的C树将会越来越多。如下图所示：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/13.png" alt=""></p>
+<p>图5：多部件的LSM-tree</p>
+<p>通常，一个多部件的LSM-tree由大小依次递增的C0，C1，C2，…，CK-1和CK组成，C0常驻内存之中，可以是键值索引的数据结构。而C1~CK则存储于硬盘之中，但其经常访问的页会被缓存于内存之中，它们的结构都是索引树。在数据不断插入的过程中，当较小的Ci-1的规模超过某一阈值时，相邻的两个部件Ci-1和Ci会进行滚动合并，从较小的Ci-1转移条目至较大的Ci中。各个相邻部件Ci-1和Ci的滚动合并是异步的。也就是说，一个条目会插入到C0中，之后经过不断的异步滚动合并过程，最终合并至CK中。<br>由于各个相邻部件Ci-1和Ci的滚动合并是异步的，但当对其中的数据进行访问时，常常发生一些并发性问题。例如当进行精确检索或者加载多页块至内存时，Ci里的一个节点会被读入内存；当进行范围检索或滚动合并时，Ci里的多页块会被读入内存中。这些情况下，查找数据时Ci里的所有未被锁住的结点都可以被访问，并会定位被读入内存的结点。即使结点正在进行滚动合并，结点也可以被访问。显然，这时结点上的数据可能是不完整的。基于这些考虑，访问LSM-tree必须遵循下列规则：</p>
+<ul>
+<li>当硬盘中的相邻部件进行滚动合并的时候，当前参与合并的结点不能被查找；</li>
+<li>当C0和C1进行滚动合并的时候，当前参与合并的C0的结点周边不能被查找和插入；</li>
+<li>在Ci-1和Ci与Ci和Ci+1同时进行滚动合并时，Ci-1与Ci滚动合并的游标有时会超过Ci和Ci+1滚动合并的游标。</li>
+</ul>
+<p>为了避免对硬盘里的部件进行存取时产生的物理冲突，LSM-tree设置了以结点为单位的锁。在进行滚动合并时，正在合并的结点会在写模式下被锁住，直到有来自较大部件的结点被合并才被释放。在进行查找时，正在被读取的结点会在读模式下被锁住，读取完毕后，锁即被释放。</p>
+<p>与C0和C1的滚动合并相比，硬盘内的相邻部件Ci-1和Ci之间的滚动合并多了一个清空块和填充块。这是因为Ci-1和Ci都存储在硬盘之中，合并时需要先将Ci-1和Ci的清空块和填充块存入内存，合并的过程与C0和C1的相同，但Ci-1不会将所有的条目都拿去合并，而是会保留一部分条目（例如新插入的那部分条目）到Ci-1的填充块。如下图所示：</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/14.png" alt=""></p>
+<p>图6：硬盘中相邻两部件的滚动合并</p>
+<p>当前正在进行滚动合并的结点被加锁（红圈圈住的点），写保护。蓝色的点表示游标，绿色的点表示游标未到达的结点，树上折线表示从树根到游标的路径</p>
+<p><strong>查找、删除和修改</strong></p>
+<p>在LSM-tree树进行查找时，为了保证LSM-tree上的所有条目都被检查。首先要搜索C0，再搜索C1，进而搜索C2，…，CK-1和CK。即使硬盘中的部件C1，C2，…，CK-1和CK的结构都是B-tree，这也将耗费一些时间。但在实际的应用中，总可以将搜索限制在前几个的部件的搜索上。<br>试想新条目插入时首先插入至C0中，然后通过各相邻部件Ci，和Ci+1之间的滚动合并，逐步转移到更大的部件中。在滚动合并时，如果将最近τ时间内被访问的条目保留下来，而将其它条目用于合并，那么经常被访问的那些数据就会被依次保存在C0，C1，…，CK-1和CK中。也就是说，我们可以简单的认为，C0保存的是最近τ时间内被访问的条目，C1保存的是除了C0保存的数据外，最近2τ时间内被访问的条目，C2保存的是除了C0和C1保存的数据外，最近3τ时间内被访问的条目。依此可推广到CK-1。而最后的部件CK保存的是最近Kτ之前的条目。这样凡是在最近τ时间内被执行的事务都不需要与硬盘进行I/O交换，可以直接在内存中找到数据。</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/15.png" alt=""></p>
+<p>图7：查找与删除</p>
+<p>LSM-tree的优势在于其能推迟写回硬盘的时间，进而达到批量地插入数据的目的。为了更高效地利用LSM-tree的插入优势，删除操作被设计为通过插入操作来执行。当C0所索引的一个条目被删除时，首先在C0上查找该条目所对应的索引是否存在，若不存在，就建立一个索引。然后在该索引键值的位置上设置删除条目（delete node entry）。删除条目的意义仅在于通知所有访问该索引的操作，“此索引键值所索引的条目已经被删除了”。在后续的滚动合并中，凡是在较大的部件中碰到的与该索引键值相同的条目都将被删除。此外，当在LSM-tree中查找删除的条目时，如果碰到这种删除条目，就会直接返回未找到。对于条目的修改，依仗LSM-tree的插入优势，可以先插入一个对应的删除条目，待删除条目经滚动合并离开C0后，再在上插入该条目的新值。</p>
+<p><strong>崩溃恢复</strong></p>
+<p>在新条目插入到C0后，当C0与C1进行滚动合并时，某些条目将从C0转移到更大的部件中。由于滚动合并发生在内存缓存的多页块中，所以只有当条目真正写入硬盘时，滚动合并的成果才会真正生效。然而滚动合并时可能就会发生系统故障，进而使得内存数据丢失。为了能有效地进行系统恢复，在LSM-tree的日常使用中，需要记录一些用以恢复数据的日志。然而与以往数据库中的日志不同的是，日志中只需要要记录数据插入的事务。简单地说，这些日志只包含了被插入数据的行的号码及插入的域和值。<br>LSM-tree在记日志时设置检查点（checkpoint）以恢复某一时刻的LSM-tree。当需要在时刻T0设置检查点时：</p>
+<ul>
+<li>完成所有部件的当前合并，这样结点上的锁就会被释放；</li>
+<li>将所有新条目的插入操作以及滚动合并推迟至检查点设置完成之后；</li>
+<li>将C0写入硬盘中的一个已知的位置；此后对C0的插入操作可以开始，但是合并操作还要继续等待；</li>
+<li>将硬盘中的所有部件（C1~CK）在内存中缓存的结点写入硬盘；</li>
+<li>向日志中写入一条特殊的检查点日志。</li>
+</ul>
+<p>检查点日志的内容包括：</p>
+<ul>
+<li>T0时刻最后一个插入的已索引的行的日志序列号（Log Sequence Number，LSN0）；</li>
+<li>硬盘中的所有部件的根在硬盘中的地址；</li>
+<li>各个部件的合并游标；</li>
+<li>新多页块动态分配的当前信息。在以后的恢复中，硬盘存储的动态分配算法将使用此信息判别哪些多页块是可用的。</li>
+</ul>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/16.png" alt=""></p>
+<p>图8：Checkpoint</p>
+<p>一旦检查点的信息设置完毕，就可以开始执行被推迟的新条目的插入操作了。由于后续合并操作中向硬盘写入多页块时，会将信息写入硬盘中的新位置，所以检查点的信息不会被消除。只有当后续检查点使得过期的多页块作废时，检查点的信息才会被废弃。</p>
+<p><strong>恢复</strong></p>
+<p>当系统崩溃后重启进行恢复时，需要进行如下操作：</p>
+<ul>
+<li>在日志中定位一个检查点；</li>
+<li>将之前写入硬盘的C0和其它部件在内存中缓存的多页块加载到内存中；</li>
+<li>将日志中在LSN0之后的部分读入内存，执行其中索引条目的插入操作；</li>
+<li>读取检查点日志中硬盘部件（C1~CK）的根的位置和合并游标，启动滚动合并，覆盖检查点之后的多页块；</li>
+<li>当检查点之后的所有新索引条目都已插入至LSM-tree且被索引后，恢复即完成。</li>
+</ul>
+<p>这一恢复措施的唯一的一个缺点就是恢复的时间可能会比较长，但通常这并不严重。因为内存中的数据可以很快地写入硬盘。当两个相邻的部件进行滚动合并时，新产生的结点将会写入到硬盘中的新位置。这样在将合并产生的结点写入硬盘时，上层结点中指向该结点的指针需要更新为结点的新位置。当正在进行滚动合并，却临时需要设置检查点时，加载进内存的多页块和目录结点都会写入到硬盘中新的位置。这样，在高层的目录结点中指向这些结点的指针同样需要立即更新为硬盘中的新地址。在恢复的过程中需要注意的是目录结点的更新。</p>
+<p><img src="/assets/images/2013/01/12/the-log-structured-merge-tree/17.png" alt=""></p>
+<p>图9：高层结点引用下层结点的新位置</p>
+<p>更进一步，当使用检查点进行恢复时，滚动合并所需的所有的多页块都会从硬盘重新读回内存，由于所有的多页块的新位置较之设置检查点时的旧位置都发生了改变，这样所有目录结点的指针都需要更新。这听起来似乎是一大笔性能开销，但这些多页块其实都已加载到内存里了，所以没有I/O开销。若要使得恢复的时间不超过几分钟，那么可以每隔几分钟的I/O操作就设置一次检查点。</p>
+<p><strong>小结</strong></p>
+<p>日志结构的合并树（LSM-tree）是一种基于硬盘的数据结构，与B-tree相比，能显著地减少硬盘磁盘臂的开销，并能在较长的时间提供对文件的高速插入（删除）。然而LSM-tree在某些情况下，特别是在查询需要快速响应时性能不佳。通常LSM-tree适用于索引插入比检索更频繁的应用系统。Bigtable在提供Tablet服务时，使用GFS来存储日志和SSTable，而GFS的设计初衷就是希望通过添加新数据的方式而不是通过重写旧数据的方式来修改文件。而LSM-tree通过滚动合并和多页块的方法推迟和批量进行索引更新，充分利用内存来存储近期或常用数据以降低查找代价，利用硬盘来存储不常用数据以减少存储代价。</p>
+<p><strong>参考文献</strong></p>
+<p>[1]FAY CHANG,JEFFREY DEAN,SANJAY GHEMAWAT et al.Bigtable: A Distributed Storage System for Structured Data[J].ACM Transactions on Computer Systems,2008,26(2):1-26.</p>
+<p>[2]Sanjay Ghemawat,Howard Gobioff,Shun-Tak Leung et al.The Google File System[J].Operating systems review,2003,37(5):29-43.DOI:10.1145/1165389.945450.</p>
+<p>[3]O’Neil P;Cheng E;Gawlick D.The log-structured merge-tree[J].Acta Informatica,1996,33(04):351-385.DOI:10.1007/s002360050048.</p>
+<p>[4]M.Rosenblum;J.K.Osterhout.The design and implementation of a log-structured file system[J].ACM Trans on Computer Systems vol,1992,10(01):26-52.DOI:10.1145/146941.146943.</p>
+<p>[5]O’Neil P; The SB-tree:An index-sequential structure for high-performance sequential access[J].Acta Informatica,1992,29, 241-265</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://www.cnblogs.com/siegfang/archive/2013/01/12/lsm-tree.html" target="_blank" rel="noopener">日志结构的合并树 The Log-Structured Merge-Tree</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Succinct/" rel="tag"># Succinct</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2012/2012-08-21-bitmap/" rel="next" title="海量数据处理算法—BitMap">
+                <i class="fa fa-chevron-left"></i> 海量数据处理算法—BitMap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/2013-03-02-hbase-shell-commends/" rel="prev" title="HBase Shell Commands">
+                HBase Shell Commands <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

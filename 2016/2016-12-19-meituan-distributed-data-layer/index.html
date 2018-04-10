@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Distributed,Diddleware,Data-Access," />
+
+
+<meta name="description" content="背景2016年Q3季度初，在美团外卖上单2.0项目上线后，商家和商品数量急速增长，预估商品库的容量和写峰值QPS会很快遇到巨大压力。随之而来也会影响线上服务的查询性能、DB（数据库，以下统一称DB）主从延迟、表变更困难等一系列问题。 要解决上面所说的问题，通常有两种方案。第一种方案是直接对现有的商品库进行垂直拆分，可以缓解目前写峰值QPS过大、DB主从延迟的问题。第二种方案是对现有的商品库大表进行">
+<meta name="keywords" content="Distributed,Diddleware,Data-Access">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MTDDL——美团点评分布式数据访问层中间件">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-12-19-meituan-distributed-data-layer/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="背景2016年Q3季度初，在美团外卖上单2.0项目上线后，商家和商品数量急速增长，预估商品库的容量和写峰值QPS会很快遇到巨大压力。随之而来也会影响线上服务的查询性能、DB（数据库，以下统一称DB）主从延迟、表变更困难等一系列问题。 要解决上面所说的问题，通常有两种方案。第一种方案是直接对现有的商品库进行垂直拆分，可以缓解目前写峰值QPS过大、DB主从延迟的问题。第二种方案是对现有的商品库大表进行">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/002.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/003.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/004.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/005.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/006.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/007.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/008.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/009.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/010.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/011.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/012.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/013.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/014.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/015.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/016.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/017.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.930Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MTDDL——美团点评分布式数据访问层中间件">
+<meta name="twitter:description" content="背景2016年Q3季度初，在美团外卖上单2.0项目上线后，商家和商品数量急速增长，预估商品库的容量和写峰值QPS会很快遇到巨大压力。随之而来也会影响线上服务的查询性能、DB（数据库，以下统一称DB）主从延迟、表变更困难等一系列问题。 要解决上面所说的问题，通常有两种方案。第一种方案是直接对现有的商品库进行垂直拆分，可以缓解目前写峰值QPS过大、DB主从延迟的问题。第二种方案是对现有的商品库大表进行">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/12/19/meituan-distributed-data-layer/001.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-12-19-meituan-distributed-data-layer/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>MTDDL——美团点评分布式数据访问层中间件 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-12-19-meituan-distributed-data-layer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">MTDDL——美团点评分布式数据访问层中间件</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-19T00:00:00+08:00">2016-12-19</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Distributed/" itemprop="url" rel="index"><span itemprop="name">Distributed</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2016年Q3季度初，在美团外卖上单2.0项目上线后，商家和商品数量急速增长，预估商品库的容量和写峰值QPS会很快遇到巨大压力。随之而来也会影响线上服务的查询性能、DB（数据库，以下统一称DB）主从延迟、表变更困难等一系列问题。</p>
+<p>要解决上面所说的问题，通常有两种方案。第一种方案是直接对现有的商品库进行垂直拆分，可以缓解目前写峰值QPS过大、DB主从延迟的问题。第二种方案是对现有的商品库大表进行分库分表，从根本上解决现有问题。方案一实施起来周期较短，但只能解决一时之痛，由此可见，分库分表是必然的。</p>
+<p>在确定分库分表的方案之后，我们调研了外卖订单、结算以及主站等业务的分库分表实现方案，也调研了业界很多分库分表中间件。在综合考虑性能、稳定性及实现成本的前提下，最终决定自主研发客户端分库分表中间件MTDDL来支撑外卖商品分库分表项目，这也就是MTDDL的由来。</p>
+<p>当然，在MTDDL的设计研发过程中，我们充分考虑了MTDDL的通用性、可扩展性、功能的全面性和接入的便利性。到目前为止一共开发了四期，实现了MySQL动态数据源、读写分离、分布式唯一主键生成器、分库分表、连接池及SQL监控、动态化配置等一系列功能，支持分库分表算法、分布式唯一主键生成算法的高可扩展性，而且支持全注解的方式接入，业务方不需要引入任何配置文件。</p>
+<p>下面就部分业界方案及MTDDL的设计目标详细展开下，然后从源码的角度来剖析下MTDDL的整个逻辑架构和具体实现。</p>
+<h1 id="业界调研"><a href="#业界调研" class="headerlink" title="业界调研"></a>业界调研</h1><table>
+<thead>
+<tr>
+<th>业界组件</th>
+<th>简介</th>
+<th>实现方案</th>
+<th>功能特性</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas</td>
+<td>Qihoo 360开发维护的一个基于MySQL协议的数据中间层项目。它实现了MySQL的客户端与服务端协议，作为服务端与应用程序通信，同时作为客户端与MySQL通信</td>
+<td>proxy-based</td>
+<td>实现读写分离、单库分表</td>
+<td>功能简单，性能跟稳定性较好</td>
+<td>不支持分库分表</td>
+</tr>
+<tr>
+<td>MTAtlas</td>
+<td>原美团DBA团队在开源Atlas基础上做的一系列升级改造</td>
+<td>proxy-based</td>
+<td>在读写分离、单库分表的基础上，完成了分库分表的功能开发</td>
+<td>在Atlas基础上支持了分库分表</td>
+<td>当时还处于测试阶段，暂不推荐业务方使用</td>
+</tr>
+<tr>
+<td>TDDL</td>
+<td>淘宝根据自己的业务特点开发了TDDL框架，主要解决了分库分表对应用的透明化以及异构数据库之间的数据复制，它是一个基于集中式配置的JDBC datasource实现</td>
+<td>client-based</td>
+<td>实现动态数据源、读写分离、分库分表</td>
+<td>功能齐全</td>
+<td>分库分表功能还未开源，当前公布文档较少，并且需要依赖diamond（淘宝内部使用的一个管理持久配置的系统）</td>
+</tr>
+<tr>
+<td>Zebra</td>
+<td>Zebra是原点评内部使用数据源、DAO以及监控等和数据库打交道的中间件集</td>
+<td>client-based</td>
+<td>实现动态数据源、读写分离、分库分表、CAT监控</td>
+<td>功能齐全且有监控</td>
+<td>接入较为复杂，当时只支持c3p0、Druid、Tomcat JDBC等连接池，且分库分表算法只支持Groovy表达式不易扩展</td>
+</tr>
+</tbody>
+</table>
+<h1 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h1><p>MTDDL（Meituan Distributed Data Layer），美团点评分布式数据访问层中间件，旨在为全公司提供一个通用数据访问层服务，支持MySQL动态数据源、读写分离、分布式唯一主键生成器、分库分表、动态化配置等功能，并且支持从客户端角度对数据源的各方面（比如连接池、SQL等）进行监控，后续考虑支持NoSQL、Cache等多种数据源。</p>
+<h1 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h1><ul>
+<li>动态数据源</li>
+<li>读写分离</li>
+<li>分布式唯一主键生成器</li>
+<li>分库分表</li>
+<li>连接池及SQL监控</li>
+<li>动态化配置</li>
+</ul>
+<h1 id="逻辑架构"><a href="#逻辑架构" class="headerlink" title="逻辑架构"></a>逻辑架构</h1><p>下图是一次完整的DAO层insert方法调用时序图，简单阐述了MTDDL的整个逻辑架构。其中包含了分布式唯一主键的获取、动态数据源的路由以及SQL埋点监控等过程：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/001.png" alt=""></p>
+<h1 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h1><h2 id="动态数据源及读写分离"><a href="#动态数据源及读写分离" class="headerlink" title="动态数据源及读写分离"></a>动态数据源及读写分离</h2><p>在Spring JDBC AbstractRoutingDataSource的基础上扩展出MultipleDataSource动态数据源类，通过动态数据源注解及AOP实现。</p>
+<h3 id="动态数据源"><a href="#动态数据源" class="headerlink" title="动态数据源"></a>动态数据源</h3><p>MultipleDataSource动态数据源类，继承于Spring JDBC AbstractRoutingDataSource抽象类，实现了determineCurrentLookupKey方法，通过setDataSourceKey方法来动态调整dataSourceKey，进而达到动态调整数据源的功能。其类图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/002.png" alt=""></p>
+<h3 id="动态数据源AOP"><a href="#动态数据源AOP" class="headerlink" title="动态数据源AOP"></a>动态数据源AOP</h3><p>ShardMultipleDataSourceAspect动态数据源切面类，针对DAO方法进行功能增强，通过扫描DataSource动态数据源注解来获取相应的dataSourceKey，从而指定具体的数据源。具体流程图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/003.png" alt=""></p>
+<h3 id="配置和使用方式举例"><a href="#配置和使用方式举例" class="headerlink" title="配置和使用方式举例"></a>配置和使用方式举例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 参考配置 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"multipleDataSource"</span> <span class="attr">class</span>=<span class="string">"com.sankuai.meituan.waimai.datasource.multi.MultipleDataSource"</span>&gt;</span></span><br><span class="line">    /** 数据源配置 */</span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"targetDataSources"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">map</span> <span class="attr">key-type</span>=<span class="string">"java.lang.String"</span>&gt;</span> </span><br><span class="line">            /** 写数据源 */</span><br><span class="line">            <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">"dbProductWrite"</span> <span class="attr">value-ref</span>=<span class="string">"dbProductWrite"</span>/&gt;</span></span><br><span class="line">            /** 读数据源 */</span><br><span class="line">            <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">"dbProductRead"</span> <span class="attr">value-ref</span>=<span class="string">"dbProductRead"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">map</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * DAO使用动态数据源注解</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">WmProductSkuDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 增删改走写数据源 */</span></span><br><span class="line">    <span class="meta">@DataSource</span>(<span class="string">"dbProductWrite&amp;quot"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(WmProductSku sku)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 查询走读数据源 */</span></span><br><span class="line">    <span class="meta">@DataSource</span>(<span class="string">"dbProductRead"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getById</span><span class="params">(<span class="keyword">long</span> sku_id)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="分布式唯一主键生成器"><a href="#分布式唯一主键生成器" class="headerlink" title="分布式唯一主键生成器"></a>分布式唯一主键生成器</h2><p>众所周知，分库分表首先要解决的就是分布式唯一主键的问题，业界也有很多相关方案：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>实现方案</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>UUID</td>
+<td>本地生成，不需要RPC，低延时；扩展性好，基本没有性能上限</td>
+<td>无法保证趋势递增；UUID过长128位，不易存储，往往用字符串表示</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Snowflake或MongoDB ObjectId</td>
+<td>分布式生成，无单点；趋势递增，生成效率快</td>
+<td>没有全局时钟的情况下，只能保证趋势递增；当通过NTP进行时钟同步时可能会出现重复ID；数据间隙较大</td>
+</tr>
+<tr>
+<td>3</td>
+<td>proxy服务+数据库分段获取ID</td>
+<td>分布式生成，段用完后需要去DB获取，同server有序</td>
+<td>可能产生数据空洞，即有些ID没有分配就被跳过了，主要原因是在服务重启的时候发生；无法保证有序，需要未来解决，可能会通过其他接口方案实现</td>
+</tr>
+</tbody>
+</table>
+<p>综上，方案3的缺点可以通过一些手段避免，但其他方案的缺点不好处理，所以选择第3种方案。目前该方案已由美团点评技术工程部实现——分布式ID生成系统Leaf，MTDDL集成了此功能。</p>
+<h3 id="分布式ID生成系统Leaf"><a href="#分布式ID生成系统Leaf" class="headerlink" title="分布式ID生成系统Leaf"></a>分布式ID生成系统Leaf</h3><p>美团点评分布式ID生成系统Leaf，其实是一种基于DB的Ticket服务，通过一张通用的Ticket表来实现分布式ID的持久化，执行update更新语句来获取一批Ticket，这些获取到的Ticket会在内存中进行分配，分配完之后再从DB获取下一批Ticket。整体架构图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/004.png" alt=""></p>
+<p>每个业务tag对应一条DB记录，DB MaxID字段记录当前该Tag已分配出去的最大ID值。</p>
+<p>IDGenerator服务启动之初向DB申请一个号段，传入号段长度如 genStep = 10000，DB事务置 MaxID = MaxID + genStep，DB设置成功代表号段分配成功。每次IDGenerator号段分配都通过原子加的方式，待分配完毕后重新申请新号段。</p>
+<h3 id="唯一主键生成算法扩展"><a href="#唯一主键生成算法扩展" class="headerlink" title="唯一主键生成算法扩展"></a>唯一主键生成算法扩展</h3><p>MTDDL不仅集成了Leaf算法，还支持唯一主键算法的扩展，通过新增唯一主键生成策略类实现IDGenStrategy接口即可。IDGenStrategy接口包含两个方法：getIDGenType用来指定唯一主键生成策略，getId用来实现具体的唯一主键生成算法。其类图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/005.png" alt=""></p>
+<h2 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h2><p>在动态数据源AOP的基础上扩展出分库分表AOP，通过分库分表ShardHandle类实现分库分表数据源路由及分表计算。ShardHandle关联了分库分表上下文ShardContext类，而ShardContext封装了所有的分库分表算法。其类图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/006.png" alt=""></p>
+<p>分库分表流程图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/007.png" alt=""></p>
+<h3 id="分库分表取模算法"><a href="#分库分表取模算法" class="headerlink" title="分库分表取模算法"></a>分库分表取模算法</h3><p>分库分表目前默认使用的是取模算法，分表算法为 (#shard_key % (group_shard_num <em> table_shard_num))，分库算法为 (#shard_key % (group_shard_num </em> table_shard_num)) / table_shard_num，其中group_shard_num为分库个数，table_shard_num为每个库的分表个数。</p>
+<p>例如把一张大表分成100张小表然后散到2个库，则0-49落在第一个库、50-99落在第二个库。核心实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ModStrategyHandle</span> <span class="keyword">implements</span> <span class="title">ShardStrategy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getShardType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"mod"</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> DataTableName <span class="title">handle</span><span class="params">(String tableName, String dataSourceKey, <span class="keyword">int</span> tableShardNum, </span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> dbShardNum, Object shardValue)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/** 计算散到表的值 */</span></span><br><span class="line">            <span class="keyword">long</span> shard_value = Long.valueOf(shardValue.toString());</span><br><span class="line">            <span class="keyword">long</span> tablePosition = shard_value % tableShardNum;</span><br><span class="line">            <span class="keyword">long</span> dbPosition = tablePosition / (tableShardNum / dbShardNum);</span><br><span class="line">            String finalTableName = <span class="keyword">new</span> StringBuilder().append(tableName).append(<span class="string">"_"</span>).append(tablePosition).toString();</span><br><span class="line">            String finalDataSourceKey = <span class="keyword">new</span> StringBuilder().append(dataSourceKey).append(dbPosition).toString();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> DataTableName(finalTableName, finalDataSourceKey);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="分库分表算法扩展"><a href="#分库分表算法扩展" class="headerlink" title="分库分表算法扩展"></a>分库分表算法扩展</h3><p>MTDDL不仅支持分库分表取模算法，还支持分库分表算法的扩展，通过新增分库分表策略类实现ShardStrategy接口即可。ShardStrategy接口包含两个方法：getShardType用来指定分库分表策略，handle用来实现具体的数据源及分表计算逻辑。其类图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/008.png" alt=""></p>
+<h3 id="全注解方式接入"><a href="#全注解方式接入" class="headerlink" title="全注解方式接入"></a>全注解方式接入</h3><p>为了尽可能地方便业务方接入，MTDDL采用全注解方式使用分库分表功能，通过ShardInfo、ShardOn、IDGen三个注解实现。</p>
+<p>ShardInfo注解用来指定具体的分库分表配置：包括分表名前缀tableName、分表数量tableShardNum、分库数量dbShardNum、分库分表策略shardType、唯一键生成策略idGenType、唯一键业务方标识idGenKey；ShardOn注解用来指定分库分表字段；IDGen注解用来指定唯一键字段。具体类图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/009.png" alt=""></p>
+<h3 id="配置和使用方式举例-1"><a href="#配置和使用方式举例-1" class="headerlink" title="配置和使用方式举例"></a>配置和使用方式举例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 动态数据源</span></span><br><span class="line"><span class="meta">@DataSource</span>(<span class="string">"dbProductSku"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// tableName：分表名前缀，tableShardNum：分表数量，dbShardNum：分库数量，shardType：分库分表策略，idGenType：唯一键生成策略，idGenKey：唯一键业务方标识</span></span><br><span class="line"><span class="meta">@ShardInfo</span>(tableName=<span class="string">"wm_food"</span>, tableShardNum=<span class="number">100</span>, dbShardNum=<span class="number">1</span>, shardType=<span class="string">"mod"</span>, idGenType=IDGenType.LEAF, idGenKey=LeafKey.SKU)  </span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">WmProductSkuShardDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// @ShardOn("wm_poi_id") 将该注解修饰的对象的wm_poi_id字段作为shardValue</span></span><br><span class="line">    <span class="comment">// @IDGen("id")  指定要设置唯一键的字段</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(@ShardOn(<span class="string">"wm_poi_id"</span>)</span> @<span class="title">IDGen</span><span class="params">(<span class="string">"id"</span>)</span> WmProductSku sku)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// @ShardOn 将该注解修饰的参数作为shardValue</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;WmProductSku&gt; <span class="title">getSkusByWmPoiId</span><span class="params">(@ShardOn <span class="keyword">long</span> wm_poi_id)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="连接池及SQL监控"><a href="#连接池及SQL监控" class="headerlink" title="连接池及SQL监控"></a>连接池及SQL监控</h2><p>DB连接池使用不合理容易引发很多问题，如连接池最大连接数设置过小导致线程获取不到连接、获取连接等待时间设置过大导致很多线程挂起、空闲连接回收器运行周期过长导致空闲连接回收不及时等等，如果缺乏有效准确的监控，会造成无法快速定位问题以及追溯历史。</p>
+<p>再者，如果缺乏SQL执行情况相关监控，会很难及时发现DB慢查询等潜在风险，而慢查询往往就是DB服务端性能恶化乃至宕机的根源（关于慢查询，推荐阅读<a href="http://tech.meituan.com/mysql-index.html" target="_blank" rel="noopener">《MySQL索引原理及慢查询优化》</a>一文）。MTDDL从1.0.2版本开始正式引入连接池及SQL监控等相关功能。</p>
+<h3 id="连接池监控"><a href="#连接池监控" class="headerlink" title="连接池监控"></a>连接池监控</h3><h4 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a>实现方案</h4><p>结合Spring完美适配c3p0、dbcp1、dbcp2、mtthrift等多种方案，自动发现新加入到Spring容器中的数据源进行监控，通过美团点评统一监控组件JMonitor上报监控数据。整体架构图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/010.png" alt=""></p>
+<h4 id="连接数量监控"><a href="#连接数量监控" class="headerlink" title="连接数量监控"></a>连接数量监控</h4><p>监控连接池active、idle、total连接数量，Counter格式：（连接池类型.数据源.active/idle/total_connection），效果图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/011.png" alt=""></p>
+<h4 id="获取连接时间监控"><a href="#获取连接时间监控" class="headerlink" title="获取连接时间监控"></a>获取连接时间监控</h4><p>监控获取空闲连接时间，Counter格式：（ds.getConnection.数据源.time），效果图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/012.png" alt=""></p>
+<h3 id="SQL监控"><a href="#SQL监控" class="headerlink" title="SQL监控"></a>SQL监控</h3><h4 id="实现方案-1"><a href="#实现方案-1" class="headerlink" title="实现方案"></a>实现方案</h4><p>采用Spring AOP技术对所有DAO方法进行功能增强处理，通过美团点评分布式会话跟踪组件MTrace进行SQL调用数据埋点及上报，进而实现从客户端角度对SQL执行耗时、QPS、调用量、超时率、失败率等指标进行监控。整体架构图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/013.png" alt=""></p>
+<h4 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h4><p>登录美团点评的服务治理平台OCTO选择服务查看去向分析，效果图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/014.png" alt=""></p>
+<h2 id="动态化配置"><a href="#动态化配置" class="headerlink" title="动态化配置"></a>动态化配置</h2><p>为了满足业务方一些动态化需求，如解决线上DB紧急事故需动态调整数据源或者分库分表相关配置，要求无需重启在线修改立即生效，MTDDL从1.0.3版本开始正式引入动态化配置相关功能。</p>
+<h3 id="实现方案-2"><a href="#实现方案-2" class="headerlink" title="实现方案"></a>实现方案</h3><p>在Spring容器启动的时候自动注册数据源及分库分表相关配置到美团点评的统一配置中心MCC，在MCC配置管理页面可以进行动态调整，MCC客户端在感知到变更事件后会刷新本地配置，如果是数据源配置变更会根据新的配置构造出一个新数据源来替换老数据源，最后再将老的数据源优雅关闭掉。具体流程图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/015.png" alt=""></p>
+<h3 id="动态化数据源"><a href="#动态化数据源" class="headerlink" title="动态化数据源"></a>动态化数据源</h3><p>目前支持dbcp、dbcp2、c3p0等数据源，效果图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/016.png" alt=""></p>
+<h3 id="分库分表动态化"><a href="#分库分表动态化" class="headerlink" title="分库分表动态化"></a>分库分表动态化</h3><p>支持动态化配置分库分表数量、分库分表策略、唯一键生成策略、唯一键业务方标识等，效果图如下：</p>
+<p><img src="/assets/images/2016/12/19/meituan-distributed-data-layer/017.png" alt=""></p>
+<h1 id="版本迭代"><a href="#版本迭代" class="headerlink" title="版本迭代"></a>版本迭代</h1><p>MTDDL到目前为止总共开发了四期，后续考虑逐步开源，具体版本迭代如下：</p>
+<table>
+<thead>
+<tr>
+<th>项目名</th>
+<th>功能</th>
+<th>开始时间</th>
+<th>结束时间</th>
+<th>正式版本</th>
+<th>快照版本</th>
+<th>版本备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MTDDL一期</td>
+<td>动态数据源；读写分离；分布式唯一主键生成器；分库分表</td>
+<td>2016.05.30</td>
+<td>2016.06.16</td>
+<td>0.0.1</td>
+<td>0.0.1-SNAPSHOT</td>
+<td>MTDDL第一版</td>
+</tr>
+<tr>
+<td>MTDDL二期</td>
+<td>分布式唯一主键生成算法可扩展；支持零配置接入MTDDL；优化shardkey配置方式</td>
+<td>2016.08.23</td>
+<td>2016.09.05</td>
+<td>1.0.1</td>
+<td>1.0.1-SNAPSHOT</td>
+<td>MTDDL接入优化</td>
+</tr>
+<tr>
+<td>MTDDL三期</td>
+<td>连接池及SQL监控；缓存优化</td>
+<td>2016.09.06</td>
+<td>2016.09.20</td>
+<td>1.0.2</td>
+<td>1.0.2-SNAPSHOT</td>
+<td>MTDDL监控完善</td>
+</tr>
+<tr>
+<td>MTDDL四期</td>
+<td>唯一主键生成注解化；动态化配置</td>
+<td>2016.10.11</td>
+<td>2016.11.08</td>
+<td>1.0.3</td>
+<td>1.0.3-SNAPSHOT</td>
+<td>MTDDL配置动态化</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<ul>
+<li>Author: 刘军</li>
+<li>Source: <a href="http://tech.meituan.com" target="_blank" rel="noopener">美团点评技术团队</a></li>
+<li>Link: <a href="http://tech.meituan.com/mtddl.html" target="_blank" rel="noopener">MTDDL——美团点评分布式数据访问层中间件</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Distributed/" rel="tag"># Distributed</a>
+          
+            <a href="/tags/Diddleware/" rel="tag"># Diddleware</a>
+          
+            <a href="/tags/Data-Access/" rel="tag"># Data-Access</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-12-09-sorting-system-feature-production-framework/" rel="next" title="外卖排序系统特征生产框架">
+                <i class="fa fa-chevron-left"></i> 外卖排序系统特征生产框架
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/2017-02-10-meituan-deeplearning-application/" rel="prev" title="深度学习在美团点评的应用">
+                深度学习在美团点评的应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#业界调研"><span class="nav-text">业界调研</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设计目标"><span class="nav-text">设计目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#功能特性"><span class="nav-text">功能特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#逻辑架构"><span class="nav-text">逻辑架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体实现"><span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#动态数据源及读写分离"><span class="nav-text">动态数据源及读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态数据源"><span class="nav-text">动态数据源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态数据源AOP"><span class="nav-text">动态数据源AOP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和使用方式举例"><span class="nav-text">配置和使用方式举例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式唯一主键生成器"><span class="nav-text">分布式唯一主键生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式ID生成系统Leaf"><span class="nav-text">分布式ID生成系统Leaf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#唯一主键生成算法扩展"><span class="nav-text">唯一主键生成算法扩展</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分库分表"><span class="nav-text">分库分表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分库分表取模算法"><span class="nav-text">分库分表取模算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分库分表算法扩展"><span class="nav-text">分库分表算法扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全注解方式接入"><span class="nav-text">全注解方式接入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置和使用方式举例-1"><span class="nav-text">配置和使用方式举例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接池及SQL监控"><span class="nav-text">连接池及SQL监控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#连接池监控"><span class="nav-text">连接池监控</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实现方案"><span class="nav-text">实现方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#连接数量监控"><span class="nav-text">连接数量监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取连接时间监控"><span class="nav-text">获取连接时间监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL监控"><span class="nav-text">SQL监控</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实现方案-1"><span class="nav-text">实现方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现效果"><span class="nav-text">实现效果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态化配置"><span class="nav-text">动态化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现方案-2"><span class="nav-text">实现方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态化数据源"><span class="nav-text">动态化数据源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分库分表动态化"><span class="nav-text">分库分表动态化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#版本迭代"><span class="nav-text">版本迭代</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

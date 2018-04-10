@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Algorithm,AVLTree," />
+
+
+<meta name="description" content="概要前面分别介绍了AVL树”C语言版本”和”C++版本”，本章介绍AVL树的Java实现版本，它的算法与C语言和C++版本一样。内容包括：  AVL树的介绍 AVL树的Java实现 AVL树的Java测试程序  AVL树的介绍AVL树是高度平衡的而二叉树。它的特点是：AVL树中任何节点的两个子树的高度最大差别为1。   上面的两张图片，左边的是AVL树，它的任何节点的两个子树的高度差别都&amp;lt;=">
+<meta name="keywords" content="Algorithm,AVLTree">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AVL树(三)之 Java的实现">
+<meta property="og:url" content="http://hyperj.github.com/2014/2014-03-30-avl-tree-implementation/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="概要前面分别介绍了AVL树”C语言版本”和”C++版本”，本章介绍AVL树的Java实现版本，它的算法与C语言和C++版本一样。内容包括：  AVL树的介绍 AVL树的Java实现 AVL树的Java测试程序  AVL树的介绍AVL树是高度平衡的而二叉树。它的特点是：AVL树中任何节点的两个子树的高度最大差别为1。   上面的两张图片，左边的是AVL树，它的任何节点的两个子树的高度差别都&amp;lt;=">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/001.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/005.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/006.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/007.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/008.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/009.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/010.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/011.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/012.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/013.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/014.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/015.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/016.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/017.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/018.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/019.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/020.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/021.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/022.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/023.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/024.jpg">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.900Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AVL树(三)之 Java的实现">
+<meta name="twitter:description" content="概要前面分别介绍了AVL树”C语言版本”和”C++版本”，本章介绍AVL树的Java实现版本，它的算法与C语言和C++版本一样。内容包括：  AVL树的介绍 AVL树的Java实现 AVL树的Java测试程序  AVL树的介绍AVL树是高度平衡的而二叉树。它的特点是：AVL树中任何节点的两个子树的高度最大差别为1。   上面的两张图片，左边的是AVL树，它的任何节点的两个子树的高度差别都&amp;lt;=">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2014/03/30/avl-tree-implementation/001.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2014/2014-03-30-avl-tree-implementation/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>AVL树(三)之 Java的实现 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2014/2014-03-30-avl-tree-implementation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">AVL树(三)之 Java的实现</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2014-03-30T00:00:00+08:00">2014-03-30</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>前面分别介绍了AVL树”C语言版本”和”C++版本”，本章介绍AVL树的Java实现版本，它的算法与C语言和C++版本一样。内容包括：</p>
+<ol>
+<li>AVL树的介绍</li>
+<li>AVL树的Java实现</li>
+<li>AVL树的Java测试程序</li>
+</ol>
+<h2 id="AVL树的介绍"><a href="#AVL树的介绍" class="headerlink" title="AVL树的介绍"></a>AVL树的介绍</h2><p>AVL树是高度平衡的而二叉树。它的特点是：AVL树中任何节点的两个子树的高度最大差别为1。 </p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/001.jpg" alt=""></p>
+<p>上面的两张图片，左边的是AVL树，它的任何节点的两个子树的高度差别都&lt;=1；而右边的不是AVL树，因为7的两颗子树的高度相差为2(以2为根节点的树的高度是3，而以8为根节点的树的高度是1)。</p>
+<h2 id="AVL树的Java实现"><a href="#AVL树的Java实现" class="headerlink" title="AVL树的Java实现"></a>AVL树的Java实现</h2><h3 id="1-节点"><a href="#1-节点" class="headerlink" title="1. 节点"></a>1. 节点</h3><h4 id="1-1-节点定义"><a href="#1-1-节点定义" class="headerlink" title="1.1 节点定义"></a>1.1 节点定义</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AVLTree</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AVLTreeNode&lt;T&gt; mRoot;    <span class="comment">// 根结点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// AVL树的节点(内部类)</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">AVLTreeNode</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">        T key;                <span class="comment">// 关键字(键值)</span></span><br><span class="line">        <span class="keyword">int</span> height;         <span class="comment">// 高度</span></span><br><span class="line">        AVLTreeNode&lt;T&gt; left;    <span class="comment">// 左孩子</span></span><br><span class="line">        AVLTreeNode&lt;T&gt; right;    <span class="comment">// 右孩子</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">AVLTreeNode</span><span class="params">(T key, AVLTreeNode&lt;T&gt; left, AVLTreeNode&lt;T&gt; right)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.left = left;</span><br><span class="line">            <span class="keyword">this</span>.right = right;</span><br><span class="line">            <span class="keyword">this</span>.height = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AVLTree是AVL树对应的类，而AVLTreeNode是AVL树节点，它是AVLTree的内部类。AVLTree包含了AVL树的根节点，AVL树的基本操作也定义在AVL树中。AVLTreeNode包括的几个组成对象:</p>
+<p>(01) key – 是关键字，是用来对AVL树的节点进行排序的。</p>
+<p>(02) left – 是左孩子。</p>
+<p>(03) right – 是右孩子。</p>
+<p>(04) height – 是高度。</p>
+<h4 id="1-2-树的高度"><a href="#1-2-树的高度" class="headerlink" title="1.2 树的高度"></a>1.2 树的高度</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 获取树的高度</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">height</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tree != <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> tree.height;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">height</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> height(mRoot);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关于高度，有的地方将”空二叉树的高度是-1”，而本文采用维基百科上的定义：树的高度为最大层次。即空的二叉树的高度是0，非空树的高度等于它的最大层次(根的层次为1，根的子节点为第2层，依次类推)。</p>
+<h4 id="1-3-比较大小"><a href="#1-3-比较大小" class="headerlink" title="1.3 比较大小"></a>1.3 比较大小</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 比较两个值的大小</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">max</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a&gt;b ? a : b;</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">### 2. 旋转</span><br><span class="line"></span><br><span class="line">如果在AVL树中进行插入或删除节点后，可能导致AVL树失去平衡。这种失去平衡的可以概括为<span class="number">4</span>种姿态：LL(左左)，LR(左右)，RR(右右)和RL(右左)。下面给出它们的示意图：</span><br><span class="line"></span><br><span class="line">![](/assets/images/<span class="number">2014</span>/<span class="number">03</span>/<span class="number">30</span>/avl-tree-implementation/<span class="number">002</span>.jpg)</span><br><span class="line"></span><br><span class="line">上图中的<span class="number">4</span>棵树都是<span class="string">"失去平衡的AVL树"</span>，从左往右的情况依次是：LL、LR、RL、RR。除了上面的情况之外，还有其它的失去平衡的AVL树，如下图：</span><br><span class="line"></span><br><span class="line">![](/assets/images/<span class="number">2014</span>/<span class="number">03</span>/<span class="number">30</span>/avl-tree-implementation/<span class="number">003</span>.jpg)</span><br><span class="line"></span><br><span class="line">上面的两张图都是为了便于理解，而列举的关于<span class="string">"失去平衡的AVL树"</span>的例子。总的来说，AVL树失去平衡时的情况一定是LL、LR、RL、RR这<span class="number">4</span>种之一，它们都由各自的定义：</span><br><span class="line"></span><br><span class="line">(<span class="number">1</span>) LL：LeftLeft，也称为<span class="string">"左左"</span>。插入或删除一个节点后，根节点的左子树的左子树还有非空子节点，导致<span class="string">"根的左子树的高度"</span>比<span class="string">"根的右子树的高度"</span>大<span class="number">2</span>，导致AVL树失去了平衡。</span><br><span class="line"></span><br><span class="line">   例如，在上面LL情况中，由于<span class="string">"根节点(8)的左子树(4)的左子树(2)还有非空子节点"</span>，而<span class="string">"根节点(8)的右子树(12)没有子节点"</span>；导致<span class="string">"根节点(8)的左子树(4)高度"</span>比<span class="string">"根节点(8)的右子树(12)"</span>高<span class="number">2</span>。</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>) LR：LeftRight，也称为<span class="string">"左右"</span>。插入或删除一个节点后，根节点的左子树的右子树还有非空子节点，导致<span class="string">"根的左子树的高度"</span>比<span class="string">"根的右子树的高度"</span>大<span class="number">2</span>，导致AVL树失去了平衡。</span><br><span class="line"></span><br><span class="line">   例如，在上面LR情况中，由于<span class="string">"根节点(8)的左子树(4)的左子树(6)还有非空子节点"</span>，而<span class="string">"根节点(8)的右子树(12)没有子节点"</span>；导致<span class="string">"根节点(8)的左子树(4)高度"</span>比<span class="string">"根节点(8)的右子树(12)"</span>高<span class="number">2</span>。</span><br><span class="line"></span><br><span class="line">(<span class="number">3</span>) RL：RightLeft，称为<span class="string">"右左"</span>。插入或删除一个节点后，根节点的右子树的左子树还有非空子节点，导致<span class="string">"根的右子树的高度"</span>比<span class="string">"根的左子树的高度"</span>大<span class="number">2</span>，导致AVL树失去了平衡。</span><br><span class="line"></span><br><span class="line">   例如，在上面RL情况中，由于<span class="string">"根节点(8)的右子树(12)的左子树(10)还有非空子节点"</span>，而<span class="string">"根节点(8)的左子树(4)没有子节点"</span>；导致<span class="string">"根节点(8)的右子树(12)高度"</span>比<span class="string">"根节点(8)的左子树(4)"</span>高<span class="number">2</span>。</span><br><span class="line"></span><br><span class="line">(<span class="number">4</span>) RR：RightRight，称为<span class="string">"右右"</span>。插入或删除一个节点后，根节点的右子树的右子树还有非空子节点，导致<span class="string">"根的右子树的高度"</span>比<span class="string">"根的左子树的高度"</span>大<span class="number">2</span>，导致AVL树失去了平衡。</span><br><span class="line"></span><br><span class="line">   例如，在上面RR情况中，由于<span class="string">"根节点(8)的右子树(12)的右子树(14)还有非空子节点"</span>，而<span class="string">"根节点(8)的左子树(4)没有子节点"</span>；导致<span class="string">"根节点(8)的右子树(12)高度"</span>比<span class="string">"根节点(8)的左子树(4)"</span>高<span class="number">2</span>。</span><br><span class="line"></span><br><span class="line">如果在AVL树中进行插入或删除节点后，可能导致AVL树失去平衡。AVL失去平衡之后，可以通过旋转使其恢复平衡，下面分别介绍<span class="string">"LL(左左)，LR(左右)，RR(右右)和RL(右左)"</span>这<span class="number">4</span>种情况对应的旋转方法。</span><br><span class="line"></span><br><span class="line">#### 2.1 LL的旋转</span><br><span class="line"></span><br><span class="line">LL失去平衡的情况，可以通过一次旋转让AVL树恢复平衡。如下图：</span><br><span class="line"></span><br><span class="line">![](/assets/images/<span class="number">2014</span>/<span class="number">03</span>/<span class="number">30</span>/avl-tree-implementation/<span class="number">004</span>.jpg)</span><br><span class="line"></span><br><span class="line">图中左边是旋转之前的树，右边是旋转之后的树。从中可以发现，旋转之后的树又变成了AVL树，而且该旋转只需要一次即可完成。</span><br><span class="line"></span><br><span class="line">对于LL旋转，你可以这样理解为：LL旋转是围绕<span class="string">"失去平衡的AVL根节点"</span>进行的，也就是节点k2；而且由于是LL情况，即左左情况，就用手抓着<span class="string">"左孩子，即k1"</span>使劲摇。将k1变成根节点，k2变成k1的右子树，<span class="string">"k1的右子树"</span>变成<span class="string">"k2的左子树"</span>。</span><br><span class="line"></span><br><span class="line">LL的旋转代码</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * LL：左左对应的情况(左单旋转)。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">leftLeftRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k2)</span> </span>&#123;</span><br><span class="line">    AVLTreeNode&lt;T&gt; k1;</span><br><span class="line"></span><br><span class="line">    k1 = k2.left;</span><br><span class="line">    k2.left = k1.right;</span><br><span class="line">    k1.right = k2;</span><br><span class="line"></span><br><span class="line">    k2.height = max( height(k2.left), height(k2.right)) + <span class="number">1</span>;</span><br><span class="line">    k1.height = max( height(k1.left), k2.height) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> k1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-2-RR的旋转"><a href="#2-2-RR的旋转" class="headerlink" title="2.2 RR的旋转"></a>2.2 RR的旋转</h4><p>理解了LL之后，RR就相当容易理解了。RR是与LL对称的情况！RR恢复平衡的旋转方法如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/005.jpg" alt=""></p>
+<p>图中左边是旋转之前的树，右边是旋转之后的树。RR旋转也只需要一次即可完成。</p>
+<p>RR的旋转代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * RR：右右对应的情况(右单旋转)。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">rightRightRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k1)</span> </span>&#123;</span><br><span class="line">    AVLTreeNode&lt;T&gt; k2;</span><br><span class="line"></span><br><span class="line">    k2 = k1.right;</span><br><span class="line">    k1.right = k2.left;</span><br><span class="line">    k2.left = k1;</span><br><span class="line"></span><br><span class="line">    k1.height = max( height(k1.left), height(k1.right)) + <span class="number">1</span>;</span><br><span class="line">    k2.height = max( height(k2.right), k1.height) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> k2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-LR的旋转"><a href="#2-3-LR的旋转" class="headerlink" title="2.3 LR的旋转"></a>2.3 LR的旋转</h4><p>LR失去平衡的情况，需要经过两次旋转才能让AVL树恢复平衡。如下图：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/006.jpg" alt=""></p>
+<p>第一次旋转是围绕”k1”进行的”RR旋转”，第二次是围绕”k3”进行的”LL旋转”。</p>
+<p>LR的旋转代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * LR：左右对应的情况(左双旋转)。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">leftRightRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k3)</span> </span>&#123;</span><br><span class="line">    k3.left = rightRightRotation(k3.left);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> leftLeftRotation(k3);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-4-RL的旋转"><a href="#2-4-RL的旋转" class="headerlink" title="2.4 RL的旋转"></a>2.4 RL的旋转</h4><p>RL是与LR的对称情况！RL恢复平衡的旋转方法如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/007.jpg" alt=""></p>
+<p>第一次旋转是围绕”k3”进行的”LL旋转”，第二次是围绕”k1”进行的”RR旋转”。</p>
+<p>RL的旋转代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * RL：右左对应的情况(右双旋转)。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">rightLeftRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k1)</span> </span>&#123;</span><br><span class="line">    k1.right = leftLeftRotation(k1.right);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rightRightRotation(k1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-插入"><a href="#3-插入" class="headerlink" title="3. 插入"></a>3. 插入</h3><p>插入节点的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * 将结点插入到AVL树中，并返回根节点</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 参数说明：</span></span><br><span class="line"><span class="comment"> *     tree AVL树的根结点</span></span><br><span class="line"><span class="comment"> *     key 插入的结点的键值</span></span><br><span class="line"><span class="comment"> * 返回值：</span></span><br><span class="line"><span class="comment"> *     根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">insert</span><span class="params">(AVLTreeNode&lt;T&gt; tree, T key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tree == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 新建节点</span></span><br><span class="line">        tree = <span class="keyword">new</span> AVLTreeNode&lt;T&gt;(key, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">if</span> (tree==<span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(<span class="string">"ERROR: create avltree node failed!"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> cmp = key.compareTo(tree.key);</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;    <span class="comment">// 应该将key插入到"tree的左子树"的情况</span></span><br><span class="line">            tree.left = insert(tree.left, key);</span><br><span class="line">            <span class="comment">// 插入节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">            <span class="keyword">if</span> (height(tree.left) - height(tree.right) == <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (key.compareTo(tree.left.key) &lt; <span class="number">0</span>)</span><br><span class="line">                    tree = leftLeftRotation(tree);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    tree = leftRightRotation(tree);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;    <span class="comment">// 应该将key插入到"tree的右子树"的情况</span></span><br><span class="line">            tree.right = insert(tree.right, key);</span><br><span class="line">            <span class="comment">// 插入节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">            <span class="keyword">if</span> (height(tree.right) - height(tree.left) == <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (key.compareTo(tree.right.key) &gt; <span class="number">0</span>)</span><br><span class="line">                    tree = rightRightRotation(tree);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    tree = rightLeftRotation(tree);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;    <span class="comment">// cmp==0</span></span><br><span class="line">            System.out.println(<span class="string">"添加失败：不允许添加相同的节点！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    tree.height = max( height(tree.left), height(tree.right)) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> tree;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">    mRoot = insert(mRoot, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-删除"><a href="#4-删除" class="headerlink" title="4. 删除"></a>4. 删除</h3><p>删除节点的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * 删除结点(z)，返回根节点</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 参数说明：</span></span><br><span class="line"><span class="comment"> *     tree AVL树的根结点</span></span><br><span class="line"><span class="comment"> *     z 待删除的结点</span></span><br><span class="line"><span class="comment"> * 返回值：</span></span><br><span class="line"><span class="comment"> *     根节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">remove</span><span class="params">(AVLTreeNode&lt;T&gt; tree, AVLTreeNode&lt;T&gt; z)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 根为空 或者 没有要删除的节点，直接返回null。</span></span><br><span class="line">    <span class="keyword">if</span> (tree==<span class="keyword">null</span> || z==<span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> cmp = z.key.compareTo(tree.key);</span><br><span class="line">    <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;        <span class="comment">// 待删除的节点在"tree的左子树"中</span></span><br><span class="line">        tree.left = remove(tree.left, z);</span><br><span class="line">        <span class="comment">// 删除节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">        <span class="keyword">if</span> (height(tree.right) - height(tree.left) == <span class="number">2</span>) &#123;</span><br><span class="line">            AVLTreeNode&lt;T&gt; r =  tree.right;</span><br><span class="line">            <span class="keyword">if</span> (height(r.left) &gt; height(r.right))</span><br><span class="line">                tree = rightLeftRotation(tree);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                tree = rightRightRotation(tree);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;    <span class="comment">// 待删除的节点在"tree的右子树"中</span></span><br><span class="line">        tree.right = remove(tree.right, z);</span><br><span class="line">        <span class="comment">// 删除节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">        <span class="keyword">if</span> (height(tree.left) - height(tree.right) == <span class="number">2</span>) &#123;</span><br><span class="line">            AVLTreeNode&lt;T&gt; l =  tree.left;</span><br><span class="line">            <span class="keyword">if</span> (height(l.right) &gt; height(l.left))</span><br><span class="line">                tree = leftRightRotation(tree);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                tree = leftLeftRotation(tree);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;    <span class="comment">// tree是对应要删除的节点。</span></span><br><span class="line">        <span class="comment">// tree的左右孩子都非空</span></span><br><span class="line">        <span class="keyword">if</span> ((tree.left!=<span class="keyword">null</span>) &amp;&amp; (tree.right!=<span class="keyword">null</span>)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (height(tree.left) &gt; height(tree.right)) &#123;</span><br><span class="line">                <span class="comment">// 如果tree的左子树比右子树高；</span></span><br><span class="line">                <span class="comment">// 则(01)找出tree的左子树中的最大节点</span></span><br><span class="line">                <span class="comment">//   (02)将该最大节点的值赋值给tree。</span></span><br><span class="line">                <span class="comment">//   (03)删除该最大节点。</span></span><br><span class="line">                <span class="comment">// 这类似于用"tree的左子树中最大节点"做"tree"的替身；</span></span><br><span class="line">                <span class="comment">// 采用这种方式的好处是：删除"tree的左子树中最大节点"之后，AVL树仍然是平衡的。</span></span><br><span class="line">                AVLTreeNode&lt;T&gt; max = maximum(tree.left);</span><br><span class="line">                tree.key = max.key;</span><br><span class="line">                tree.left = remove(tree.left, max);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 如果tree的左子树不比右子树高(即它们相等，或右子树比左子树高1)</span></span><br><span class="line">                <span class="comment">// 则(01)找出tree的右子树中的最小节点</span></span><br><span class="line">                <span class="comment">//   (02)将该最小节点的值赋值给tree。</span></span><br><span class="line">                <span class="comment">//   (03)删除该最小节点。</span></span><br><span class="line">                <span class="comment">// 这类似于用"tree的右子树中最小节点"做"tree"的替身；</span></span><br><span class="line">                <span class="comment">// 采用这种方式的好处是：删除"tree的右子树中最小节点"之后，AVL树仍然是平衡的。</span></span><br><span class="line">                AVLTreeNode&lt;T&gt; min = maximum(tree.right);</span><br><span class="line">                tree.key = min.key;</span><br><span class="line">                tree.right = remove(tree.right, min);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            AVLTreeNode&lt;T&gt; tmp = tree;</span><br><span class="line">            tree = (tree.left!=<span class="keyword">null</span>) ? tree.left : tree.right;</span><br><span class="line">            tmp = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> tree;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">    AVLTreeNode&lt;T&gt; z; </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((z = search(mRoot, key)) != <span class="keyword">null</span>)</span><br><span class="line">        mRoot = remove(mRoot, z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完整的实现代码</p>
+<p>AVL树的实现文件(AVRTree.java)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java 语言: AVL树</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> skywang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2013/11/07</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AVLTree</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AVLTreeNode&lt;T&gt; mRoot;    <span class="comment">// 根结点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// AVL树的节点(内部类)</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">AVLTreeNode</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Comparable</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</span><br><span class="line">        T key;                <span class="comment">// 关键字(键值)</span></span><br><span class="line">        <span class="keyword">int</span> height;         <span class="comment">// 高度</span></span><br><span class="line">        AVLTreeNode&lt;T&gt; left;    <span class="comment">// 左孩子</span></span><br><span class="line">        AVLTreeNode&lt;T&gt; right;    <span class="comment">// 右孩子</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">AVLTreeNode</span><span class="params">(T key, AVLTreeNode&lt;T&gt; left, AVLTreeNode&lt;T&gt; right)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.left = left;</span><br><span class="line">            <span class="keyword">this</span>.right = right;</span><br><span class="line">            <span class="keyword">this</span>.height = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造函数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AVLTree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mRoot = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 获取树的高度</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">height</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> tree.height;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">height</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> height(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 比较两个值的大小</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">max</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a&gt;b ? a : b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 前序遍历"AVL树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">preOrder</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">            preOrder(tree.left);</span><br><span class="line">            preOrder(tree.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">preOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        preOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 中序遍历"AVL树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">inOrder</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            inOrder(tree.left);</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">            inOrder(tree.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">inOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        inOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 后序遍历"AVL树"</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postOrder</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line">            postOrder(tree.left);</span><br><span class="line">            postOrder(tree.right);</span><br><span class="line">            System.out.print(tree.key+<span class="string">" "</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        postOrder(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * (递归实现)查找"AVL树x"中键值为key的节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">search</span><span class="params">(AVLTreeNode&lt;T&gt; x, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (x==<span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> x;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> cmp = key.compareTo(x.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> search(x.left, key);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> search(x.right, key);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AVLTreeNode&lt;T&gt; <span class="title">search</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> search(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * (非递归实现)查找"AVL树x"中键值为key的节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">iterativeSearch</span><span class="params">(AVLTreeNode&lt;T&gt; x, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (x!=<span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> cmp = key.compareTo(x.key);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>)</span><br><span class="line">                x = x.left;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)</span><br><span class="line">                x = x.right;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> x;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AVLTreeNode&lt;T&gt; <span class="title">iterativeSearch</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> iterativeSearch(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 查找最小结点：返回tree为根结点的AVL树的最小结点。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">minimum</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tree.left != <span class="keyword">null</span>)</span><br><span class="line">            tree = tree.left;</span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">minimum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        AVLTreeNode&lt;T&gt; p = minimum(mRoot);</span><br><span class="line">        <span class="keyword">if</span> (p != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> p.key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 查找最大结点：返回tree为根结点的AVL树的最大结点。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">maximum</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(tree.right != <span class="keyword">null</span>)</span><br><span class="line">            tree = tree.right;</span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">maximum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        AVLTreeNode&lt;T&gt; p = maximum(mRoot);</span><br><span class="line">        <span class="keyword">if</span> (p != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> p.key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * LL：左左对应的情况(左单旋转)。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">leftLeftRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k2)</span> </span>&#123;</span><br><span class="line">        AVLTreeNode&lt;T&gt; k1;</span><br><span class="line"></span><br><span class="line">        k1 = k2.left;</span><br><span class="line">        k2.left = k1.right;</span><br><span class="line">        k1.right = k2;</span><br><span class="line"></span><br><span class="line">        k2.height = max( height(k2.left), height(k2.right)) + <span class="number">1</span>;</span><br><span class="line">        k1.height = max( height(k1.left), k2.height) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> k1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * RR：右右对应的情况(右单旋转)。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">rightRightRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k1)</span> </span>&#123;</span><br><span class="line">        AVLTreeNode&lt;T&gt; k2;</span><br><span class="line"></span><br><span class="line">        k2 = k1.right;</span><br><span class="line">        k1.right = k2.left;</span><br><span class="line">        k2.left = k1;</span><br><span class="line"></span><br><span class="line">        k1.height = max( height(k1.left), height(k1.right)) + <span class="number">1</span>;</span><br><span class="line">        k2.height = max( height(k2.right), k1.height) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> k2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * LR：左右对应的情况(左双旋转)。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">leftRightRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k3)</span> </span>&#123;</span><br><span class="line">        k3.left = rightRightRotation(k3.left);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> leftLeftRotation(k3);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * RL：右左对应的情况(右双旋转)。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 返回值：旋转后的根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">rightLeftRotation</span><span class="params">(AVLTreeNode&lt;T&gt; k1)</span> </span>&#123;</span><br><span class="line">        k1.right = leftLeftRotation(k1.right);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> rightRightRotation(k1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 将结点插入到AVL树中，并返回根节点</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 参数说明：</span></span><br><span class="line"><span class="comment">     *     tree AVL树的根结点</span></span><br><span class="line"><span class="comment">     *     key 插入的结点的键值</span></span><br><span class="line"><span class="comment">     * 返回值：</span></span><br><span class="line"><span class="comment">     *     根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">insert</span><span class="params">(AVLTreeNode&lt;T&gt; tree, T key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 新建节点</span></span><br><span class="line">            tree = <span class="keyword">new</span> AVLTreeNode&lt;T&gt;(key, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">if</span> (tree==<span class="keyword">null</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">"ERROR: create avltree node failed!"</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> cmp = key.compareTo(tree.key);</span><br><span class="line"></span><br><span class="line">               <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;    <span class="comment">// 应该将key插入到"tree的左子树"的情况</span></span><br><span class="line">                tree.left = insert(tree.left, key);</span><br><span class="line">                <span class="comment">// 插入节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">                <span class="keyword">if</span> (height(tree.left) - height(tree.right) == <span class="number">2</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (key.compareTo(tree.left.key) &lt; <span class="number">0</span>)</span><br><span class="line">                        tree = leftLeftRotation(tree);</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        tree = leftRightRotation(tree);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;    <span class="comment">// 应该将key插入到"tree的右子树"的情况</span></span><br><span class="line">                tree.right = insert(tree.right, key);</span><br><span class="line">                <span class="comment">// 插入节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">                <span class="keyword">if</span> (height(tree.right) - height(tree.left) == <span class="number">2</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (key.compareTo(tree.right.key) &gt; <span class="number">0</span>)</span><br><span class="line">                        tree = rightRightRotation(tree);</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        tree = rightLeftRotation(tree);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;    <span class="comment">// cmp==0</span></span><br><span class="line">                System.out.println(<span class="string">"添加失败：不允许添加相同的节点！"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tree.height = max( height(tree.left), height(tree.right)) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        mRoot = insert(mRoot, key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 删除结点(z)，返回根节点</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 参数说明：</span></span><br><span class="line"><span class="comment">     *     tree AVL树的根结点</span></span><br><span class="line"><span class="comment">     *     z 待删除的结点</span></span><br><span class="line"><span class="comment">     * 返回值：</span></span><br><span class="line"><span class="comment">     *     根节点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> AVLTreeNode&lt;T&gt; <span class="title">remove</span><span class="params">(AVLTreeNode&lt;T&gt; tree, AVLTreeNode&lt;T&gt; z)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 根为空 或者 没有要删除的节点，直接返回null。</span></span><br><span class="line">        <span class="keyword">if</span> (tree==<span class="keyword">null</span> || z==<span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> cmp = z.key.compareTo(tree.key);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) &#123;        <span class="comment">// 待删除的节点在"tree的左子树"中</span></span><br><span class="line">            tree.left = remove(tree.left, z);</span><br><span class="line">            <span class="comment">// 删除节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">            <span class="keyword">if</span> (height(tree.right) - height(tree.left) == <span class="number">2</span>) &#123;</span><br><span class="line">                AVLTreeNode&lt;T&gt; r =  tree.right;</span><br><span class="line">                <span class="keyword">if</span> (height(r.left) &gt; height(r.right))</span><br><span class="line">                    tree = rightLeftRotation(tree);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    tree = rightRightRotation(tree);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>) &#123;    <span class="comment">// 待删除的节点在"tree的右子树"中</span></span><br><span class="line">            tree.right = remove(tree.right, z);</span><br><span class="line">            <span class="comment">// 删除节点后，若AVL树失去平衡，则进行相应的调节。</span></span><br><span class="line">            <span class="keyword">if</span> (height(tree.left) - height(tree.right) == <span class="number">2</span>) &#123;</span><br><span class="line">                AVLTreeNode&lt;T&gt; l =  tree.left;</span><br><span class="line">                <span class="keyword">if</span> (height(l.right) &gt; height(l.left))</span><br><span class="line">                    tree = leftRightRotation(tree);</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    tree = leftLeftRotation(tree);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;    <span class="comment">// tree是对应要删除的节点。</span></span><br><span class="line">            <span class="comment">// tree的左右孩子都非空</span></span><br><span class="line">            <span class="keyword">if</span> ((tree.left!=<span class="keyword">null</span>) &amp;&amp; (tree.right!=<span class="keyword">null</span>)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (height(tree.left) &gt; height(tree.right)) &#123;</span><br><span class="line">                    <span class="comment">// 如果tree的左子树比右子树高；</span></span><br><span class="line">                    <span class="comment">// 则(01)找出tree的左子树中的最大节点</span></span><br><span class="line">                    <span class="comment">//   (02)将该最大节点的值赋值给tree。</span></span><br><span class="line">                    <span class="comment">//   (03)删除该最大节点。</span></span><br><span class="line">                    <span class="comment">// 这类似于用"tree的左子树中最大节点"做"tree"的替身；</span></span><br><span class="line">                    <span class="comment">// 采用这种方式的好处是：删除"tree的左子树中最大节点"之后，AVL树仍然是平衡的。</span></span><br><span class="line">                    AVLTreeNode&lt;T&gt; max = maximum(tree.left);</span><br><span class="line">                    tree.key = max.key;</span><br><span class="line">                    tree.left = remove(tree.left, max);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 如果tree的左子树不比右子树高(即它们相等，或右子树比左子树高1)</span></span><br><span class="line">                    <span class="comment">// 则(01)找出tree的右子树中的最小节点</span></span><br><span class="line">                    <span class="comment">//   (02)将该最小节点的值赋值给tree。</span></span><br><span class="line">                    <span class="comment">//   (03)删除该最小节点。</span></span><br><span class="line">                    <span class="comment">// 这类似于用"tree的右子树中最小节点"做"tree"的替身；</span></span><br><span class="line">                    <span class="comment">// 采用这种方式的好处是：删除"tree的右子树中最小节点"之后，AVL树仍然是平衡的。</span></span><br><span class="line">                    AVLTreeNode&lt;T&gt; min = maximum(tree.right);</span><br><span class="line">                    tree.key = min.key;</span><br><span class="line">                    tree.right = remove(tree.right, min);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                AVLTreeNode&lt;T&gt; tmp = tree;</span><br><span class="line">                tree = (tree.left!=<span class="keyword">null</span>) ? tree.left : tree.right;</span><br><span class="line">                tmp = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> tree;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(T key)</span> </span>&#123;</span><br><span class="line">        AVLTreeNode&lt;T&gt; z; </span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((z = search(mRoot, key)) != <span class="keyword">null</span>)</span><br><span class="line">            mRoot = remove(mRoot, z);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* </span></span><br><span class="line"><span class="comment">     * 销毁AVL树</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">(AVLTreeNode&lt;T&gt; tree)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (tree==<span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (tree.left != <span class="keyword">null</span>)</span><br><span class="line">            destroy(tree.left);</span><br><span class="line">        <span class="keyword">if</span> (tree.right != <span class="keyword">null</span>)</span><br><span class="line">            destroy(tree.right);</span><br><span class="line"></span><br><span class="line">        tree = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        destroy(mRoot);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 打印"二叉查找树"</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * key        -- 节点的键值 </span></span><br><span class="line"><span class="comment">     * direction  --  0，表示该节点是根节点;</span></span><br><span class="line"><span class="comment">     *               -1，表示该节点是它的父结点的左孩子;</span></span><br><span class="line"><span class="comment">     *                1，表示该节点是它的父结点的右孩子。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">(AVLTreeNode&lt;T&gt; tree, T key, <span class="keyword">int</span> direction)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(tree != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(direction==<span class="number">0</span>)    <span class="comment">// tree是根节点</span></span><br><span class="line">                System.out.printf(<span class="string">"%2d is root\n"</span>, tree.key, key);</span><br><span class="line">            <span class="keyword">else</span>                <span class="comment">// tree是分支节点</span></span><br><span class="line">                System.out.printf(<span class="string">"%2d is %2d's %6s child\n"</span>, tree.key, key, direction==<span class="number">1</span>?<span class="string">"right"</span> : <span class="string">"left"</span>);</span><br><span class="line"></span><br><span class="line">            print(tree.left, tree.key, -<span class="number">1</span>);</span><br><span class="line">            print(tree.right,tree.key,  <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mRoot != <span class="keyword">null</span>)</span><br><span class="line">            print(mRoot, mRoot.key, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AVL树的测试程序(AVLTreeTest.java)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Java 语言: AVL树</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> skywang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2013/11/07</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AVLTreeTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> arr[]= &#123;<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">16</span>,<span class="number">15</span>,<span class="number">14</span>,<span class="number">13</span>,<span class="number">12</span>,<span class="number">11</span>,<span class="number">10</span>,<span class="number">8</span>,<span class="number">9</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i;</span><br><span class="line">        AVLTree&lt;Integer&gt; tree = <span class="keyword">new</span> AVLTree&lt;Integer&gt;();</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"== 依次添加: "</span>);</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">0</span>; i&lt;arr.length; i++) &#123;</span><br><span class="line">            System.out.printf(<span class="string">"%d "</span>, arr[i]);</span><br><span class="line">            tree.insert(arr[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"\n== 前序遍历: "</span>);</span><br><span class="line">        tree.preOrder();</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"\n== 中序遍历: "</span>);</span><br><span class="line">        tree.inOrder();</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"\n== 后序遍历: "</span>);</span><br><span class="line">        tree.postOrder();</span><br><span class="line">        System.out.printf(<span class="string">"\n"</span>);</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"== 高度: %d\n"</span>, tree.height());</span><br><span class="line">        System.out.printf(<span class="string">"== 最小值: %d\n"</span>, tree.minimum());</span><br><span class="line">        System.out.printf(<span class="string">"== 最大值: %d\n"</span>, tree.maximum());</span><br><span class="line">        System.out.printf(<span class="string">"== 树的详细信息: \n"</span>);</span><br><span class="line">        tree.print();</span><br><span class="line"></span><br><span class="line">        i = <span class="number">8</span>;</span><br><span class="line">        System.out.printf(<span class="string">"\n== 删除根节点: %d"</span>, i);</span><br><span class="line">        tree.remove(i);</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"\n== 高度: %d"</span>, tree.height());</span><br><span class="line">        System.out.printf(<span class="string">"\n== 中序遍历: "</span>);</span><br><span class="line">        tree.inOrder();</span><br><span class="line">        System.out.printf(<span class="string">"\n== 树的详细信息: \n"</span>);</span><br><span class="line">        tree.print();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 销毁二叉树</span></span><br><span class="line">        tree.destroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="AVL树的Java测试程序"><a href="#AVL树的Java测试程序" class="headerlink" title="AVL树的Java测试程序"></a>AVL树的Java测试程序</h2><p>AVL树的测试程序运行结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">== 依次添加: 3 2 1 4 5 6 7 16 15 14 13 12 11 10 8 9 </span><br><span class="line">== 前序遍历: 7 4 2 1 3 6 5 13 11 9 8 10 12 15 14 16 </span><br><span class="line">== 中序遍历: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 </span><br><span class="line">== 后序遍历: 1 3 2 5 6 4 8 10 9 12 11 14 16 15 13 7 </span><br><span class="line">== 高度: 5</span><br><span class="line">== 最小值: 1</span><br><span class="line">== 最大值: 16</span><br><span class="line">== 树的详细信息: </span><br><span class="line"> 7 is root</span><br><span class="line"> 4 is  7&apos;s   left child</span><br><span class="line"> 2 is  4&apos;s   left child</span><br><span class="line"> 1 is  2&apos;s   left child</span><br><span class="line"> 3 is  2&apos;s  right child</span><br><span class="line"> 6 is  4&apos;s  right child</span><br><span class="line"> 5 is  6&apos;s   left child</span><br><span class="line">13 is  7&apos;s  right child</span><br><span class="line">11 is 13&apos;s   left child</span><br><span class="line"> 9 is 11&apos;s   left child</span><br><span class="line"> 8 is  9&apos;s   left child</span><br><span class="line">10 is  9&apos;s  right child</span><br><span class="line">12 is 11&apos;s  right child</span><br><span class="line">15 is 13&apos;s  right child</span><br><span class="line">14 is 15&apos;s   left child</span><br><span class="line">16 is 15&apos;s  right child</span><br><span class="line"></span><br><span class="line">== 删除根节点: 8</span><br><span class="line">== 高度: 5</span><br><span class="line">== 中序遍历: 1 2 3 4 5 6 7 9 10 11 12 13 14 15 16 </span><br><span class="line">== 树的详细信息: </span><br><span class="line"> 7 is root</span><br><span class="line"> 4 is  7&apos;s   left child</span><br><span class="line"> 2 is  4&apos;s   left child</span><br><span class="line"> 1 is  2&apos;s   left child</span><br><span class="line"> 3 is  2&apos;s  right child</span><br><span class="line"> 6 is  4&apos;s  right child</span><br><span class="line"> 5 is  6&apos;s   left child</span><br><span class="line">13 is  7&apos;s  right child</span><br><span class="line">11 is 13&apos;s   left child</span><br><span class="line"> 9 is 11&apos;s   left child</span><br><span class="line">10 is  9&apos;s  right child</span><br><span class="line">12 is 11&apos;s  right child</span><br><span class="line">15 is 13&apos;s  right child</span><br><span class="line">14 is 15&apos;s   left child</span><br><span class="line">16 is 15&apos;s  right child</span><br></pre></td></tr></table></figure>
+<p>下面，我们对测试程序的流程进行分析！</p>
+<h3 id="1-新建AVL树"><a href="#1-新建AVL树" class="headerlink" title="1. 新建AVL树"></a>1. 新建AVL树</h3><h3 id="2-依次添加”3-2-1-4-5-6-7-16-15-14-13-12-11-10-8-9”-到AVL树中。"><a href="#2-依次添加”3-2-1-4-5-6-7-16-15-14-13-12-11-10-8-9”-到AVL树中。" class="headerlink" title="2. 依次添加”3,2,1,4,5,6,7,16,15,14,13,12,11,10,8,9” 到AVL树中。"></a>2. 依次添加”3,2,1,4,5,6,7,16,15,14,13,12,11,10,8,9” 到AVL树中。</h3><h4 id="2-01-添加3-2"><a href="#2-01-添加3-2" class="headerlink" title="2.01 添加3,2"></a>2.01 添加3,2</h4><p>添加3,2都不会破坏AVL树的平衡性。</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/008.jpg" alt=""></p>
+<h4 id="2-02-添加1"><a href="#2-02-添加1" class="headerlink" title="2.02 添加1"></a>2.02 添加1</h4><p>添加1之后，AVL树失去平衡(LL)，此时需要对AVL树进行旋转(LL旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/009.jpg" alt=""></p>
+<h4 id="2-03-添加4"><a href="#2-03-添加4" class="headerlink" title="2.03 添加4"></a>2.03 添加4</h4><p>添加4不会破坏AVL树的平衡性。</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/010.jpg" alt=""></p>
+<h4 id="2-04-添加5"><a href="#2-04-添加5" class="headerlink" title="2.04 添加5"></a>2.04 添加5</h4><p>添加5之后，AVL树失去平衡(RR)，此时需要对AVL树进行旋转(RR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/011.jpg" alt=""></p>
+<h4 id="2-05-添加6"><a href="#2-05-添加6" class="headerlink" title="2.05 添加6"></a>2.05 添加6</h4><p>添加6之后，AVL树失去平衡(RR)，此时需要对AVL树进行旋转(RR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/012.jpg" alt=""></p>
+<h4 id="2-06-添加7"><a href="#2-06-添加7" class="headerlink" title="2.06 添加7"></a>2.06 添加7</h4><p>添加7之后，AVL树失去平衡(RR)，此时需要对AVL树进行旋转(RR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/013.jpg" alt=""></p>
+<h4 id="2-07-添加16"><a href="#2-07-添加16" class="headerlink" title="2.07 添加16"></a>2.07 添加16</h4><p>添加16不会破坏AVL树的平衡性。</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/014.jpg" alt=""></p>
+<h4 id="2-08-添加15"><a href="#2-08-添加15" class="headerlink" title="2.08 添加15"></a>2.08 添加15</h4><p>添加15之后，AVL树失去平衡(RR)，此时需要对AVL树进行旋转(RR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/015.jpg" alt=""></p>
+<h4 id="2-09-添加14"><a href="#2-09-添加14" class="headerlink" title="2.09 添加14"></a>2.09 添加14</h4><p>添加14之后，AVL树失去平衡(RL)，此时需要对AVL树进行旋转(RL旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/016.jpg" alt=""></p>
+<h4 id="2-10-添加13"><a href="#2-10-添加13" class="headerlink" title="2.10 添加13"></a>2.10 添加13</h4><p>添加13之后，AVL树失去平衡(RR)，此时需要对AVL树进行旋转(RR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/017.jpg" alt=""></p>
+<h4 id="2-11-添加12"><a href="#2-11-添加12" class="headerlink" title="2.11 添加12"></a>2.11 添加12</h4><p>添加12之后，AVL树失去平衡(LL)，此时需要对AVL树进行旋转(LL旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/018.jpg" alt=""></p>
+<h4 id="2-12-添加11"><a href="#2-12-添加11" class="headerlink" title="2.12 添加11"></a>2.12 添加11</h4><p>添加11之后，AVL树失去平衡(LL)，此时需要对AVL树进行旋转(LL旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/019.jpg" alt=""></p>
+<h4 id="2-13-添加10"><a href="#2-13-添加10" class="headerlink" title="2.13 添加10"></a>2.13 添加10</h4><p>添加10之后，AVL树失去平衡(LL)，此时需要对AVL树进行旋转(LL旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/020.jpg" alt=""></p>
+<h4 id="2-14-添加8"><a href="#2-14-添加8" class="headerlink" title="2.14 添加8"></a>2.14 添加8</h4><p>添加8不会破坏AVL树的平衡性。</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/021.jpg" alt=""></p>
+<h4 id="2-15-添加9"><a href="#2-15-添加9" class="headerlink" title="2.15 添加9"></a>2.15 添加9</h4><p>但是添加9之后，AVL树失去平衡(LR)，此时需要对AVL树进行旋转(LR旋转)。旋转过程如下：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/022.jpg" alt=""></p>
+<h3 id="3-打印树的信息"><a href="#3-打印树的信息" class="headerlink" title="3. 打印树的信息"></a>3. 打印树的信息</h3><p>输出下面树的信息：</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/023.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">前序遍历: 7 4 2 1 3 6 5 13 11 9 8 10 12 15 14 16 </span><br><span class="line">中序遍历: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 </span><br><span class="line">后序遍历: 1 3 2 5 6 4 8 10 9 12 11 14 16 15 13 7 </span><br><span class="line">高度: 5</span><br><span class="line">最小值: 1</span><br><span class="line">最大值: 16</span><br></pre></td></tr></table></figure>
+<h3 id="4-删除节点8"><a href="#4-删除节点8" class="headerlink" title="4. 删除节点8"></a>4. 删除节点8</h3><p>删除操作并不会造成AVL树的不平衡。</p>
+<p><img src="/assets/images/2014/03/30/avl-tree-implementation/024.jpg" alt=""></p>
+<p>删除节点8之后，再打印该AVL树的信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">高度: 5</span><br><span class="line">中序遍历: 1 2 3 4 5 6 7 9 10 11 12 13 14 15 16</span><br></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li>原文链接：<a href="http://www.cnblogs.com/skywang12345/p/3577479.html" target="_blank" rel="noopener">AVL树(三)之 Java的实现</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" rel="tag"># Algorithm</a>
+          
+            <a href="/tags/AVLTree/" rel="tag"># AVLTree</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-03-28-binary-search-tree-and-implementation/" rel="next" title="二叉查找树(三)之 Java的实现">
+                <i class="fa fa-chevron-left"></i> 二叉查找树(三)之 Java的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/2014-04-01-splay-tree-java-implementation/" rel="prev" title="伸展树Java实现">
+                伸展树Java实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概要"><span class="nav-text">概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AVL树的介绍"><span class="nav-text">AVL树的介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AVL树的Java实现"><span class="nav-text">AVL树的Java实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-节点"><span class="nav-text">1. 节点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-节点定义"><span class="nav-text">1.1 节点定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-树的高度"><span class="nav-text">1.2 树的高度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-比较大小"><span class="nav-text">1.3 比较大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-RR的旋转"><span class="nav-text">2.2 RR的旋转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-LR的旋转"><span class="nav-text">2.3 LR的旋转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-RL的旋转"><span class="nav-text">2.4 RL的旋转</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-插入"><span class="nav-text">3. 插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-删除"><span class="nav-text">4. 删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AVL树的Java测试程序"><span class="nav-text">AVL树的Java测试程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-新建AVL树"><span class="nav-text">1. 新建AVL树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-依次添加”3-2-1-4-5-6-7-16-15-14-13-12-11-10-8-9”-到AVL树中。"><span class="nav-text">2. 依次添加”3,2,1,4,5,6,7,16,15,14,13,12,11,10,8,9” 到AVL树中。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-01-添加3-2"><span class="nav-text">2.01 添加3,2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-02-添加1"><span class="nav-text">2.02 添加1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-03-添加4"><span class="nav-text">2.03 添加4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-04-添加5"><span class="nav-text">2.04 添加5</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-05-添加6"><span class="nav-text">2.05 添加6</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-06-添加7"><span class="nav-text">2.06 添加7</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-07-添加16"><span class="nav-text">2.07 添加16</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-08-添加15"><span class="nav-text">2.08 添加15</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-09-添加14"><span class="nav-text">2.09 添加14</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-10-添加13"><span class="nav-text">2.10 添加13</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-11-添加12"><span class="nav-text">2.11 添加12</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-12-添加11"><span class="nav-text">2.12 添加11</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-13-添加10"><span class="nav-text">2.13 添加10</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-14-添加8"><span class="nav-text">2.14 添加8</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-15-添加9"><span class="nav-text">2.15 添加9</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-打印树的信息"><span class="nav-text">3. 打印树的信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-删除节点8"><span class="nav-text">4. 删除节点8</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>

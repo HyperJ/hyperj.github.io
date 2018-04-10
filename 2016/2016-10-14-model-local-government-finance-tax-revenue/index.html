@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Machine-Learning,Model," />
+
+
+<meta name="description" content="说明主要内容是基于某省财政项目的预测模型项目的一些经验和心得。 税改历史该项目的大体背景是基于税费营改增后对地方财政收入的影响做出预测，是典型的通过大数据的方式和手段，解决政府问题的项目。 先普及一下我国的税改历史，以便大家了解我们在做模型时所要考虑的问题的复杂性。  1994年分税制施行，地方财权得到了确认。但在二十来年的地方财政管理实践中也出现了诸如区域不平衡和财政竞争等问题。对于公共财政管理">
+<meta name="keywords" content="Machine-Learning,Model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="地方政府财政税收收入预测模型经验">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-10-14-model-local-government-finance-tax-revenue/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="说明主要内容是基于某省财政项目的预测模型项目的一些经验和心得。 税改历史该项目的大体背景是基于税费营改增后对地方财政收入的影响做出预测，是典型的通过大数据的方式和手段，解决政府问题的项目。 先普及一下我国的税改历史，以便大家了解我们在做模型时所要考虑的问题的复杂性。  1994年分税制施行，地方财权得到了确认。但在二十来年的地方财政管理实践中也出现了诸如区域不平衡和财政竞争等问题。对于公共财政管理">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/model-local-government-finance-tax-revenue/001.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/10/14/model-local-government-finance-tax-revenue/002.jpg">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.926Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="地方政府财政税收收入预测模型经验">
+<meta name="twitter:description" content="说明主要内容是基于某省财政项目的预测模型项目的一些经验和心得。 税改历史该项目的大体背景是基于税费营改增后对地方财政收入的影响做出预测，是典型的通过大数据的方式和手段，解决政府问题的项目。 先普及一下我国的税改历史，以便大家了解我们在做模型时所要考虑的问题的复杂性。  1994年分税制施行，地方财权得到了确认。但在二十来年的地方财政管理实践中也出现了诸如区域不平衡和财政竞争等问题。对于公共财政管理">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/10/14/model-local-government-finance-tax-revenue/001.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HyperJ's Blog!" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-10-14-model-local-government-finance-tax-revenue/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>地方政府财政税收收入预测模型经验 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Data, Distribution, Containerization & Artificial Intelligence</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-work">
+          <a href="/work/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />Work</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-projects">
+          <a href="/projects/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />Projects</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-collections">
+          <a href="/collections/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-list"></i> <br />Collections</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-specials">
+          <a href="/specials/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br />Specials</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-translations">
+          <a href="/translations/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br />Translations</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-link"></i> <br />Links</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-book"></i> <br />Books</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-10-14-model-local-government-finance-tax-revenue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">地方政府财政税收收入预测模型经验</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-14T00:00:00+08:00">2016-10-14</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine-Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             Views: 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>主要内容是基于某省财政项目的预测模型项目的一些经验和心得。</p>
+<h3 id="税改历史"><a href="#税改历史" class="headerlink" title="税改历史"></a>税改历史</h3><p>该项目的大体背景是基于税费营改增后对地方财政收入的影响做出预测，是典型的通过大数据的方式和手段，解决政府问题的项目。</p>
+<p>先普及一下我国的税改历史，以便大家了解我们在做模型时所要考虑的问题的复杂性。</p>
+<ul>
+<li>1994年分税制施行，地方财权得到了确认。但在二十来年的地方财政管理实践中也出现了诸如区域不平衡和财政竞争等问题。对于公共财政管理者而言，实现对财政收入的精细化控制和预测，是稳定地方财政和经济发展的一项要务。</li>
+<li>2012年12月1日，在上海交通运输业和部分现代服务业开展营业税改征增值税试点。</li>
+<li>2012年8月1日起至年底，国务院将扩大营改增试点至北京、江苏、安徽、福建、广东、天津、浙江、湖北8省（市）；</li>
+<li>2013年8月1日，“营改增”范围已推广到全国试行，将广播影视服务业纳入试点范围。</li>
+<li>2014年1月1日起，将铁路运输和邮政服务业纳入营业税改征增值税试点，至此交通运输业已全部纳入营改增范围；</li>
+<li>2016年5月1日起，我国全面推开营改增试点，将建筑业、房地产业、金融业、生活服务业全部纳入营改增试点，至此，营业税退出历史舞台，增值税制度将更加规范。</li>
+</ul>
+<p>做预测建模，最重要的是需要有时间上连续的数据。可由于税制的改革，人为的造成了数据的不连续性和不完整性，在设计模型时，无形中增加了很大的难度。</p>
+<p>今年的“营改增”，更是造成了及其大的数据问题，对预测建模提出了新的挑战。</p>
+<p>“营改增”是指将以前缴纳营业税的应税项目改为缴纳增值税，仅对服务或者产品增值的一部分进行缴税，以减少重复缴税的情况。“营改增”的实行，完善了中国流转税的税制，有效解决了双重征税的问题，破解了混合销售、兼营造成的征管困境。“营改增”的实行使小规模纳税人税收减少明显，使一般纳税人税收略有下降；在对企业的结构和管理模式上也都有深刻影响。</p>
+<p>因此，在全国开展“营改增”的大环境下，企业、行业、政府都正在或开始经历一场崭新而深刻的变革。如何利用已有试点数据来把握政策改革带来的影响以及对未来进行预测，是当前政府与财税部门的一大痛点。</p>
+<p>发现了用户的痛点，解决痛点。</p>
+<p>下面简单介绍一下该项目的背景：</p>
+<p>某省为更加全面深入掌握市县财源信息，科学分析今后财政收入趋势，更加精准地发挥参谋职能，拟建设集财源信息采集、查询、分析、预测等功能为一体的市县财源库，为省级和市县财政决策提供支持。</p>
+<p>为实现其目标，该项目需要建设3大基础平台。</p>
+<ol>
+<li>建立财源信息采集平台，实现各市县财政部门负责的财源信息定期录入以及省财政相关处室局部分信息补充录入或审核修改。</li>
+<li>建立系统数据分析平台，能够根据需要，生成各类统计表或统计图，直观反映现阶段财源发展或收入增长变化情况。</li>
+<li>建立财源收入预测平台，能够利用现成数据或预计数据，相对准确地预测今后一段时期收入增长趋势。</li>
+</ol>
+<p>有了这3大平台，就可以为数据分析与挖掘提供足够的弹药。</p>
+<p>依托上述“三大平台”，实现“三大功能”：</p>
+<ol>
+<li>查询功能。根据用户的财源信息需求，即时获取重点企业各项指标数据信息，方便日常工作查询。</li>
+<li>分析功能。便于财源信息数据分析利用，能够分市县、分产业、分行业、分规模分析收入增长或变化情况，科学合理监测财源发展。</li>
+<li>预测功能。基于财源指标数据与收入增长之间的相关性分析，建立收入趋势预测分析模型，能够预测下一年度或今后一段时期财源变动或收入增长情况，为领导决策以及今后政策出台或调整提供参考。</li>
+</ol>
+<p>为实现上述“三大功能”需求，需要采集以下五类指标数据信息：</p>
+<ol>
+<li><p>基本信息</p>
+<p> 主要包括：入库企业名称、地址、登记注册时间、法人代表、主营范围、所属产业、所属行业、分支机构、注册资本、员工人数等。</p>
+</li>
+<li><p>财务指标</p>
+<p> 主要包括入库企业资产、负债、营业收入、净利润、利润率、销售价格、主要原材料成本等。</p>
+</li>
+<li><p>税收指标</p>
+<p> 主要包括入库企业增值税、消费税、企业所得税、个人所得税、房产税、土地使用税、印花税、城建税、教育费附加等。</p>
+</li>
+<li><p>投入产出指标</p>
+<p> 主要包括入库企业投资额、工资及奖金、工时、主要原材料、能源（包括用电量）以及产品产量、销售量、销售收入、工业总增加值（总产值）等。</p>
+</li>
+<li><p>财政收入指标</p>
+<p> 主要包括全省以及各市县地方财政收入、税收收入、其他收入以及各税种收入情况等。</p>
+</li>
+</ol>
+<p>在明确了项目的建设目标后，明确了所要解决的问题和理解了相应的数据字段信息后，我们变可以开始相应的建模工作了。</p>
+<p>由于财政经济系统运行于整个地区的国民经济环境之中，因此，在考虑财政指标的同时，模型还引入了一些财政系统以外的对财政指标变化影响较大的宏观经济指标作为外生变量，首先预测这些宏观指标，然后根据它们的发展趋势，以及与财政重要指标的关联程度来分析和确认财政财力系统主要指标预测的合理性。</p>
+<p>数据维度的增加对建模工作的开展是把双刃剑。维度多会导致维度灾难，难以发现数据特征。因此，我们采用了目前先进的组合预测建模方式去解决问题。既能实现较低维度数据的分析与挖掘，又要考虑数据在高维空间上的稀疏性特点。</p>
+<p><img src="/assets/images/2016/10/14/model-local-government-finance-tax-revenue/001.jpg" alt=""></p>
+<p>将传统的时间序列分析，与机器学习的SVM和神经网络有效的结合在一起。完成建模工作。</p>
+<p>模型设计图最左边部分就是基于传统的时间序列分析和财政上常用的“基年法”进行的常规预测。</p>
+<p>由于增加了企业的财务数据信息和纳税信息，右侧部分是对传统分析预测方法所进行的修正。</p>
+<p>这套混合，组合建模方法也是目前世界先进的，解决大数据建模的方法。</p>
+<p>该预测模型在设计上实现了两个功能：</p>
+<ol>
+<li>通过优化了的组合预测模型对财政收入总体及部分进行预测；</li>
+<li>利用某省积累的部分营改增试点行业历史数据训练模型，对营改增全面实行后的影响进行估计与预测；</li>
+</ol>
+<p>全部模型设计分为四个步骤：</p>
+<ol>
+<li>利用企业数据库数据，对不同行业不同税种的行业财源进行机器学习算法框架内的预测；</li>
+<li>通过组合预测模型，对财政收入中的企业税收部分进行预测，并结合上一步结果进行修正；</li>
+<li>通过组合预测模型，对企业税占财政收入比例进行预测，并结合上一步结果估计政府财政收入；</li>
+<li>通过组合预测模型，对地方政府公共财政预算收入进行预测，并结合上一步结果进行优化。</li>
+</ol>
+<p>下面解释整个建模的思路：</p>
+<p>建模一定要有相关的理论基础和业务基础，会在稍后的叙述中将这些理论列出来。先普及一个概念，以便讲解建模思路。</p>
+<p>地方财政总收入（全口径，如北京市财政收入）= 地方财政收入+上划中央收入 = 地方一般预算财政收入 + 基金预算收入（包括政府性基金收入和社会保险基金收入）+ 上划中央收入（注：包含有基金收入的财政总收入叫做全口径财政收入，否则仅叫财政总收入。）</p>
+<p>所以财政收入，不仅仅是税收，还包括其他很多项内容。</p>
+<p>建模思路讲解正式开始：</p>
+<ol>
+<li><p>财政收入数据是典型的时间序列型数据，且由于经济发展具有连续性，故采用计量经济学的时间序列分析方法对经济指标进行分析和预测是被理论和实践证实了的有效预测方法之一。为了优化预测结果，在时间序列模型（如指数平滑）之外，采用回归、SVM等算法建立组合预测模型。</p>
+</li>
+<li><p>由于财政收入数据量及维度较少，考虑使用企业税收预测对政府财政收入预测进行修正，理由如下：</p>
+</li>
+</ol>
+<p>a) 企业税收是政府财政收入的主要来源；</p>
+<p>b) 财源库内五类数据指标中有四类都与企业相关，数据量相对丰富，且粒度较细；</p>
+<p>c) 通过对企业所处细分行业的单项税收进行预测，引入更丰富的变量和机器学习算法，可以实现对预测模型更加精细化的调控；</p>
+<ol>
+<li>对企业税收收入的预测：</li>
+</ol>
+<p>a) 通过国家颁布的行业划分标准、税种分类标准、纳税属性、以及分类算法对每个行业内不同群组的不同税种进行细分，形成行业财源画像；</p>
+<p>b) 以行业财源画像属性数据、宏观经济数据、国际经济数据作为自变量，以行业财源数据作为因变量，进行模型构建。由于计划引入的数据维度较多，考虑采用SVM、神经网络等算法进行计算，并综合优化预测结果。</p>
+<ol>
+<li><p>以组合预测模型对企业税的不同税种进行预测。由于“营改增”试行，对应行业营业税与增值税较以往会发生较大改变，通过拆分计算，可以更好地捕捉到税改对税收的影响。</p>
+</li>
+<li><p>使用由行业财源画像得出的预测结果对企业税各税种的预测进行优化。</p>
+</li>
+<li><p>以组合预测模型对企业税的财政占比进行预测。</p>
+</li>
+<li><p>结合企业税收预测和企业税的财政占比预测形成基于企业税的财政收入预测。</p>
+</li>
+<li><p>对组合预测模型计算的政府财政收入预测结果进行修正。</p>
+</li>
+</ol>
+<p>基于上述思路所创建的模型，理论上经得起推敲。实践中也有相比常规方法更好的效果。</p>
+<p>所使用的数据科学理论基础如下：</p>
+<ul>
+<li>一些关于预测方法精确度回顾和调查指出，大部分关于预测方法研究的文献都认为简单的时间序列模型并不一定比复杂模型差。</li>
+<li>还有一些文献则认为不考虑数据趋势或者季节变化的移动自平均以及单指数平滑模型非常的好。</li>
+<li>因果分析法(包括回归分析)的一个最大优点在于它能够提供一种使政策制定者通过对收入预测过程以及预测方法的了解过程系统地掌握经济原理。</li>
+<li>支持向量机(Support Vector Machines, SVM)，在解决小样本、非线性及高维模式识别问题中表现出了许多特有的优势，并能够应用推广到函数拟合等其他机器学习问题中，支持向量机成功地解决了高维问题和局部极值问题。</li>
+<li>在经济系统预测中，包括在电力负荷预测中，组合预测模型的表现较单一预测模型效果要好。</li>
+</ul>
+<p>历史年度地方财政经济数据，所使用的数据介绍如下：</p>
+<ul>
+<li>地方财政收入指标数据</li>
+</ul>
+<p>主要包括：全省以及各市县地方财政收入、税收收入、其他收入以及各税种收入情况等。</p>
+<ul>
+<li>地方经济数据</li>
+</ul>
+<p>主要包括：人口数量、GDP、人均收入、住宅（新建/二手）每平米均价、商业地产每平米均价等。</p>
+<p>历史年度地方企业数据</p>
+<ul>
+<li>基本信息</li>
+</ul>
+<p>主要包括：入库企业名称、地址、登记注册时间、法人代表、主营范围、所属产业、所属行业、分支机构、注册资本、员工人数等。</p>
+<ul>
+<li>财务指标</li>
+</ul>
+<p>主要包括入库企业资产、负债、营业收入、净利润、利润率、销售价格、主要原材料成本等。</p>
+<ul>
+<li>税收指标</li>
+</ul>
+<p>主要包括入库企业增值税、消费税、企业所得税、个人所得税、房产税、土地使用税、印花税、城建税、教育费附加等。</p>
+<ul>
+<li>投入产出指标</li>
+</ul>
+<p>主要包括入库企业投资额、工资及奖金、工时、主要原材料、能源（包括用电量）以及产品产量、销售量、销售收入、工业总增加值（总产值）等。</p>
+<p>宏观经济数据</p>
+<p>主要包括：历史年度通货膨胀率、利率、全国GDP、全国人均收入、CPI、上证综指、深证综指等。</p>
+<p>国际经济数据</p>
+<p>主要包括：人民币对美元汇率、恒生指数、日经指数、道琼斯指数、纳斯达克指数等。</p>
+<p>所参考的政策类数据如下：</p>
+<pre><code>政策类数据
+税制改革类政策
+宏观调控类政策
+</code></pre><p>政策对预测模型的准确率影响很大，所以必须要考虑进去。</p>
+<p>该模型的主要创新点如下：</p>
+<ul>
+<li>以对企业税收的预测对财政收入预测进行优化；</li>
+<li>通过对行业财源进行细分及画像，可以引入更丰富的变量对企业的财源能力进行估计；</li>
+<li>通过引入宏观经济等政策性变量，可以较好地捕捉政策变化对某行业财源以及政府财政收入的影响；</li>
+<li>通过对企业税进行税种划分预测，可以较好地捕捉到税改（如“营改增”）对行业财源的影响，并为将来进一步积累数据优化模型留出拓展空间。</li>
+</ul>
+<p>该模型的设计也并不完美，会存在一定的潜在问题。但是我们也有相对应的解决方案。</p>
+<p>潜在问题和对策</p>
+<ul>
+<li>财政收入数据量较小。由于现行税制是1994年实行的，有效时间序列样本最多仅有21年数据（21条观测值）。即使通过机器学习方法对行业财源进行细分与模拟，在时间维度上的训练样本仍然有限。可以考虑根据城市或行业对企业进行分组，做交叉验证。</li>
+<li>在深入到行业层级的数据之后，实现了训练样本容量扩大的同时，也引入了额外的估计误差，而这种误差会在随后的计算中被累加。虽然通过有监督的学习方式，可以对误差进行控制，但时间维度上的数据有限性仍然会局限训练效果。由于SVM算法对小样本具有更好的适应性，在此考虑使用SVM进行模型建立，辅以人工神经网络算法。</li>
+<li>由于国家政策的改变或新政策的实行不具有重复性，故无法对模型就某项政策的影响效果进行组间训练。若模拟效果不好，考虑再向上一层，对全行业进行估计，以此对冲掉不同企业对政策的反馈情况。待新政实行较长时间后，积累了足够多的数据，再尝试深入研究。</li>
+</ul>
+<p>今后我们会尝试在更多领域进行组合建模的尝试。</p>
+<p>基于传统信息化信息孤岛的问题，以及计算能力不足的瓶颈，组合建模是相对合理的建模计算解决方法。</p>
+<p>既考虑目前的信息化硬件环境，也考虑大数据的计算能力。</p>
+<p>地方政府财政收入结构</p>
+<p>地方财政总收入（全口径，如北京市财政收入）= 地方财政收入+上划中央收入 = 地方一般预算财政收入 + 基金预算收入（包括政府性基金收入和社会保险基金收入）+ 上划中央收入（注：包含有基金收入的财政总收入叫做全口径财政收入，否则仅叫财政总收入。）</p>
+<p>地方一般预算财政收入：通过一定的形式和程序，有计划有组织并由国家支配的纳入预算管理的资金。包括：</p>
+<p>（1） 税收收入。国内增值税的25%、营业税、企业所得税（纳入分享范围的企业所得税的40%+未纳入分享范围企业全部所得税）、个人所得税的40%、资源税、城市维护建设税、房产税、印花税（证券印花税的3%+其余印花税的全部）、城镇土地使用税、土地增值税、车船税、耕地占用税、契税、烟叶税、其他税收收入。</p>
+<p>（2） 非税收入。专项收入、行政事业性收费收入、罚没收入、国有资本经营收入、国有资源有偿使用收入、其他收入。</p>
+<p>基金预算收入：指按规定收取，转入或通过当年财政安排，由财政管理并具有指定用途的政府性基金预算收入等。主要包括：工业交通部门、商贸部门、文教部门、农业部门、其他部门的基金收入和社会保障基金收入、地方财政税费附加收入、基金预算调拨收入等。</p>
+<p>行政区本级财政收入指的是行政区本级政府与下级政府之间经过分享、返还之后可供行政区本级政府支配的财政收入。如，北京市财政收入中还包含了下面区县的财政收入，北京市政府本级财政收入仅占其中的一部分。</p>
+<p><img src="/assets/images/2016/10/14/model-local-government-finance-tax-revenue/002.jpg" alt=""></p>
+<p>企业税在地方政府一般预算财政收入中的角色</p>
+<p>由于我国改革开放，各地方经济的发展极不平衡。企业税在各地方政府的财政收入中所占比例跨度也非常大。目前没有统一的衡量标准和计量方法。非税收入在地方财政收入所占比重也相对不透明。以罚款，基金收入，土地出让金等方式所带来的财政收入，由于担心发布所带来的社会负面效应，一般不予公开。目前争议比较大，因此企业税在地方政府财政收入中所处的角色也不尽相同。</p>
+<p>财政学理论基础</p>
+<p>长期以来,我国对来年预算收入的制定都采用“基数法”,即以上年预算收入数作为基数,以一定的增长率来计算,并考虑一些特殊因素进行调整,而在对关键的增长率进行确定时,大多数地方政府都采取在GDP增长率基础上进行相应调整的方法。这种方法割裂了财政收入与经济系统各变量之间的复杂关系,并不能够客观地反映财政收入的数量,对政府预算制定的指导作用有限。因此,通过更合理、更科学的预测方法和技术,结合财政经济以及税收经济理论,建立相应的地方财政收入预测模型,获得更准确的预测数据,对于国家和地方政府编制合理的预算报告、进行宏观经济调控、监测税源稳定情况等都具有非常重要的意义和作用。</p>
+<p>这是我们在建模过程中所涉及到的一些理论基础和业务基础知识。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine-Learning</a>
+          
+            <a href="/tags/Model/" rel="tag"># Model</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/" rel="next" title="分布式会话跟踪系统架构设计与实践">
+                <i class="fa fa-chevron-left"></i> 分布式会话跟踪系统架构设计与实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-10-15-programming-principles/" rel="prev" title="Categorized overview of Programming Principles & Patterns">
+                Categorized overview of Programming Principles & Patterns <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/hyperj.jpg"
+                alt="HyperJ" />
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Data, Distribution, Containerization, Artificial Intelligence</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">178</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">196</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#税改历史"><span class="nav-text">税改历史</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a></div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+
+
+  
+
+</body>
+</html>
