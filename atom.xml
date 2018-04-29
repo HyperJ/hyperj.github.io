@@ -459,36 +459,6 @@
   </entry>
   
   <entry>
-    <title>Java Memory Model</title>
-    <link href="http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/"/>
-    <id>http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/</id>
-    <published>2018-02-15T16:00:00.000Z</published>
-    <updated>2018-03-11T10:08:30.947Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;TODO&quot;&gt;&lt;a href=&quot;#TODO&quot; class=&quot;headerlink&quot; title=&quot;TODO&quot;&gt;&lt;/a&gt;TODO&lt;/h3&gt;&lt;h3 id=&quot;Links&quot;&gt;&lt;a href=&quot;#Links&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Java" scheme="http://hyperj.github.com/categories/Java/"/>
-    
-    
-      <category term="Java" scheme="http://hyperj.github.com/tags/Java/"/>
-    
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Memory Model" scheme="http://hyperj.github.com/tags/Memory-Model/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Preprocessing Data Practice</title>
     <link href="http://hyperj.github.com/2018/02/2018-02-15-preprocessing-data-practice/"/>
     <id>http://hyperj.github.com/2018/02/2018-02-15-preprocessing-data-practice/</id>
@@ -521,6 +491,36 @@
       <category term="Feature" scheme="http://hyperj.github.com/tags/Feature/"/>
     
       <category term="Preprocessing" scheme="http://hyperj.github.com/tags/Preprocessing/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java Memory Model</title>
+    <link href="http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/"/>
+    <id>http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/</id>
+    <published>2018-02-15T16:00:00.000Z</published>
+    <updated>2018-03-11T10:08:30.947Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h3 id=&quot;TODO&quot;&gt;&lt;a href=&quot;#TODO&quot; class=&quot;headerlink&quot; title=&quot;TODO&quot;&gt;&lt;/a&gt;TODO&lt;/h3&gt;&lt;h3 id=&quot;Links&quot;&gt;&lt;a href=&quot;#Links&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="Java" scheme="http://hyperj.github.com/categories/Java/"/>
+    
+    
+      <category term="Java" scheme="http://hyperj.github.com/tags/Java/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
+    
+      <category term="Memory Model" scheme="http://hyperj.github.com/tags/Memory-Model/"/>
     
   </entry>
   
@@ -893,11 +893,11 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
+      <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
-      <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
   </entry>
   
@@ -925,9 +925,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
   </entry>
   
