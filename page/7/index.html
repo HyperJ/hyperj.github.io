@@ -49,19 +49,19 @@
 
 <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css" />
 
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.0.4">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicon.ico?v=6.2.0">
 
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.0.4">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon.ico?v=6.2.0">
 
 
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.0.4">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.ico?v=6.2.0">
 
 
-  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.0.4" color="#222">
+  <link rel="mask-icon" href="/assets/images/favicon.ico?v=6.2.0" color="#222">
 
 
 
@@ -76,7 +76,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Gemini',
-    version: '6.0.4',
+    version: '6.2.0',
     sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: false,
     fastclick: false,
@@ -532,6 +532,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-12-09-namenode-memory-detail/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/2016-12-09-namenode-memory-detail/" itemprop="url">HDFS NameNode内存详解</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-09T00:00:00+08:00">2016-12-09</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Namenode/" itemprop="url" rel="index"><span itemprop="name">Namenode</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          前言《HDFS NameNode内存全景》中，我们从NameNode内部数据结构的视角，对它的内存全景及几个关键数据结构进行了简单解读，并结合实际场景介绍了NameNode可能遇到的问题，还有业界进行横向扩展方面的多种可借鉴解决方案。
+事实上，对NameNode实施横向扩展前，会面临常驻内存随数据规
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/2016-12-09-namenode-memory-detail/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-12-09-sorting-system-feature-production-framework/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -643,171 +808,6 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/2016-12-09-sorting-system-feature-production-framework/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-12-09-namenode-memory-detail/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="HyperJ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/assets/images/hyperj.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HyperJ's Blog!">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/2016-12-09-namenode-memory-detail/" itemprop="url">HDFS NameNode内存详解</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-09T00:00:00+08:00">2016-12-09</time>
-            
-
-            
-            
-              
-                
-              
-            
-
-            
-              
-              <span class="post-meta-divider">|</span>
-              
-
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Post modified&#58;</span>
-              
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Namenode/" itemprop="url" rel="index"><span itemprop="name">Namenode</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          前言《HDFS NameNode内存全景》中，我们从NameNode内部数据结构的视角，对它的内存全景及几个关键数据结构进行了简单解读，并结合实际场景介绍了NameNode可能遇到的问题，还有业界进行横向扩展方面的多种可借鉴解决方案。
-事实上，对NameNode实施横向扩展前，会面临常驻内存随数据规
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/2016-12-09-namenode-memory-detail/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -2025,172 +2025,6 @@ java安全沙箱（四）之安全管理器及Java API
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="HyperJ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/assets/images/hyperj.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HyperJ's Blog!">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/" itemprop="url">分布式会话跟踪系统架构设计与实践</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-14T00:00:00+08:00">2016-10-14</time>
-            
-
-            
-            
-              
-                
-              
-            
-
-            
-              
-              <span class="post-meta-divider">|</span>
-              
-
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Post modified&#58;</span>
-              
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Distributed/" itemprop="url" rel="index"><span itemprop="name">Distributed</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。
-美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。
-目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-10-14-model-local-government-finance-tax-revenue/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2304,6 +2138,172 @@ java安全沙箱（四）之安全管理器及Java API
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/2016-10-14-model-local-government-finance-tax-revenue/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/hyperj.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/" itemprop="url">分布式会话跟踪系统架构设计与实践</a></h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-14T00:00:00+08:00">2016-10-14</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Distributed/" itemprop="url" rel="index"><span itemprop="name">Distributed</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          本文整理自美团点评技术沙龙第08期：大规模集群的服务治理设计与实践。
+美团点评技术沙龙由美团点评技术团队主办，每月一期。每期沙龙邀请美团点评及其它互联网公司的技术专家分享来自一线的实践经验，覆盖各主要技术领域。
+目前沙龙会分别在北京、上海和厦门等地举行，要参加下一次最新沙龙活动？赶快关注微信公众号“
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/2016-10-14-distributed-session-tracking-system-architecture-design-and-practice/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -2962,12 +2962,12 @@ java安全沙箱（四）之安全管理器及Java API
             <div class="links-of-author motion-element">
               
                 <span class="links-of-author-item">
-                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
                   
                 </span>
               
                 <span class="links-of-author-item">
-                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="GitHubGist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>GitHubGist</a>
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
                   
                 </span>
               
@@ -3052,7 +3052,7 @@ java安全沙箱（四）之安全管理器及Java API
       <div class="footer-inner">
         <div class="copyright">&copy; 2009 &mdash; <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
-    <i class="fa fa-github"></i>
+    <i class="fa fa-[object Object]"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">HyperJ</span>
 
@@ -3169,28 +3169,28 @@ java安全沙箱（四）之安全管理器及Java API
   
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=6.0.4"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
 
 
 
   
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
 
 
 
@@ -3591,12 +3591,9 @@ java安全沙箱（四）之安全管理器及Java API
   
 
   
-  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.0.4"></script>
-  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.0.4"></script>
-
 
   
-  <script type="text/javascript" src="/js/src/exturl.js?v=6.0.4"></script>
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.2.0"></script>
 
 
   
