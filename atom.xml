@@ -45,6 +45,37 @@
   </entry>
   
   <entry>
+    <title>Service Log</title>
+    <link href="http://hyperj.github.com/2018/06/2018-06-01-service-log/"/>
+    <id>http://hyperj.github.com/2018/06/2018-06-01-service-log/</id>
+    <published>2018-05-31T16:00:00.000Z</published>
+    <updated>2018-06-01T10:57:00.876Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h3 id=&quot;Log&quot;&gt;&lt;a href=&quot;#Log&quot; class=&quot;headerlink&quot; title=&quot;Log&quot;&gt;&lt;/a&gt;Log&lt;/h3&gt;&lt;p&gt;Who When Where What Content&lt;/p&gt;
+&lt;h3 id=&quot;Level&quot;&gt;&lt;a href=&quot;#Level&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="Log" scheme="http://hyperj.github.com/categories/Log/"/>
+    
+    
+      <category term="Log" scheme="http://hyperj.github.com/tags/Log/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
+    
+      <category term="Service" scheme="http://hyperj.github.com/tags/Service/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Canal</title>
     <link href="http://hyperj.github.com/2018/05/2018-05-29-canal/"/>
     <id>http://hyperj.github.com/2018/05/2018-05-29-canal/</id>
@@ -131,9 +162,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Scheduler" scheme="http://hyperj.github.com/tags/Scheduler/"/>
     
@@ -165,9 +196,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Scheduler" scheme="http://hyperj.github.com/tags/Scheduler/"/>
     
@@ -199,9 +230,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="NodeManager" scheme="http://hyperj.github.com/tags/NodeManager/"/>
     
@@ -231,9 +262,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="ResourceManager" scheme="http://hyperj.github.com/tags/ResourceManager/"/>
     
@@ -263,9 +294,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
   </entry>
   
@@ -492,6 +523,36 @@
   </entry>
   
   <entry>
+    <title>Java Memory Model</title>
+    <link href="http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/"/>
+    <id>http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/</id>
+    <published>2018-02-15T16:00:00.000Z</published>
+    <updated>2018-03-11T10:08:30.947Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h3 id=&quot;TODO&quot;&gt;&lt;a href=&quot;#TODO&quot; class=&quot;headerlink&quot; title=&quot;TODO&quot;&gt;&lt;/a&gt;TODO&lt;/h3&gt;&lt;h3 id=&quot;Links&quot;&gt;&lt;a href=&quot;#Links&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="Java" scheme="http://hyperj.github.com/categories/Java/"/>
+    
+    
+      <category term="Java" scheme="http://hyperj.github.com/tags/Java/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
+    
+      <category term="Memory Model" scheme="http://hyperj.github.com/tags/Memory-Model/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Preprocessing Data Practice</title>
     <link href="http://hyperj.github.com/2018/02/2018-02-15-preprocessing-data-practice/"/>
     <id>http://hyperj.github.com/2018/02/2018-02-15-preprocessing-data-practice/</id>
@@ -524,36 +585,6 @@
       <category term="Feature" scheme="http://hyperj.github.com/tags/Feature/"/>
     
       <category term="Preprocessing" scheme="http://hyperj.github.com/tags/Preprocessing/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Java Memory Model</title>
-    <link href="http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/"/>
-    <id>http://hyperj.github.com/2018/02/2018-02-16-java-memory-model/</id>
-    <published>2018-02-15T16:00:00.000Z</published>
-    <updated>2018-03-11T10:08:30.947Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;TODO&quot;&gt;&lt;a href=&quot;#TODO&quot; class=&quot;headerlink&quot; title=&quot;TODO&quot;&gt;&lt;/a&gt;TODO&lt;/h3&gt;&lt;h3 id=&quot;Links&quot;&gt;&lt;a href=&quot;#Links&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Java" scheme="http://hyperj.github.com/categories/Java/"/>
-    
-    
-      <category term="Java" scheme="http://hyperj.github.com/tags/Java/"/>
-    
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Memory Model" scheme="http://hyperj.github.com/tags/Memory-Model/"/>
     
   </entry>
   
@@ -928,9 +959,9 @@
     
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
-      <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
   </entry>
   
@@ -1125,39 +1156,6 @@
       <category term="FIFO" scheme="http://hyperj.github.com/tags/FIFO/"/>
     
       <category term="Fair" scheme="http://hyperj.github.com/tags/Fair/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Scheduling - Sequence</title>
-    <link href="http://hyperj.github.com/2018/01/2018-01-27-spark-scheduling-sequence/"/>
-    <id>http://hyperj.github.com/2018/01/2018-01-27-spark-scheduling-sequence/</id>
-    <published>2018-01-26T16:00:00.000Z</published>
-    <updated>2018-03-11T10:08:30.941Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;Sequence&quot;&gt;&lt;a href=&quot;#Sequence&quot; class=&quot;headerlink&quot; title=&quot;Sequence&quot;&gt;&lt;/a&gt;Sequence&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Driver: RDD(foreach, foreachPartition,
-        
-      
-    
-    </summary>
-    
-      <category term="Spark" scheme="http://hyperj.github.com/categories/Spark/"/>
-    
-    
-      <category term="Spark" scheme="http://hyperj.github.com/tags/Spark/"/>
-    
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Scheduling" scheme="http://hyperj.github.com/tags/Scheduling/"/>
-    
-      <category term="Sequence" scheme="http://hyperj.github.com/tags/Sequence/"/>
     
   </entry>
   
