@@ -49,7 +49,7 @@
     <link href="http://hyperj.github.com/2018/06/2018-06-01-service-log/"/>
     <id>http://hyperj.github.com/2018/06/2018-06-01-service-log/</id>
     <published>2018-05-31T16:00:00.000Z</published>
-    <updated>2018-06-01T10:57:00.876Z</updated>
+    <updated>2018-06-03T07:19:01.186Z</updated>
     
     <summary type="html">
     
@@ -957,9 +957,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
       <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
@@ -989,9 +989,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
   </entry>
   
