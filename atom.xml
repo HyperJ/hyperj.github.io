@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://hyperj.github.com/"/>
-  <updated>2018-04-10T08:42:24.085Z</updated>
+  <updated>2018-06-07T13:30:16.129Z</updated>
   <id>http://hyperj.github.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://hyperj.github.com/2018/12/2018-12-31-todo/"/>
     <id>http://hyperj.github.com/2018/12/2018-12-31-todo/</id>
     <published>2018-12-30T16:00:00.000Z</published>
-    <updated>2018-04-10T08:42:24.085Z</updated>
+    <updated>2018-06-07T13:30:16.129Z</updated>
     
     <summary type="html">
     
@@ -957,9 +957,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
-    
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
+    
+      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
       <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
@@ -989,9 +989,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
-    
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
+    
+      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
   </entry>
   
