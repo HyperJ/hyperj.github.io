@@ -959,9 +959,9 @@
     
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
-      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
-    
       <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
+    
+      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
   </entry>
   
@@ -1151,11 +1151,11 @@
     
       <category term="Scheduling" scheme="http://hyperj.github.com/tags/Scheduling/"/>
     
-      <category term="Fair" scheme="http://hyperj.github.com/tags/Fair/"/>
-    
       <category term="Job" scheme="http://hyperj.github.com/tags/Job/"/>
     
       <category term="FIFO" scheme="http://hyperj.github.com/tags/FIFO/"/>
+    
+      <category term="Fair" scheme="http://hyperj.github.com/tags/Fair/"/>
     
   </entry>
   
