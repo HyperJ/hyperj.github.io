@@ -45,6 +45,36 @@
   </entry>
   
   <entry>
+    <title>Data Dependency</title>
+    <link href="http://hyperj.github.com/2018/06/2018-06-19-data-dependency/"/>
+    <id>http://hyperj.github.com/2018/06/2018-06-19-data-dependency/</id>
+    <published>2018-06-18T16:00:00.000Z</published>
+    <updated>2018-06-19T05:49:04.827Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;A data dependency in computer science is a situation in which a program statement (instruction) refers to the data of a preceding statement. In
+        
+      
+    
+    </summary>
+    
+      <category term="Data" scheme="http://hyperj.github.com/categories/Data/"/>
+    
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
+    
+      <category term="Data" scheme="http://hyperj.github.com/tags/Data/"/>
+    
+      <category term="Dependency" scheme="http://hyperj.github.com/tags/Dependency/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Service Log</title>
     <link href="http://hyperj.github.com/2018/06/2018-06-01-service-log/"/>
     <id>http://hyperj.github.com/2018/06/2018-06-01-service-log/</id>
@@ -162,9 +192,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Scheduler" scheme="http://hyperj.github.com/tags/Scheduler/"/>
     
@@ -196,9 +226,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Scheduler" scheme="http://hyperj.github.com/tags/Scheduler/"/>
     
@@ -230,9 +260,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="NodeManager" scheme="http://hyperj.github.com/tags/NodeManager/"/>
     
@@ -262,9 +292,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="ResourceManager" scheme="http://hyperj.github.com/tags/ResourceManager/"/>
     
@@ -294,9 +324,9 @@
     
       <category term="Hadoop" scheme="http://hyperj.github.com/tags/Hadoop/"/>
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="YARN" scheme="http://hyperj.github.com/tags/YARN/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
   </entry>
   
@@ -957,9 +987,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
       <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
@@ -989,9 +1019,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
-    
       <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
+    
+      <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
     
   </entry>
   
@@ -1118,44 +1148,6 @@
       <category term="Scheduling" scheme="http://hyperj.github.com/tags/Scheduling/"/>
     
       <category term="Strategy" scheme="http://hyperj.github.com/tags/Strategy/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spark Scheduling - Algorithm</title>
-    <link href="http://hyperj.github.com/2018/01/2018-01-28-spark-scheduling-algorithm/"/>
-    <id>http://hyperj.github.com/2018/01/2018-01-28-spark-scheduling-algorithm/</id>
-    <published>2018-01-27T16:00:00.000Z</published>
-    <updated>2018-03-11T10:08:30.941Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;h3 id=&quot;SchedulingAlgorithm&quot;&gt;&lt;a href=&quot;#SchedulingAlgorithm&quot; class=&quot;headerlink&quot;
-        
-      
-    
-    </summary>
-    
-      <category term="Spark" scheme="http://hyperj.github.com/categories/Spark/"/>
-    
-    
-      <category term="Algorithm" scheme="http://hyperj.github.com/tags/Algorithm/"/>
-    
-      <category term="Spark" scheme="http://hyperj.github.com/tags/Spark/"/>
-    
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Scheduling" scheme="http://hyperj.github.com/tags/Scheduling/"/>
-    
-      <category term="Job" scheme="http://hyperj.github.com/tags/Job/"/>
-    
-      <category term="FIFO" scheme="http://hyperj.github.com/tags/FIFO/"/>
-    
-      <category term="Fair" scheme="http://hyperj.github.com/tags/Fair/"/>
     
   </entry>
   
