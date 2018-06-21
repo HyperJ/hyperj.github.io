@@ -97,9 +97,9 @@
       <category term="Log" scheme="http://hyperj.github.com/categories/Log/"/>
     
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="Log" scheme="http://hyperj.github.com/tags/Log/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Service" scheme="http://hyperj.github.com/tags/Service/"/>
     
@@ -160,9 +160,9 @@
       <category term="Distributed" scheme="http://hyperj.github.com/categories/Distributed/"/>
     
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="Architecture" scheme="http://hyperj.github.com/tags/Architecture/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Distributed" scheme="http://hyperj.github.com/tags/Distributed/"/>
     
@@ -574,9 +574,9 @@
       <category term="Java" scheme="http://hyperj.github.com/categories/Java/"/>
     
     
-      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
       <category term="Java" scheme="http://hyperj.github.com/tags/Java/"/>
+    
+      <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
       <category term="Memory Model" scheme="http://hyperj.github.com/tags/Memory-Model/"/>
     
@@ -763,11 +763,11 @@
       <category term="Spark" scheme="http://hyperj.github.com/categories/Spark/"/>
     
     
+      <category term="Optimization" scheme="http://hyperj.github.com/tags/Optimization/"/>
+    
       <category term="Spark" scheme="http://hyperj.github.com/tags/Spark/"/>
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Optimization" scheme="http://hyperj.github.com/tags/Optimization/"/>
     
       <category term="Spark Streaming" scheme="http://hyperj.github.com/tags/Spark-Streaming/"/>
     
@@ -828,11 +828,11 @@
       <category term="Spark" scheme="http://hyperj.github.com/categories/Spark/"/>
     
     
+      <category term="Architecture" scheme="http://hyperj.github.com/tags/Architecture/"/>
+    
       <category term="Spark" scheme="http://hyperj.github.com/tags/Spark/"/>
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Architecture" scheme="http://hyperj.github.com/tags/Architecture/"/>
     
       <category term="Spark Streaming" scheme="http://hyperj.github.com/tags/Spark-Streaming/"/>
     
@@ -890,11 +890,11 @@
       <category term="Spark" scheme="http://hyperj.github.com/categories/Spark/"/>
     
     
+      <category term="Optimization" scheme="http://hyperj.github.com/tags/Optimization/"/>
+    
       <category term="Spark" scheme="http://hyperj.github.com/tags/Spark/"/>
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
-    
-      <category term="Optimization" scheme="http://hyperj.github.com/tags/Optimization/"/>
     
       <category term="Spark SQL" scheme="http://hyperj.github.com/tags/Spark-SQL/"/>
     
