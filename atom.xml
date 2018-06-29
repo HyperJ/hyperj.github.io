@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>HyperJ&#39;s Blog!</title>
   
-  <subtitle>Data, Distribution, Containerization &amp; Artificial Intelligence</subtitle>
+  <subtitle>Knowledge makes me travel through time and space.</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://hyperj.github.com/"/>
@@ -1019,9 +1019,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
-    
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
+    
+      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
       <category term="Rancher" scheme="http://hyperj.github.com/tags/Rancher/"/>
     
@@ -1051,9 +1051,9 @@
     
       <category term="HyperJ" scheme="http://hyperj.github.com/tags/HyperJ/"/>
     
-      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
-    
       <category term="Docker" scheme="http://hyperj.github.com/tags/Docker/"/>
+    
+      <category term="Kubernetes" scheme="http://hyperj.github.com/tags/Kubernetes/"/>
     
   </entry>
   
