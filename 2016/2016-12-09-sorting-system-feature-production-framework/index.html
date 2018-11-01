@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="背景 图1 外卖排序系统框架 外卖的排序策略是由机器学习模型驱动的，模型迭代效率制约着策略优化效果。如上图所示，在排序系统里，特征是最为基础的部分：有了特征之后，我们离线训练出模型，然后将特征和模型一起推送给线上排序服务使用。特征生产Pipeline对于策略迭代的效率起着至关重要的作用。经过实践中的积累和提炼，我们整理出一套通用的特征生产框架，大大节省开发量，提高策略迭代效率。 外卖排序系统使用G">
+<meta name="keywords" content="Machine-Learning,Framework,Sorting,Feature">
+<meta property="og:type" content="article">
+<meta property="og:title" content="外卖排序系统特征生产框架">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-12-09-sorting-system-feature-production-framework/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="背景 图1 外卖排序系统框架 外卖的排序策略是由机器学习模型驱动的，模型迭代效率制约着策略优化效果。如上图所示，在排序系统里，特征是最为基础的部分：有了特征之后，我们离线训练出模型，然后将特征和模型一起推送给线上排序服务使用。特征生产Pipeline对于策略迭代的效率起着至关重要的作用。经过实践中的积累和提炼，我们整理出一套通用的特征生产框架，大大节省开发量，提高策略迭代效率。 外卖排序系统使用G">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/002.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/003.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/004.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/005.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/006.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/007.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/008.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/009.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/010.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/011.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="外卖排序系统特征生产框架">
+<meta name="twitter:description" content="背景 图1 外卖排序系统框架 外卖的排序策略是由机器学习模型驱动的，模型迭代效率制约着策略优化效果。如上图所示，在排序系统里，特征是最为基础的部分：有了特征之后，我们离线训练出模型，然后将特征和模型一起推送给线上排序服务使用。特征生产Pipeline对于策略迭代的效率起着至关重要的作用。经过实践中的积累和提炼，我们整理出一套通用的特征生产框架，大大节省开发量，提高策略迭代效率。 外卖排序系统使用G">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/12/09/sorting-system-feature-production-framework/001.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-12-09-sorting-system-feature-production-framework/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>外卖排序系统特征生产框架 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-12-09-sorting-system-feature-production-framework/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">外卖排序系统特征生产框架
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-12-09 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-09T00:00:00+08:00">2016-12-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine-Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/001.png" alt=""></p>
+<p>图1 外卖排序系统框架</p>
+<p>外卖的排序策略是由机器学习模型驱动的，模型迭代效率制约着策略优化效果。如上图所示，在排序系统里，特征是最为基础的部分：有了特征之后，我们离线训练出模型，然后将特征和模型一起推送给线上排序服务使用。特征生产Pipeline对于策略迭代的效率起着至关重要的作用。经过实践中的积累和提炼，我们整理出一套通用的特征生产框架，大大节省开发量，提高策略迭代效率。</p>
+<p>外卖排序系统使用GBDT（Gradient Boosting Decision Tree）树模型，比较复杂。受限于计算能力，除了上下文特征（如时间、地域、终端类型、距离等）之外，目前使用的主要是一些宽泛的统计特征，比如商家销量、商家单均价、用户的品类偏好等。这些特征的生产流程包括：离线的统计、离线到在线的同步、在线的加载等。</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/002.png" alt=""></p>
+<p>图2 特征生产流程</p>
+<p>如上图，目前外卖排序的特征生产流程主要有：</p>
+<ol>
+<li><p><strong>特征统计</strong>：基于基础数据表（如曝光表、点击表、订单表等），统计若干时段内特定维度的总量、分布等，如商家月均销量、用户不同品类下单占比。统计结果存储于Hive表。这部分工作，简单的可基于ETL，复杂的可基于Spark。产出的特征可供离线训练和线上预测，<strong>本文主要围绕线上展开</strong>。</p>
+</li>
+<li><p><strong>特征推送</strong>：Hive表里的数据需要存入KV，以便线上实时使用。这一步，首先要将Hive表里的记录映射成POJO类（称为<strong>Domain</strong>类），然后将其序列化，最后将序列化串存入KV。这部分工作比较单一，基于MapReduce实现。</p>
+</li>
+<li><p><strong>特征获取</strong>：在线服务根据需求，从KV中取出数据，并反序列化为Domain对象。</p>
+</li>
+<li><p><strong>特征加载</strong>：针对模型所需特征列表，取得对应的Domain对象。这步通过调用特征获取实现。</p>
+</li>
+</ol>
+<p>前两步为离线操作，后两步为在线操作。特征同步由离线推送和在线获取共同完成。离线生产流程是一个周期性的Pipeline，目前是以天为周期。</p>
+<p>为此，我们设计了一套通用的框架，基于此框架，只需要简单的配置和少量代码开发，就可以新增一组特征。下文将详细介绍框架的各个部分。</p>
+<h1 id="特征统计"><a href="#特征统计" class="headerlink" title="特征统计"></a>特征统计</h1><p>排序模型用到的特征大部分是统计特征。有些特征比较简单，如商家的月均销量、商家单均价等，可用ETL统计(GROUP BY + SUM/AVG)；有些特征稍微复杂，如用户的品类偏好（在不同品类上的占比）、用户的下单额分布（不同金额区段的占比），用ETL就比较繁琐。针对后一种情况，我们开发了一套Spark程序来统计。我们发现，这种统计需求可以规约成一种范式：针对某些<strong>统计对象</strong>（用户、商家）的一些<strong>维度</strong>（品类、下单额），基于某些<strong>度量值</strong>（点击、下单）做<strong>统计</strong>（比例/总和）。</p>
+<p>同一对象，可统计不同维度；同一维度，有不同的度量角度；同一度量角度，有不同的统计方式。如下图：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/003.png" alt=""></p>
+<p>图3 特征统计范式</p>
+<p>例如，对于用户点击品类偏好、用户下单品类偏好、用户下单额分布、用户下单总额等特征，可做范式分解：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/004.png" alt=""></p>
+<p>图4 特征统计范式示例</p>
+<p>其中，</p>
+<ul>
+<li><p><strong>统计对象、统计维度、度量值</strong>对应于Hive表中的字段（维度一般来自维度表，度量值一般来自事实表，主要是曝光、点击、下单）。为了增加灵活性，我们还允许对原始Hive字段做加工，加工后的值作为统计维度、度量值（加工的接口我们分别称为维度算子和度量算子）。</p>
+</li>
+<li><p><strong>统计量</strong>基于度量值做的一些聚合操作，如累加、求均值、拼接、求占比、算分位点（分布）。前两者输出一个数值，后三者输出形如&quot;Key1:Value1,Key2:Value2&quot;的KeyValue列表。</p>
+</li>
+</ul>
+<p>另外，统计通常是在一定时间窗口内进行的，由于不同时期的数据价值不同（新数据比老数据更有价值），我们引入了<strong>时间衰减</strong>，对老数据降权。</p>
+<p>基于以上考虑，整个统计流程可以分解为（基于Spark）：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/005.png" alt=""></p>
+<p>图5 特征统计流程</p>
+<ol>
+<li><p>按统计对象字段做聚合（GROUP BY）。统计对象字段由配置给定。对于外卖排序主要为uuid、poi_id。这一步可能会有数据倾斜，需要更多优化。</p>
+</li>
+<li><p>计算维度。支持维度算子，可以对原始维度字段做处理，如对金额字段做分段处理，以分段后的金额作为维度。</p>
+</li>
+<li><p>按统计维度聚合（GROUP BY）。这是在对象聚合的基础上做的二次聚合。维度字段由配置给定，可以有多个字段，表示交叉特征统计，如不同时段的品类偏好，维度字段为：时段、品类。</p>
+</li>
+<li><p>时间衰减并累加。衰减各个时间的度量值，并把所有时间的度量值累加，作为加权后的度量值。时间字段和度量字段由配置给定。时间字段主要为日期，度量字段主要为曝光、点击、下单。经过维度聚合后，度量值都在特定维度值对应的记录集上做累加，每个维度对应一个度量值，维度和度量值是一个KeyValue的映射关系。</p>
+</li>
+<li><p>计算度量值。度量字段也可以通过度量算子做进一步处理，算子得到的结果作为度量值。也可以有多个字段，如点击和曝光字段，配合除法算子，可以得到点击率作为度量值。</p>
+</li>
+<li><p>计算统计量。经过对象和维度聚合后，对象、维度、度量值建立了二级映射关系：对象维度度量值，相当于一个二维Map：Map&lt;对象, Map&lt;维度, 度量值&gt;&gt;。统计量是对Map&lt;维度, 度量值&gt;做一个聚合操作。每个统计量对应输出Hive表中的一个字段。现在主要支持如下几种算子：</p>
+</li>
+</ol>
+<blockquote>
+<ul>
+<li>累加：对该维度的所有度量值求和；</li>
+<li>求均值：该维度所有取值情况对应的度量值的均值；</li>
+<li>拼接：把Map&lt;维度, 度量值&gt;序列化为&quot;Key1:Value1, Key2:Value2&quot;形式，以便以字符串的形式存储于一个输出字段内。为了防止序列化串太长，可通过配置设定只保留度量值最大的top N；</li>
+<li>求占比：该维度所有取值情况对应的度量值占度量值总和的比重，即Map&lt;维度, 度量值/Sum(度量值)&gt;。然后再做拼接输出；</li>
+<li>算分位点：有时候想直到某些维度的分布情况，比如用户下单金额的分布以考察用户的消费能力。分位点可以作为分布的一种简单而有效的表示方法。该算子输出每个分位点的维度值，形如&quot;分位点1:维度值1, 分位点2:维度值2&quot;。此时，度量值只是用来算比值。</li>
+</ul>
+</blockquote>
+<p><strong>维度算子</strong>、<strong>度量算子</strong>、<strong>统计算子</strong>都可以通过扩展接口的方式实现自定义。</p>
+<p>如下是统计用户点击品类偏好、用户下单品类偏好、用户下单额分布的配置文件和Hive表示例([Toml]<sup>[1]</sup>格式)</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/006.png" alt=""></p>
+<p>图6 特征统计配置示例</p>
+<p>相对于ETL，这套Spark统计框架更为简单清晰，还可以同时统计多个相关的特征。通过简单的配置就可以实现特征的统计，开发量比较小。</p>
+<h1 id="特征同步"><a href="#特征同步" class="headerlink" title="特征同步"></a>特征同步</h1><p>离线统计得到的特征存储在Hive表中，出于性能的考虑，不能在线上直接访问。我们需要把特征从Hive中推送到更为高效的KV数据库中，线上服务再从KV中获取。整个同步过程可以分为如下步骤：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/007.png" alt=""></p>
+<p>图7 特征推送流程</p>
+<ol>
+<li><p>ORM：将Hive表中的每行记录映射为Domain对象（类似于[Hibernate]<sup>[2]</sup>的功能）</p>
+</li>
+<li><p><strong>序列化</strong>：将Domain对象序列化，然后存储到KV中。一个Domain类包含一组相关的、可同时在一个任务中统计的特征数据。每个Domain对象都有一个key值来作为自己唯一的标志—实现key()接口。同时，由于不同类型的Domain都会存储在一起，我们还需要为每种类型的Domain设定一个Key值前缀prefix以示区别。因此，KV中的Key是Domain.prefix + Domain.key，Value是序列化串。我们支持json和protostuff两种序列化方式。</p>
+</li>
+<li><p><strong>反序列化</strong>：在线服务根据key和Domain.prefix从KV中得到序列化串，并反序列化为Domain对象。</p>
+</li>
+</ol>
+<p>前两步为离线操作，第三步为在线操作（在预测代码中被调用）。</p>
+<p>我们针对Hive开发了一套ORM库（见图8），主要基于Java反射，除了支持基本类型(int/long/float/double/String等)，还支持POJO类型和集合类型(List/Map)。因为ETL不支持json拼接，为了兼容基于ETL统计的特征数据，我们的POJO以及集合类型是基于自定义的规范做编解码。针对Spark统计的特征数据，后续我们可以支持json格式的编解码。</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/008.png" alt=""></p>
+<p>图8 Hive ORM示意</p>
+<p>特征序列化和反序列我们统一封装为通用的<strong>KvService</strong>：负责序列化与反序列，以及读写KV。如下图：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/009.png" alt=""></p>
+<p>图9 KvService</p>
+<p>对于新特征，只需要定义一个Domain类，并实现接口key()即可，KvService自动完成Key值的拼接（以Domain的类名作为Key的prefix），序列化和反序列化，读写KV。</p>
+<p>我们通过周期性的离线MapReduce任务，读取Hive表的记录，并调用KvService的put接口，将特征数据推送到KV中。由于KvService能够统一处理各种Domain类型，MapReduce任务也是通用的，无需为每个特征单独开发。</p>
+<p>对于特征同步，只需要开发Domain类，并做少量配置，开发量也很小。目前，我们为了代码的可读性，采用Domain这种强类型的方式来定义特征，如果可以弱化这种需求的话，还可以做更多的框架优化，省去Domain类开发这部分工作。</p>
+<h1 id="特征加载"><a href="#特征加载" class="headerlink" title="特征加载"></a>特征加载</h1><p>通过前面几步，我们已经准备好特征数据，并存储于KV中。线上有诸多模型在运行，不同模型需要不同的特征数据。特征加载这一步主要解决怎么高效便捷地为模型提供相应的特征数据。</p>
+<p>离线得到的只是一些原始特征，在线还可能需要基于原始特征做更多的处理，得到高阶特征。比如离线得到了商家和用户的下单金额分布，在线我们可能需要基于这两个分布计算一个匹配度，以表征该商家是否在用户消费能力的承受范围之内。</p>
+<p>我们把在线特征抽象为一个特征算子：<strong>FeatureOperator</strong>。类似的，一个特征算子包含了一组相关的在线特征，且可能依赖一组相关的离线特征。它除了封装了在线特征的计算过程，还通过两个Java Annotation声明该特征算子产出的特征清单(@<strong>Features</strong>)和所需要的数据清单(@<strong>Fetchers</strong>)。所有的数据获取都是由<strong>DataFetcher</strong>调用<strong>KvService</strong>的get接口实现，拿到的<strong>Domain</strong>对象统一存储在<strong>DataPortal</strong>对象中以便后续使用。</p>
+<p>服务启动时，会自动扫描所有的FeatureOperator的Annotation（@Features、@Fetchers），拿到对应的特征清单和数据清单，从而建立起映射关系：FeatureFeatureOperatorDataFetcher。而每个模型通过配置文件给定其所需要的特征清单，这样就建立起模型到特征的映射关系（如图9）： </p>
+<blockquote>
+<p><strong>Model → Feature → FeatureOperator → DataFetcher</strong></p>
+</blockquote>
+<p>不同的在线特征可能会依赖相同的离线特征，也就是FeatureOperatorDataFetcher是多对多的关系。为了避免重复从KV读取相同的数据以造成性能浪费，离线特征的获取和在线特征的抽取被划分成两步：先汇总所有离线特征需求，统一获取离线特征；得到离线特征后，再进行在线特征的抽取。这样，我们也可以在离线特征加载阶段采用并发以减少网络IO延时。整个流程如图10所示：</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/010.png" alt=""></p>
+<p>图10 模型和特征数据的映射关系</p>
+<p><img src="/assets/images/2016/12/09/sorting-system-feature-production-framework/011.png" alt=""></p>
+<p>图11 特征加载流程</p>
+<p>对于新特征，我们需要实现对应的FeatureOperator、DataFetcher。DataFetcher主要封装了Domain和DataPortal的关系。类似的，如果我们不需要以强类型的方式来保证代码的业务可读性，也可以通过优化框架省去DataFetcher和DataPortal的定制开发。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>我们在合理抽象特征生产过程的各个环节后，设计了一套较为通用的框架，只需要少量的代码开发（主要是自定义一些算子）以及一些配置，就可以很方便地生产一组特征，有效地提高了策略迭代效率。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a><em>参考文献</em></h2><ol>
+<li><a href="https://github.com/toml-lang/toml" target="_blank" rel="noopener">TOML</a>.</li>
+<li><a href="http://hibernate.org/orm/" target="_blank" rel="noopener">Hibernate ORM</a>.</li>
+</ol>
+<hr>
+<ul>
+<li>Author: 海文</li>
+<li>Source: <a href="http://tech.meituan.com/" target="_blank" rel="noopener">美团点评技术团队</a></li>
+<li>Link: <a href="http://tech.meituan.com/feature_pipeline.html" target="_blank" rel="noopener">外卖排序系统特征生产框架</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine-Learning</a>
+          
+            <a href="/tags/Framework/" rel="tag"># Framework</a>
+          
+            <a href="/tags/Sorting/" rel="tag"># Sorting</a>
+          
+            <a href="/tags/Feature/" rel="tag"># Feature</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-12-09-namenode-memory-detail/" rel="next" title="HDFS NameNode内存详解">
+                <i class="fa fa-chevron-left"></i> HDFS NameNode内存详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-12-19-meituan-distributed-data-layer/" rel="prev" title="MTDDL——美团点评分布式数据访问层中间件">
+                MTDDL——美团点评分布式数据访问层中间件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

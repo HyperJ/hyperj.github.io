@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. 插入排序1.1 性能分析时间复杂度O(n^2), 空间复杂度O(1) 排序时间与输入有关：输入的元素个数；元素已排序的程度。 最佳情况，输入数组是已经排好序的数组，运行时间是n的线性函数； 最坏情况，输入数组是逆序，运行时间是n的二次函数。 1.2 核心代码123456789101112public void sort()&amp;#123;    int temp;    for(int i =">
+<meta name="keywords" content="Algorithm,Sort,Performance">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用排序算法总结（性能+代码）">
+<meta property="og:url" content="http://hyperj.github.com/2015/2015-03-13-sort-algorithm-summary/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="1. 插入排序1.1 性能分析时间复杂度O(n^2), 空间复杂度O(1) 排序时间与输入有关：输入的元素个数；元素已排序的程度。 最佳情况，输入数组是已经排好序的数组，运行时间是n的线性函数； 最坏情况，输入数组是逆序，运行时间是n的二次函数。 1.2 核心代码123456789101112public void sort()&amp;#123;    int temp;    for(int i =">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/03/13/sort-algorithm-summary/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/03/13/sort-algorithm-summary/002.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/03/13/sort-algorithm-summary/003.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/03/13/sort-algorithm-summary/004.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常用排序算法总结（性能+代码）">
+<meta name="twitter:description" content="1. 插入排序1.1 性能分析时间复杂度O(n^2), 空间复杂度O(1) 排序时间与输入有关：输入的元素个数；元素已排序的程度。 最佳情况，输入数组是已经排好序的数组，运行时间是n的线性函数； 最坏情况，输入数组是逆序，运行时间是n的二次函数。 1.2 核心代码123456789101112public void sort()&amp;#123;    int temp;    for(int i =">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2015/03/13/sort-algorithm-summary/001.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2015/2015-03-13-sort-algorithm-summary/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>常用排序算法总结（性能+代码） | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2015/2015-03-13-sort-algorithm-summary/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">常用排序算法总结（性能+代码）
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-03-05 00:00:00" itemprop="dateCreated datePublished" datetime="2015-03-05T00:00:00+08:00">2015-03-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-插入排序"><a href="#1-插入排序" class="headerlink" title="1. 插入排序"></a>1. 插入排序</h2><h3 id="1-1-性能分析"><a href="#1-1-性能分析" class="headerlink" title="1.1 性能分析"></a>1.1 性能分析</h3><p>时间复杂度<code>O(n^2)</code>, 空间复杂度<code>O(1)</code></p>
+<p>排序时间与输入有关：输入的元素个数；元素已排序的程度。</p>
+<p>最佳情况，输入数组是已经排好序的数组，运行时间是<code>n</code>的线性函数； 最坏情况，输入数组是逆序，运行时间是<code>n</code>的二次函数。</p>
+<h3 id="1-2-核心代码"><a href="#1-2-核心代码" class="headerlink" title="1.2 核心代码"></a>1.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public void sort()&#123;</span><br><span class="line">    int temp;</span><br><span class="line">    for(int i = 1; i&amp;lt;arraytoSort.length; i++)&#123;</span><br><span class="line">        for(int j = i-1; j&amp;gt;=0; j--)&#123;</span><br><span class="line">            if( arraytoSort[j+1] &amp;lt; arraytoSort[j] )&#123;</span><br><span class="line">                temp = arraytoSort[j+1];</span><br><span class="line">                arraytoSort[j+1] = arraytoSort[j];</span><br><span class="line">                arraytoSort[j] = temp;</span><br><span class="line">            &#125;   </span><br><span class="line">        &#125;   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-选择排序"><a href="#2-选择排序" class="headerlink" title="2.选择排序"></a>2.选择排序</h2><h3 id="2-1-性能分析"><a href="#2-1-性能分析" class="headerlink" title="2.1 性能分析"></a>2.1 性能分析</h3><p>时间复杂度<code>O(n^2)</code>, 空间复杂度<code>O(1)</code></p>
+<p>排序时间与输入无关，最佳情况，最坏情况都是如此, 不稳定 如 <code>{5,5,2}</code>。</p>
+<h3 id="2-2核心代码"><a href="#2-2核心代码" class="headerlink" title="2.2核心代码"></a>2.2核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public void sort()&#123; </span><br><span class="line">    for(int i = 0; i&amp;lt;arraytoSort.length-1; i++)&#123;</span><br><span class="line">        int min = i;</span><br><span class="line">        int temp;</span><br><span class="line">        //find min</span><br><span class="line">        for(int j = i+1; j&amp;lt;arraytoSort.length ;j++)&#123;</span><br><span class="line">            if(arraytoSort[j] &amp;lt;arraytoSort[min])&#123;</span><br><span class="line">                min = j;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        //swap the min with the ith element</span><br><span class="line">        temp = arraytoSort[min];</span><br><span class="line">        arraytoSort[min] = arraytoSort[i];</span><br><span class="line">        arraytoSort[i] = temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-归并排序"><a href="#3-归并排序" class="headerlink" title="3. 归并排序"></a>3. 归并排序</h2><h3 id="3-1-性能分析"><a href="#3-1-性能分析" class="headerlink" title="3.1 性能分析"></a>3.1 性能分析</h3><p>时间复杂度 <code>O(nlogn)</code>, 空间复杂度<code>O(n) +O(logn)</code></p>
+<p>排序时间与输入无关，最佳情况，最坏情况都是如此, 稳定。</p>
+<p>原理：</p>
+<p>可以将数组分成二组。依次类推，当分出来的小组只有一个数据时，可以认为这个小组组内已经达到了有序，然后再合并相邻的二个小组就可以了。这样通过先递归的分解数列，再合并数列就完成了归并排序</p>
+<p>归并排序的时间复杂度，合并耗费<code>O(n)</code>时间，而由完全二叉树的深度可知，整个归并排序需要进行<code>log_2n</code>次，因此，总的时间复杂度为 <code>O(nlogn)</code>，而且这是归并排序算法中最好、最坏、平均的时间性能。</p>
+<p>由于归并排序在归并过程中需要与原始记录序列同样数量的存储空间存放归并结果 以及 递归时深度为 <code>log_2n</code> 的栈空间，因此空间复杂度为<code>O(n+logn)</code>。</p>
+<p>另外，对代码进行仔细研究，发现 Merge 函数中有<code>if (L[i]&amp;lt;R[j])</code> 语句，这就说明它需要两两比较，不存在跳跃，因此归并排序是一种稳定的排序算法。</p>
+<p>也就是说，归并排序是一种比较占用内存，但却效率高且稳定的算法。</p>
+<h3 id="3-2-核心代码"><a href="#3-2-核心代码" class="headerlink" title="3.2 核心代码"></a>3.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">public int merge( int p, int q, int r )&#123;</span><br><span class="line">    int count = 0;</span><br><span class="line">    int[] right = assignlist(p,q); </span><br><span class="line">    //赋值左半部分数组（赋值就是用for循环，还有一个哨兵：最后一个元素设置为maxvalue）</span><br><span class="line">    int[] left = assignlist(q+1,r); //赋值有半部分数组</span><br><span class="line">    int i = 0;</span><br><span class="line">    int j = 0;</span><br><span class="line"></span><br><span class="line">    for(int k = p; k&amp;lt;=r; k++)&#123;</span><br><span class="line">        if(right[i] &amp;lt;= left[j])&#123;    </span><br><span class="line">            arraytoSort[k] = right[i];</span><br><span class="line">            i++;    </span><br><span class="line">        &#125;</span><br><span class="line">        else if(right[i] &amp;gt; left[j])&#123;</span><br><span class="line">            arraytoSort[k] = left[j];</span><br><span class="line">            j++;</span><br><span class="line">            count = count + (q - p + 1) -i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void MergeSort(int arry[],int start,int end)&#123;</span><br><span class="line">    if(start&amp;lt;end)</span><br><span class="line">    &#123;</span><br><span class="line">        int mid=(start+end)/2;//数组重点</span><br><span class="line">        MergeSort(arry,start,mid);//递归调用，排序前半段arry[start...mid]</span><br><span class="line">        MergeSort(arry,mid+1,end);//递归调用，排序后半段arry[mid+1,end]</span><br><span class="line">        MergeArry(arry,start,mid,end);//归并上述两段有序数组。</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-3-延伸"><a href="#3-3-延伸" class="headerlink" title="3.3 延伸"></a>3.3 延伸</h3><p>求逆序对</p>
+<h2 id="4冒泡排序"><a href="#4冒泡排序" class="headerlink" title="4冒泡排序"></a>4冒泡排序</h2><h3 id="4-1-性能分析"><a href="#4-1-性能分析" class="headerlink" title="4.1 性能分析"></a>4.1 性能分析</h3><p>时间复杂度<code>O(n^2)</code>, 空间复杂度<code>O(1)</code>， 稳定，因为存在两两比较，不存在跳跃。</p>
+<p>排序时间与输入无关，最好，最差，平均都是<code>O(n^2)</code></p>
+<h3 id="4-2-核心代码"><a href="#4-2-核心代码" class="headerlink" title="4.2 核心代码"></a>4.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">for(int i=0;i&amp;lt;arraytoSort.length-1;i++)&#123;    </span><br><span class="line">    for(int j=arraytoSort.length-1;j&amp;gt;=i+1;j--)&#123;</span><br><span class="line">        int temp;</span><br><span class="line">        if(arraytoSort[j]&amp;lt;arraytoSort[j-1])</span><br><span class="line">        &#123;</span><br><span class="line">            temp = arraytoSort[j];</span><br><span class="line">            arraytoSort[j] = arraytoSort[j-1];</span><br><span class="line">            arraytoSort[j-1] = temp;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-3-延伸"><a href="#4-3-延伸" class="headerlink" title="4.3 延伸"></a>4.3 延伸</h3><p>冒泡排序缺陷：</p>
+<ol>
+<li><p>在排序过程中，执行完当前的第i趟排序后，可能数据已全部排序完备，但是程序无法判断是否完成排序，会继续执行剩下的<code>(n-1-i)</code>趟排序。解决方法： 设置一个<code>flag</code>位, 如果一趟无元素交换，则 <code>flag = 0</code>; 以后再也不进入第二层循环。</p>
+</li>
+<li><p>当排序的数据比较多时排序的时间会明显延长，因为会比较 <code>n*(n-1)/2</code>次。</p>
+</li>
+</ol>
+<h2 id="5-堆排序"><a href="#5-堆排序" class="headerlink" title="5. 堆排序"></a>5. 堆排序</h2><h3 id="5-1-性能分析"><a href="#5-1-性能分析" class="headerlink" title="5.1 性能分析"></a>5.1 性能分析</h3><p>时间复杂度 <code>O(nlogn)</code>, 空间复杂度<code>O(1)</code>. 从这一点就可以看出，堆排序在时间上类似归并，但是它又是一种原地排序，时间复杂度小于归并的<code>O(n+logn)</code></p>
+<p>排序时间与输入无关，最好，最差，平均都是<code>O(nlogn)</code>. 不稳定</p>
+<p>堆排序借助了堆这个数据结构，堆类似二叉树，又具有堆积的性质（子节点的关键值总小于（大于）父节点）</p>
+<p>堆排序包括两个主要操作:</p>
+<ol>
+<li>保持堆的性质heapify(A,i)</li>
+</ol>
+<p>时间复杂度<code>O(logn)</code></p>
+<ol start="2">
+<li>建堆 buildmaxheap(A)</li>
+</ol>
+<p>时间复杂度<code>O(n)</code>线性时间建堆</p>
+<p><strong>对于大数据的处理</strong>： 如果对100亿条数据选择Topk数据，选择快速排序好还是堆排序好？ 答案是只能用堆排序。 堆排序只需要维护一个k大小的空间，即在内存开辟k大小的空间。而快速排序需要开辟能存储100亿条数据的空间，which is impossible.</p>
+<h3 id="5-2-核心代码"><a href="#5-2-核心代码" class="headerlink" title="5.2 核心代码"></a>5.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class HeapSort &#123;</span><br><span class="line">    public void buildheap(int array[])&#123;</span><br><span class="line">        int length = array.length;</span><br><span class="line">        int heapsize = length;</span><br><span class="line">        int nonleaf = length / 2 - 1;</span><br><span class="line">        for(int i = nonleaf; i&amp;gt;=0;i--)&#123;</span><br><span class="line">            heapify(array,i,heapsize);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void heapify(int array[], int i,int heapsize)&#123;</span><br><span class="line">        int smallest = i;</span><br><span class="line">        int left = 2*i+1;</span><br><span class="line">        int right = 2*i+2;</span><br><span class="line">        if(left&amp;lt;heapsize)&#123;</span><br><span class="line">            if(array[i]&amp;gt;array[left])&#123;</span><br><span class="line">                smallest = left;</span><br><span class="line">            &#125;</span><br><span class="line">            else smallest = i;</span><br><span class="line">        &#125;</span><br><span class="line">        if(right&amp;lt;heapsize)&#123;</span><br><span class="line">            if(array[smallest]&amp;gt;array[right])&#123;</span><br><span class="line">                smallest = right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if(smallest != i)&#123;</span><br><span class="line">            int temp;</span><br><span class="line">            temp = array[i];</span><br><span class="line">            array[i] = array[smallest];</span><br><span class="line">            array[smallest] = temp;</span><br><span class="line">            heapify(array,smallest,heapsize);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void heapsort(int array[])&#123;</span><br><span class="line">        int heapsize = array.length;</span><br><span class="line">        buildheap(array);</span><br><span class="line"></span><br><span class="line">        for(int i=0;i&amp;lt;array.length-1;i++)&#123;</span><br><span class="line">            // swap the first and the last</span><br><span class="line">            int temp;</span><br><span class="line">            temp = array[0];</span><br><span class="line">            array[0] = array[heapsize-1];</span><br><span class="line">            array[heapsize-1] = temp;</span><br><span class="line">            // heapify the array</span><br><span class="line">            heapsize = heapsize - 1;</span><br><span class="line">            heapify(array,0,heapsize);</span><br><span class="line"></span><br><span class="line">        &#125;   </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5-3-延伸"><a href="#5-3-延伸" class="headerlink" title="5.3 延伸"></a>5.3 延伸</h3><p>堆这种数据结构的很好的应用是 优先级队列，如作业调度。</p>
+<h2 id="6-快速排序"><a href="#6-快速排序" class="headerlink" title="6 快速排序"></a>6 快速排序</h2><h3 id="6-1-性能分析"><a href="#6-1-性能分析" class="headerlink" title="6.1 性能分析"></a>6.1 性能分析</h3><p>时间复杂度 <code>O(nlogn)</code>  空间复杂度<code>O（logn）</code> 不稳定 【两个时间复杂度<code>O(nlogn)</code> 的排序算法都不稳定】</p>
+<p>时间复杂度：</p>
+<p>最坏<code>O（n^2）</code> 当<strong>划分不均匀</strong>时候 逆序and排好序都是最坏情况</p>
+<p>最好<code>O（n）</code> 当划分均匀<code>partition</code>的时间复杂度: <code>O（n）</code>一共需要<code>logn</code>次<code>partition</code></p>
+<p>空间复杂度：递归造成的栈空间的使用，最好情况，递归树的深度<code>logn</code> 空间复杂的<code>logn</code>，最坏情况，需要进行<code>n‐1</code> 递归调用，其空间复杂度为 <code>O(n)</code>，平均情况，空间复杂度也为<code>O(log2n)</code>。</p>
+<p>由于关键字的比较和交换是跳跃进行的，因此，快速排序是一种不稳定的排序方法。</p>
+<p>快速排序的每一轮就是将这一轮的基准数归位，直到所有的数都归为为止，排序结束。（类似冒泡）.</p>
+<p>partition是返回一个基准值的index, index 左边都小于该index的数，右边都大于该index的数。</p>
+<p>快速排序之所比较快，因为相比冒泡排序，每次交换是跳跃式的。每次排序的时候设置一个基准点，将小于等于基准点的数全部放到基准点的左边，将大于等于基准点的数全部放到基准点的右边。这样在每次交换的时候就不会像冒泡排序一样每次只能在相邻的数之间进行交换，交换的距离就大的多了。因此总的比较和交换次数就少了，速度自然就提高了。当然在最坏的情况下，仍可能是相邻的两个数进行了交换。因此快速排序的最差时间复杂度和冒泡排序是一样的都是 <code>O(n^2)</code>，它的平均时间复杂度为 <code>O(nlogn)</code>。其实快速排序是基于 “二分” 的思想。</p>
+<h3 id="6-2-核心代码"><a href="#6-2-核心代码" class="headerlink" title="6.2 核心代码"></a>6.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">public class Quicksort &#123;</span><br><span class="line">       public int partition(int A[], int begin, int end)&#123;</span><br><span class="line">             int i = begin;</span><br><span class="line">             int j = end;</span><br><span class="line">             int q;</span><br><span class="line">             int pivot = begin;</span><br><span class="line">             int pivotnumber = A[pivot];</span><br><span class="line">             while(i!=j)&#123;</span><br><span class="line">                   int temp;</span><br><span class="line">                   while(A[j]&amp;gt;pivotnumber &amp;amp;&amp;amp; i&amp;lt;j)&#123;</span><br><span class="line">                        j--;</span><br><span class="line"></span><br><span class="line">                  &#125;</span><br><span class="line">                   while(A[i]&amp;lt;=pivotnumber &amp;amp;&amp;amp; i&amp;lt;j)</span><br><span class="line">                  &#123;</span><br><span class="line">                        i++;</span><br><span class="line">                  &#125;</span><br><span class="line">                  temp = A[i];</span><br><span class="line">                  A[i] = A[j];</span><br><span class="line">                  A[j] = temp;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">             if(i == j)&#123;</span><br><span class="line">                   int temp;</span><br><span class="line">                  temp =A[pivot];</span><br><span class="line">                  A[pivot] = A[i];</span><br><span class="line">                  A[i] = temp;      </span><br><span class="line">            &#125;</span><br><span class="line">             return i;</span><br><span class="line">      &#125;</span><br><span class="line">       public void sort(int A[], int begin,int end)&#123;</span><br><span class="line">             if(begin&amp;lt;end)&#123;</span><br><span class="line">                   int q;</span><br><span class="line">                  q = partition(A,begin, end);</span><br><span class="line">                  sort(A,begin, q-1);</span><br><span class="line">                  sort(A,q+1,end);</span><br><span class="line">            &#125;     </span><br><span class="line">      &#125;</span><br><span class="line">       public static void main(String[] args) &#123;</span><br><span class="line">             int array[] = &#123;8,7,1,6,5,4,3,2&#125;;</span><br><span class="line">            Quicksort s = new Quicksort();</span><br><span class="line">            s.sort(array, 0, 7);</span><br><span class="line">             for(int i=0;i&amp;lt;array.length;i++)&#123;</span><br><span class="line">                  System. out.println(&quot;output &quot; + array[i]);</span><br><span class="line">            &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>非比较排序</strong>： ，计数排序，基数排序，桶排序，时间复杂度能够达到<code>O(n)</code>.  这些排序为了达到不比较的目的，对数据做了一些基本假设（限制）。如计数排序假设数据都<code>[0,n]</code> 范围内，且范围较小；基数排序假设数据都<code>[0,n]</code> 范围内；也是桶排序假设数据均匀独立的分布。</p>
+<p>而且，非比较排序的空间要求比较高，用空间换取时间吧。当我们的待排序数组具备一些基数排序与桶排序要求的特性，且空间上又比较富裕时，桶排序与基数排序不失为最佳选择。</p>
+<h2 id="7-计数排序"><a href="#7-计数排序" class="headerlink" title="7. 计数排序"></a>7. 计数排序</h2><p>我们希望能线性的时间复杂度排序，如果一个一个比较，显然是不实际的，书上也在决策树模型中论证了，比较排序的情况为<code>nlogn</code> 的复杂度。既然不能一个一个比较，我们想到一个办法，就是如果<strong>在排序的时候就知道他的位置，那不就是扫描一遍，把他放入他应该的位置</strong>不就可以了。 要知道<strong>他的位置，我们只需要知道有多少不大于他不就可以了</strong>吗？</p>
+<h3 id="7-1-性能分析"><a href="#7-1-性能分析" class="headerlink" title="7.1 性能分析"></a>7.1 性能分析</h3><p>最好，最坏，平均的时间复杂度<code>O(n+k)</code>, 天了噜， 线性时间完成排序，且稳定。</p>
+<p>优点：不需要比较函数，利用地址偏移，对范围固定在[0,k]的整数排序的最佳选择。是排序字节串最快的排序算法。</p>
+<p>缺点：由于用来计数的数组的长度取决于待排序数组中数据的范围（等于待排序数组的最大值与最小值的差加上1），这使得计数排序对于数据范围很大的数组，需要大量时间和内存。</p>
+<h3 id="7-2-核心代码"><a href="#7-2-核心代码" class="headerlink" title="7.2 核心代码"></a>7.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public int[] countsort(int A[])&#123;</span><br><span class="line">    int[] B = new int[A.length]; //to store result after sorting</span><br><span class="line">    int k = max(A);</span><br><span class="line">    int [] C = new int[k+1]; // to store temp</span><br><span class="line">    for(int i=0;i&amp;lt;A.length;i++)&#123;    </span><br><span class="line">        C[A[i]] = C[A[i]] + 1;</span><br><span class="line">    &#125;</span><br><span class="line">    // 小于等于A[i]的数的有多少个, 存入数组C</span><br><span class="line">    for(int i=1;i&amp;lt;C.length;i++)&#123;</span><br><span class="line">        C[i] = C[i] + C[i-1];</span><br><span class="line">    &#125;</span><br><span class="line">    //逆序输出确保稳定-相同元素相对顺序不变</span><br><span class="line">    for(int i=A.length-1;i&amp;gt;=0;i--)&#123;</span><br><span class="line"></span><br><span class="line">        B[C[A[i]]-1] = A[i]; </span><br><span class="line">        C[A[i]] = C[A[i]]-1;</span><br><span class="line">    &#125;</span><br><span class="line">    return B;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="7-3-扩展"><a href="#7-3-扩展" class="headerlink" title="7.3 扩展"></a>7.3 扩展</h3><p>请给出一个算法，使之对给定的介于 <code>0</code>到 <code>k</code> 之间的 <code>n</code>个整数进行预处理，并能在<code>O(1)</code> 时间内回答出输入的整数中有多少个落在 <code>[a...b]</code> 区间内。你给出的算法的预处理时间为<code>O(n+k)</code>。</p>
+<p>分析：就是用计数排序中的预处理方法，获得数组 <code>C[0...k</code>]，使得<code>C[i]</code>为不大于 <code>i</code>的元素的个数。这样落入 <code>[a...b]</code> 区间内的元素个数有 <code>C[b]-C[a-1]</code>。</p>
+<p>计数排序的重要性质是他是<strong>稳定</strong>的。一般而言，仅当卫星数据随着被排序的元素一起移动时，稳定性才显得比较重要。而这也是计数排序作为基数排序的子过程的重要原因</p>
+<h2 id="8-基数排序"><a href="#8-基数排序" class="headerlink" title="8 基数排序"></a>8 基数排序</h2><p>为什么要用基数排序 ？</p>
+<p>计数排序和桶排序都只是在研究一个关键字的排序，现在我们来讨论有多个关键字的排序问题。</p>
+<p>假设我们有一些二元组<code>(a,b)</code>，要对它们进行以<code>a</code> 为首要关键字，<code>b</code>的次要关键字的排序。我们可以先把它们先按照首要关键字排序，分成首要关键字相同的若干堆。然后，在按照次要关键值分别对每一堆进行单独排序。最后再把这些堆串连到一起，使首要关键字较小的一堆排在上面。按这种方式的基数排序称为 <strong>MSD(Most Significant Dight) 排序</strong>。</p>
+<p>第二种方式是从最低有效关键字开始排序，称为 <strong>LSD(Least Significant Dight)排序</strong> 。首先对所有的数据按照次要关键字排序，然后对所有的数据按照首要关键字排序。要注意的是，使用的排序算法必须是稳定的，否则就会取消前一次排序的结果。由于不需要分堆对每堆单独排序，LSD 方法往往比 MSD 简单而开销小。下文介绍的方法全部是基于 LSD 的。</p>
+<p>通常，基数排序要用到计数排序或者桶排序。使用计数排序时，需要的是Order数组。使用桶排序时，可以用链表的方法直接求出排序后的顺序。</p>
+<p><img src="/assets/images/2015/03/13/sort-algorithm-summary/001.png" alt=""></p>
+<h3 id="8-1-性能分析"><a href="#8-1-性能分析" class="headerlink" title="8.1 性能分析"></a>8.1 性能分析</h3><p>时间复杂度<code>O（n）</code> (实际上是<code>O(d(n+k))</code> d是位数)</p>
+<h3 id="8-2-核心代码"><a href="#8-2-核心代码" class="headerlink" title="8.2 核心代码"></a>8.2 核心代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for i = 1 to d</span><br><span class="line">    do use a stable sort to sort array A on digit i</span><br></pre></td></tr></table></figure>
+<h3 id="8-3扩展"><a href="#8-3扩展" class="headerlink" title="8.3扩展"></a>8.3扩展</h3><p>问题：对<code>[0,n^2-1]</code>的<code>n</code> 个整数进行线性时间排序。</p>
+<p>思路 ： 把整数转换为n进制再排序，每个数有两位，每位的取值范围是<code>[0..n-1]</code>，再进行基数排序</p>
+<p><a href="http://blog.csdn.net/mishifangxiangdefeng/article/details/7685839" target="_blank" rel="noopener">http://blog.csdn.net/mishifangxiangdefeng/article/details/7685839</a></p>
+<p>问题： 给定一个字符串数组，其中不同的串包含的字符数可能不同，但所有串中总的字符个数为 n。说明如何在 O(n) 时间内对该数组进行排序</p>
+<h2 id="9-桶排序"><a href="#9-桶排序" class="headerlink" title="9. 桶排序"></a>9. 桶排序</h2><p>桶排序的思想近乎彻底的分治思想。</p>
+<p>桶排序假设待排序的一组数<strong>均匀独立</strong>的分布在一个范围中，并将这一范围划分成几个子范围（桶）。</p>
+<p>然后基于某种映射函数<code>f</code> ，将待排序列的关键字 <code>k</code> 映射到第<code>i</code>个桶中 (即桶数组<code>B</code> 的下标<code>i</code>) ，那么该关键字<code>k</code> 就作为 <code>B[i]</code>中的元素 (每个桶<code>B[i]</code>都是一组大小为<code>N/M</code> 的序列 )。</p>
+<p>接着将各个桶中的数据有序的合并起来 : 对每个桶<code>B[i]</code> 中的所有元素进行比较排序 (可以使用快排)。然后依次枚举输出 <code>B[0]....B[M]</code> 中的全部内容即是一个有序序列。</p>
+<p>补充： 映射函数一般是 <code>f = array[i] / k</code>; <code>k^2 = n</code>; <code>n</code>是所有元素个数</p>
+<p><img src="/assets/images/2015/03/13/sort-algorithm-summary/002.png" alt=""></p>
+<h3 id="9-1-性能分析"><a href="#9-1-性能分析" class="headerlink" title="9.1 性能分析"></a>9.1 性能分析</h3><p>平均时间复杂度为线性的 <code>O(n+C)</code> 最优情形下，桶排序的时间复杂度为<code>O(n)</code>。</p>
+<p>桶排序的空间复杂度通常是比较高的，额外开销为<code>O(n+m)</code>（因为要维护 M 个数组的引用）。</p>
+<p>就是桶越多，时间效率就越高，而桶越多，空间却就越大，由此可见时间和空间是一个矛盾的两个方面。</p>
+<p>算法稳定性 : 桶排序的稳定性依赖于桶内排序。如果我们使用了快排，显然，算法是不稳定的。</p>
+<p><a href="http://hxraid.iteye.com/blog/647759" target="_blank" rel="noopener">一个讲bucket排序非常好的文章</a></p>
+<p>桶排序利用函数的映射关系，减少了几乎所有的比较工作。实际上，桶排序的 f(k) 值的计算，其作用就相当于快排中划分，已经把大量数据分割成了基本有序的数据块 (桶)。然后只需要对桶中的少量数据做先进的比较排序即可。</p>
+<p>对 N 个关键字进行桶排序的时间复杂度分为两个部分：</p>
+<p>(1) 循环计算每个关键字的桶映射函数，这个时间复杂度是 <code>O(n)</code>。</p>
+<p>(2) 利用先进的比较排序算法对每个桶内的所有数据进行排序，其时间复杂度为  <code>∑ O(ni*logni)</code> 。其中 <code>ni</code> 为第 <code>i</code>个桶的数据量。</p>
+<p>很显然，第 (2) 部分是桶排序性能好坏的决定因素。这就是一个时间代价和空间代价的权衡问题了。</p>
+<h3 id="9-2-核心代码"><a href="#9-2-核心代码" class="headerlink" title="9.2 核心代码"></a>9.2 核心代码</h3><h3 id="9-3扩展"><a href="#9-3扩展" class="headerlink" title="9.3扩展"></a>9.3扩展</h3><p><img src="/assets/images/2015/03/13/sort-algorithm-summary/003.png" alt=""></p>
+<h2 id="in-summary"><a href="#in-summary" class="headerlink" title="in summary"></a>in summary</h2><p><img src="/assets/images/2015/03/13/sort-algorithm-summary/004.png" alt=""></p>
+<p>关于稳定性：</p>
+<ul>
+<li>选择排序、快速排序、希尔排序、堆排序不是稳定的排序算法，</li>
+<li>冒泡排序、插入排序、归并排序和基数排序是稳定的排序算法。</li>
+<li>常用时间复杂度的大小关系：<code>O(1)&amp;lt;O(logn)&amp;lt;O(n)&amp;lt;O(nlogn)&amp;lt;O(n2)&amp;lt;O(n3)&amp;lt;O(2n)&amp;lt;O(n!)&amp;lt;O(nn)</code></li>
+</ul>
+<hr>
+<ul>
+<li>Author: <a href="https://segmentfault.com/u/secondlife" target="_blank" rel="noopener">SecondLife</a></li>
+<li>Source: <a href="https://segmentfault.com" target="_blank" rel="noopener">SegmentFault</a></li>
+<li>原文链接：<a href="https://segmentfault.com/a/1190000002595152" target="_blank" rel="noopener">常用排序算法总结（性能+代码）</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" rel="tag"># Algorithm</a>
+          
+            <a href="/tags/Sort/" rel="tag"># Sort</a>
+          
+            <a href="/tags/Performance/" rel="tag"># Performance</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-03-05-bigdata-governance/" rel="next" title="大数据治理：为业务提供持续的、可度量的价值">
+                <i class="fa fa-chevron-left"></i> 大数据治理：为业务提供持续的、可度量的价值
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-03-27-config-center-disconf/" rel="prev" title="分布式配置管理平台 Disconf">
+                分布式配置管理平台 Disconf <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

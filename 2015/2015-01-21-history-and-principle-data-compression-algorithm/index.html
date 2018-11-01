@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="压缩，是为了减少存储空间而把数据转换成比原始格式更紧凑形式的过程。数据压缩的概念相当古老，可以追溯到发明了摩尔斯码的19世纪中期。 摩尔斯码的发明，是为了使电报员能够通过电报系统，利用一系列可听到的脉冲信号传递字母信息，从而实现文字消息的传输。摩尔斯码的发明者意识到，某些字母比其他字母使用地更频繁（例如E比X更常见），因此决定使用短的脉冲信号来表示常用字母，而使用较长的脉冲信号表示非常用字母。这个">
+<meta name="keywords" content="Compression">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据压缩的历史、原理及常用算法">
+<meta property="og:url" content="http://hyperj.github.com/2015/2015-01-21-history-and-principle-data-compression-algorithm/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="压缩，是为了减少存储空间而把数据转换成比原始格式更紧凑形式的过程。数据压缩的概念相当古老，可以追溯到发明了摩尔斯码的19世纪中期。 摩尔斯码的发明，是为了使电报员能够通过电报系统，利用一系列可听到的脉冲信号传递字母信息，从而实现文字消息的传输。摩尔斯码的发明者意识到，某些字母比其他字母使用地更频繁（例如E比X更常见），因此决定使用短的脉冲信号来表示常用字母，而使用较长的脉冲信号表示非常用字母。这个">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/1.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/2.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/3.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/4.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/5.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/6.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/7.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/8.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/9.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/10.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/11.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据压缩的历史、原理及常用算法">
+<meta name="twitter:description" content="压缩，是为了减少存储空间而把数据转换成比原始格式更紧凑形式的过程。数据压缩的概念相当古老，可以追溯到发明了摩尔斯码的19世纪中期。 摩尔斯码的发明，是为了使电报员能够通过电报系统，利用一系列可听到的脉冲信号传递字母信息，从而实现文字消息的传输。摩尔斯码的发明者意识到，某些字母比其他字母使用地更频繁（例如E比X更常见），因此决定使用短的脉冲信号来表示常用字母，而使用较长的脉冲信号表示非常用字母。这个">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2015/2015-01-21-history-and-principle-data-compression-algorithm/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>数据压缩的历史、原理及常用算法 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2015/2015-01-21-history-and-principle-data-compression-algorithm/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">数据压缩的历史、原理及常用算法
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-01-21 00:00:00" itemprop="dateCreated datePublished" datetime="2015-01-21T00:00:00+08:00">2015-01-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Compression/" itemprop="url" rel="index"><span itemprop="name">Compression</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>压缩，是为了减少存储空间而把数据转换成比原始格式更紧凑形式的过程。数据压缩的概念相当古老，可以追溯到发明了摩尔斯码的19世纪中期。</p>
+<p>摩尔斯码的发明，是为了使电报员能够通过电报系统，利用一系列可听到的脉冲信号传递字母信息，从而实现文字消息的传输。摩尔斯码的发明者意识到，某些字母比其他字母使用地更频繁（例如E比X更常见），因此决定使用短的脉冲信号来表示常用字母，而使用较长的脉冲信号表示非常用字母。这个基本的压缩方案有效地改善了系统的整体效率，因为它使电报员在更短的时间内传输了更多的信息。</p>
+<p>虽然现代的压缩流程比摩尔斯码要复杂地多，但是它们仍然使用着相同的基本原理，也就是我们这篇文章中将要讲述的内容。这些概念对我们如今的计算机世界高效运行至关重要——互联网上从本地与云端存储到数据流的一切东西都严重依赖压缩算法，离开了它很可能会变得非常低效。</p>
+<h3 id="压缩管道"><a href="#压缩管道" class="headerlink" title="压缩管道"></a>压缩管道</h3><p>下图展示了压缩方案的通用流程。原始的输入数据包含我们需要压缩或减小尺寸的符号序列。这些符号被压缩器编码，输出结果是编码过的数据。需要注意的是，虽然通常编码后的数据要比原始输入数据小，但是也有例外情况（我们后面会讲到）。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/1.png" alt=""></p>
+<p>通常在之后的某个时间，编码后的数据会被输入到一个解压缩器，在这里数据被解码、重建，并以符号序列的形式输出原始数据。注意，本文我们会交替地使用“序列”和“串”来指一个符号序列集。</p>
+<p>如果输出数据和输入数据始终完全相同，那么这个压缩方案被称为<em>无损的</em>，也称无损编码器。否则，它就是一个<em>有损的</em>压缩方案。</p>
+<p>无损压缩方案通常被用来压缩文本，可执行程序，或者其他任何需要完全重建数据的地方。有损压缩方案在图像，音频，视频，或者其他为了提高压缩效率而可以接受某些程度信息丢失的场合很有用处。</p>
+<h3 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h3><p>信息的定义是度量一个数据片段复杂度的量。一个数据集拥有越多的信息，它就越难被压缩。稀有的概念和信息的概念是相关的，因为稀有符号的出现比常见符号的出现提供了更多的信息。</p>
+<p>例如，“日本的一次地震”的出现比“月球的一次地震”提供的信息号少，因为月球上的地震很不常见。我们可以预期，大多数压缩算法在压缩一个符号时，能够仔细地考虑它出现的频率或几率。</p>
+<p>我们把压缩算法降低信息负载的有效性，称为它的_效率_。一个效率更高的压缩算法相比效率低的压缩算法，能够更多地降低特定数据集的大小。</p>
+<h3 id="概率模型"><a href="#概率模型" class="headerlink" title="概率模型"></a>概率模型</h3><p>设计一个压缩方案的最重要一步，是为数据创建一个概率模型。这个模型允许我们测量数据的特征，达到有效的适应压缩算法的目的。为了使它更加清晰一些，让我们浏览一下建模过程的部分环节。</p>
+<p>假设我们有一个字母表G，它由数据集中所有可能出现的字符组成。在我们的例子中，G包含4个字符：从A到D。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/2.png" alt=""></p>
+<p>我们还有一个概率统计函数P，它定义了在输入数据串中，G中每个字符出现的概率。在输入数据串中，概率高的符号比概率低的符号更有可能出现。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/3.png" alt=""></p>
+<p>在这个例子中，我们假定符号是<a href="http://bertolami.com/index.php?engine=blog&amp;content=posts&amp;detail=fundamentals-of-data-compression" target="_blank" rel="noopener">独立同分布</a>的。在源数据串中，一个符号的出现与其他任何符号没有相关性。</p>
+<h3 id="最小编码率"><a href="#最小编码率" class="headerlink" title="最小编码率"></a>最小编码率</h3><p>B是最常见的符号，出现的概率是40%；而C是最不常见的符号，它的出现概率只有10%。我们的目标是设计一个压缩方案，它对于常见符号使所需存储空间最小化，同时它支持使用更多的必要空间来存储不常见符号。这个折衷是压缩的基本原理，并且已经存在于几乎所有的压缩算法中。</p>
+<p>有了字母表，我们可以小试身手，来定义一个基本的压缩方案。如果我们简单地把一个符号编码为8比特的ASCII值，那么我们的压缩效率，即编码率，将是8比特/符号。假定我们对只包含4个符号的字母表改进这个方案。如果我们为每个符号分配2个比特，我们仍然能够完全重建编码过的数据串，而只需要1/4的空间。</p>
+<p>这时候，我们已经显著地提升了编码率（从8到2比特/符号），但是完全忽视了我们的概率模型。正如前面提到的，我们可以结合模型发明一个策略，通过对常见符号（B和D）使用更少的比特，对不常见符号（A和C）使用更多的比特，以提高编码效率。</p>
+<p>这提出了一个在<a href="http://cm.bell-labs.com/cm/ms/what/shannonday/shannon1948.pdf" target="_blank" rel="noopener">香农开创性论文</a>中描述的重要观点——我们可以简单地基于符号（或事件）的概率，定义它的理论最小存储空间。我们如下定义一个符号的<em>最小编码率</em>：</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/4.png" alt=""></p>
+<p>例如，如果一个符号出现的概率是50%，那么它绝对最少需要一个字节来存储。</p>
+<h3 id="熵和冗余"><a href="#熵和冗余" class="headerlink" title="熵和冗余"></a>熵和冗余</h3><p>更进一步，如果我们为字母表中的字符计算最小编码率的加权平均值，我们得到一个被称作<em>香农熵</em>的值，简单地称作模型的_熵_。熵被定义为给定模型的最小编码率。它建立在字母表和它的概率模型之上，如下描述。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/5.png" alt=""></p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/6.png" alt=""></p>
+<p>正如你预料的一样，拥有更多罕见符号的模型，比拥有较少并且常见符号的模型的熵要高。更进一步，熵值更高的模型比熵值低的模型更难压缩。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/7.png" alt=""></p>
+<p>在我们当前的例子中，我们模型的熵值是1.85比特/符号。编码率（2）和熵值（1.85）的差值被称作压缩方案的_冗余_。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/8.png" alt=""></p>
+<p>在众多诸如加密和人工智能等不同的子领域，熵都是一个非常有用的话题。完整地讨论熵不在本文的范围内，但是有兴趣的读者可以在<a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29" target="_blank" rel="noopener">这里</a>获得更多的信息。</p>
+<h3 id="编码模型"><a href="#编码模型" class="headerlink" title="编码模型"></a>编码模型</h3><p>到目前为止，我们采取了一点点自由措施：自动地给出了我们符号的概率。在现实中，模型通常并不是容易得到的，我们可能通过分析源数据串（如在样例数据汇总统计符号概率），或者在压缩过程中自适应地学习，以得到这些概率值。不管是哪种情形，真实数据串的概率值不会完美地与模型匹配，而且我们会与这个差别正比例地损失压缩效率。基于这个原因，推导出（或恒定地保持）一个尽可能精确的模型是至关重要的。</p>
+<h3 id="常见算法"><a href="#常见算法" class="headerlink" title="常见算法"></a>常见算法</h3><p>当我们为数据集定义了概率模型之后，我们就能够适当地利用这个模型设计出一个压缩方案。虽然开发一个新压缩算法的过程超出了本文的范围，但是我们可以利用已经存在的算法。下面我们回顾一些最流行的算法。</p>
+<p>下面的每一个算法都是一个顺序处理器，这就是说如果要重建已编码序列的第n个符号，必须先对第0..(n-1)个符号进行解码。由于编码后数据的不定长特性，寻找操作是不可能的——解码器在不解码前面的符号的情况下，无法直接跳转到符号n的正确偏移位置。另外，一些编码方案依赖于顺序处理每个符号时保持的内部历史状态。</p>
+<p><strong>• 霍夫曼编码</strong></p>
+<p>这是一个最为广泛知晓的压缩方案。它能够追溯到19世纪50年代，David Huffman在他的论文“<a href="https://www.ic.tu-berlin.de/fileadmin/fg121/Source-Coding_WS12/selected-readings/10_04051119.pdf" target="_blank" rel="noopener">一种构建极小多余编码的方法</a>”中第一次描述了这种方法。霍夫曼编码通过得到给定字母表的最优前缀码工作。</p>
+<p>一个前缀码代表一个数值，并使字母表中的每个符号的前缀码不会成为另一个符号前缀码的前缀。例如，如果0是我们第一个符号A的前缀码，那么字母表中的其他符号都不能以0开始。由于前缀码使比特流解码变得清晰明确，因此很有用。</p>
+<p>对给定字母表得到最优前缀码的过程（霍夫曼编码的真髓）不在本文的范围之内，但是我们可以计算一下例子中字母表G的前缀码的效率。假设我们已经对字母表中每个符号做了如下编码。注意我们对常见符号赋予了更短的编码，对不常见符号赋予更长的编码。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/9.png" alt=""></p>
+<p>使用这个系统，我们的平均编码率显著地降低到了1.9比特/符号，相比之前最好的编码率2，而冗余也降低到了0.05比特/符号（相比0.15）。</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/10.png" alt=""></p>
+<p><strong>• 字典方法</strong></p>
+<p>这种类型的编码器使用一个字典来保存最近发现的符号。当遇到一个符号时，首先会在字典中查找它，检查是否已经存储过了。如果是，那么输出将只包含字典入口的引用（通常是一个偏移量），而不是整个符号。</p>
+<p>使用字典方法的压缩方案包括<a href="http://en.wikipedia.org/wiki/LZ77_and_LZ78" target="_blank" rel="noopener">LZ77 and LZ78</a>，它们是很多不同的无损压缩方案的基础。</p>
+<p>在一些情况下，会使用一个滑动窗口来自适应地追踪最近发现的符号。这种情况下，一个符号只在相对较近发现时才会保存在字典中。否则，符号被剔除（之后再出现可能会重新加入字典）。这个过程防止符号字典变得过大，并利用了一个事实，即序列中的符号会在相对短的窗口内重复出现。</p>
+<p><strong>• 哥伦布指数编码</strong></p>
+<p>假设你有一个由0到255范围内的整数组成的字母表，并且一个符号的出现概率与它到0的距离有关。这样，比较小的值是最常见的，而值越大出现的概率越小。</p>
+<p>对于这种情形，<a href="http://en.wikipedia.org/wiki/Exponential-Golomb_coding" target="_blank" rel="noopener">哥伦布指数编码器</a>会很有用处。哥伦布编码使用一个特定的前缀码，它优先考虑较小的值，而使大值付出高的代价。下面的表说明了最开始的几个值：</p>
+<p><img src="/assets/images/2015/01/21/history-and-principle-data-compression-algorithm/11.png" alt=""></p>
+<p>对一个整数进行编码的过程是很直接的。首先，递增这个整数的值，并计算存储递增后的值所需的比特数。然后，将比特数减一，并把减一后相等数量的0输出到结果流。最后，输出递增后的值（第一步中计算得到的）按比特输出到结果流。</p>
+<p>例如，4递增后是5，即二进制的101。它需要3个比特来存储，因此我们输出2个0到结果流，然后输出二进制的值101。结果就是00101。</p>
+<p>和大多数压缩方案一样，哥伦布编码的效率非常依赖于输入序列中的特定符号。包含很多大值的序列与包含较少大值的序列相比，压缩效果更差一些；在某些情况下，经过哥伦布编码后的序列甚至可能比原始输入串的尺寸更大。</p>
+<p><strong>• 算术编码</strong></p>
+<p><a href="http://en.wikipedia.org/wiki/Arithmetic_coding" target="_blank" rel="noopener">算数编码</a>是一个比较新的压缩算法，在最近（过去的15年里）得到了极大的普及，特别是媒体压缩方面。算数编码器是一种高效率，计算密集型，具有时序性的编码器。</p>
+<p>一个常见的算数编码变种，二进制算数编码，使用只包含两个符号（0和1）的字母表。这个变种特别有用处，因为它简化了编码器的设计，降低了运行时的计算代价，并且在编码器和解码器处理一个字母表和模型时，不需要任何显式的通讯。</p>
+<p>要获得更多关于算数编码的信息，请关注我即将发表的文章，Context Adaptive Binary Arithmetic Coding。</p>
+<p><strong>• 行程长度编码（RLE）</strong></p>
+<p>到现在为止，我们已经假设源符号是<em>独立同分布</em>的。我们的概率模型和编码率与熵的计算方法都依赖于这个事实。但是，如果我们的符号序列不满足这个要求呢？</p>
+<p>假设我们序列中符号的重复度很高，并且一个特定符号的出现有力地表明，它的重复实例即将跟随出现。这种情况下，我们可以选择使用另一个称作行程长度编码的编码方案。这种技术在符号重复度很高时表现良好，而在重复度低时表现较差。</p>
+<p><a href="http://en.wikipedia.org/wiki/Run-length_encoding" target="_blank" rel="noopener">行程长度编码器</a>预测数据串中连续重复符号的长度，并使用这个符号和重复次数来替代它们。</p>
+<p>例如，序列AABBBBBBBDDD包含重复的A，B和D，使用行程长度编码后的序列为A2B7D3，因为A被重复2次，B被重复7次，而D被重复3次。重建时，解码器会根据数据串中的重复次数来重复每个符号，从而得到原始的输入串。</p>
+<p>正如我们前面提到的，这个算法适合重复度高的数据串。但是要注意当对很少重复的序列编码时会发生什么：ABCDABCD会变成A1B1C1D1A1B1C1D1，与原始数据相比更差了。和其他大多数压缩算法相同，行程长度编码的效率严重依赖与原始数据串与算法模型的符合程度。在一些极端情形下，行程长度编码可能产生2倍与原始输入数据长度的压缩结果。</p>
+<h3 id="有损压缩"><a href="#有损压缩" class="headerlink" title="有损压缩"></a>有损压缩</h3><p>虽然有损压缩不在本文中的讨论范围内，但是需要重点指出的是，有损压缩经常把无损压缩作为压缩管道的一部分。有损压缩可能通过2个过程来完成：首先大幅度压缩数据（抛弃不需要或者多余的信息），然后再通过无损压缩算法进行压缩。流行的图形和视频编码，如JPEG和H.264，都是这样做的，依赖无损压缩算法如霍夫曼编码或者算数编码来达到高效压缩的效果。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文聚焦于无损压缩技术，并对一些最流行的技术提供了一个简明的介绍。希望它已经激起了你对于数据压缩重要领域的兴趣，并为这个主题的进一步阅读提供方向。</p>
+<hr>
+<ul>
+<li>Author: <a href="http://bertolami.com/index.php" target="_blank" rel="noopener">JOE BERTOLAMI</a></li>
+<li>翻译：<a href="http://www.jobbole.com/members/shenggordon/" target="_blank" rel="noopener">Sheng Gordon</a></li>
+<li>Source: <a href="http://jobbole.com" target="_blank" rel="noopener">伯乐在线</a></li>
+<li>Link: <a href="http://blog.jobbole.com/83422/" target="_blank" rel="noopener">数据压缩的历史、原理及常用算法</a></li>
+<li>原文：<a href="http://bertolami.com/index.php?engine=blog&amp;content=posts&amp;detail=fundamentals-of-data-compression" target="_blank" rel="noopener">Fundamentals of Compression</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Compression/" rel="tag"># Compression</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-12-27-hadoop-best-practices-scheduling-in-yarn/" rel="next" title="Hadoop Best Practices: Scheduling in YARN">
+                <i class="fa fa-chevron-left"></i> Hadoop Best Practices: Scheduling in YARN
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-01-22-meituan-recommendation-algorithm-practice/" rel="prev" title="美团推荐算法实践">
+                美团推荐算法实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

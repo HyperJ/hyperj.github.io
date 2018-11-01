@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="配置(Configuration)配置(Configuration) 这个概念每个技术人都不陌生，可以说一个不提供几个配置参数的系统都不好意思上线跟别的系统打招呼。那么为什么会是这个样子呢，究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时(r">
+<meta name="keywords" content="Configuration,Diamond">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一篇好TM长的关于配置中心的文章">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-09-28-config-center/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="配置(Configuration)配置(Configuration) 这个概念每个技术人都不陌生，可以说一个不提供几个配置参数的系统都不好意思上线跟别的系统打招呼。那么为什么会是这个样子呢，究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时(r">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/002.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/003.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/004.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/005.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/006.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/007.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/008.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/009.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/010.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/011.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/012.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/013.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/014.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/015.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一篇好TM长的关于配置中心的文章">
+<meta name="twitter:description" content="配置(Configuration)配置(Configuration) 这个概念每个技术人都不陌生，可以说一个不提供几个配置参数的系统都不好意思上线跟别的系统打招呼。那么为什么会是这个样子呢，究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时(r">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/09/28/config-center/001.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-09-28-config-center/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一篇好TM长的关于配置中心的文章 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-09-28-config-center/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">一篇好TM长的关于配置中心的文章
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-09-28 00:00:00" itemprop="dateCreated datePublished" datetime="2016-09-28T00:00:00+08:00">2016-09-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Configuration/" itemprop="url" rel="index"><span itemprop="name">Configuration</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="配置-Configuration"><a href="#配置-Configuration" class="headerlink" title="配置(Configuration)"></a>配置(Configuration)</h2><p>配置(Configuration) 这个概念每个技术人都不陌生，可以说一个不提供几个配置参数的系统都不好意思上线跟别的系统打招呼。那么为什么会是这个样子呢，究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “<em>系统运行时(runtime)飞行姿态的动态调整</em>“。</p>
+<p>举个简单的例子：logLevel = INFO</p>
+<p>系统正常飞行的时候，我们希望其只输出INFO级别的日志信息，在生产环境中我们甚至希望只输出WARNING/ERROR级别的日志，系统出毛病了，再将日志输出动态的调整成包含诊断信息的DEBUG级别或者TRACE级别。</p>
+<p><img src="/assets/images/2016/09/28/config-center/001.png" alt=""></p>
+<h2 id="软件的老友-配置文件"><a href="#软件的老友-配置文件" class="headerlink" title="软件的老友 - 配置文件"></a>软件的老友 - 配置文件</h2><p>在那个单机即系统的时代，我们基本都是在用配置文件来存储配置项，一个配置项，就是如上面的logLevel那样的一个含有 = 表达式，如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config_key = config_value  // value1 or value2, you can choose one from the config_value set</span><br></pre></td></tr></table></figure>
+<p>一般来说<code>config_value</code>应该是一个有限空间的值集合，应该是有选择余地的，如果<code>config_value</code>没得选择，那么我只能认为这个配置项一定特么在逗我。而一个配置文件一般是一组配置项的集合或者叫配置集，一个系统根据逻辑模块划分，可以有1到多个配置文件。如下图 :</p>
+<p><img src="/assets/images/2016/09/28/config-center/002.png" alt=""></p>
+<p>在集中式开发时代，配置文件基本足够用了，因为那时配置的管理通常不会成为一个很大的问题，简单一点来说，系统上了生产之后，如果需要修改一个配置，登录到这台生产机器上，vi修改这个配置文件，然后reload一下并不是什么很大的负担。</p>
+<p>如下图:</p>
+<p><img src="/assets/images/2016/09/28/config-center/003.png" alt=""></p>
+<p>所以曾经的企业级应用架构标准J2EE里并没有制定关于配置管理这一块的任何标准。<br>当然一些Follow J2EE标准的厂商，如以前Oracle的中间件WebLogic在实际实践时，因为很多大企业客户的环境也挺复杂的，所以WebLogic在这一块还是做了一些工作，其支持一个叫做Deployment Plan的特性，如下图:</p>
+<p><img src="/assets/images/2016/09/28/config-center/004.png" alt=""></p>
+<p>其背后的本质就是开发人员(dev)打出来的应用war包里面的配置文件都是一些PlaceHolder, 在部署人员(ops)部署war包的时候，为目标环境提供与之匹配的的depoloy plan xml文件，WebLogic Server本身在deploy这个stage将war包配置项的placeholder值替换成plan里面的值。</p>
+<h2 id="分布式系统给系统配置管理带来的挑战"><a href="#分布式系统给系统配置管理带来的挑战" class="headerlink" title="分布式系统给系统配置管理带来的挑战"></a>分布式系统给系统配置管理带来的挑战</h2><p>关于什么是分布式系统，本文不再赘述，毫无疑问今天阿里的系统就是一个大型的、服务化的、复杂的、分布式系统实现之一。在这个领域有3本书值得反复阅读&lt;&lt;分布式系统概念与设计&gt;&gt; &lt;&lt;分布式系统原理与泛型&gt;&gt; 以及 Distributed Systems For System Architects，有意思的是这三本书只有最后一本在21.3小节简单的提了一下 Configuration Of Distributed Systems，里面简单的说了一下静态配置和动态配置的概念和区别 “…System configuration may be static or dynamic…”. 这说明什么? 这说明我们阿里技术人包括我们中间件今天面临的很多问题和领域已经进入深水区，已经没有人会直接给你提供这个领域清晰的解决方案，我们自己正站在前沿，而我们的成功的或者失败的探索，其经验和成果都应该总结并分享给整个业界。</p>
+<p>在过去的大约15年左右，软件工程学在如何持续演进软件以适应一直要变的需求的方法论上有了很多的突破和大量的实践，在这个领域，从面向对象设计方法论，到极限编程，到敏捷开发、持续集成、单元测试等等，理论和实践都已经比较成熟了，关键是配合这一套方法论的配套的工具和软件集都变得非常的成熟。</p>
+<p>这里面的一个非常有意思的东西是关于系统的演进或者进化论(Software Evolution),一个系统或者说软件从被创造出来之后会经历研发、测试、到最后的go live，上了生产系统。那么这个之后，如何持续并且无痛的为其添加新行为或者调整已有行为的表现特征? 这确实非常复杂，尤其是要达到无痛的这个目标，毕竟线上系统，调整即意味着可能出故障。系统的动态配置管理毫无疑问是其中的一个小部分，如果每一个系统行为的任何一个微调都需要将整个系统停机，重启或者甚至重新构建、发布部署来实现，那要达到无痛这个目标恐怕难度更高。</p>
+<p>在分布式系统中，一次构建、发布、上线是非常非常重的一个过程，它不像单机时代那样重启一台机器、一个进程就可以了，在分布式系统中，它涉及到将软件包(例如war)分发到可能超过几千台机器，然后将几千台机器上的应用进程一一重启这么一个过程，超过2000台机器的一个应用一次完整的发布过程需要多长时间，相信很多核心系统的小二都深有体会。</p>
+<p>那么如何在不停应用集群的情况下，调整整个集群的运行时的行为特征（即系统运行时的飞行姿态），是一个分布式系统必须回答的一个问题。从这个角度讲, 我们认为:</p>
+<p><img src="/assets/images/2016/09/28/config-center/005.png" alt=""></p>
+<p>现在我们很容易理解，其实我们平时常见的分布式系统的配置变更，诸如:</p>
+<ul>
+<li>线程池、连接池大小</li>
+<li>开关、预案、限流配置</li>
+<li>toggleFeature</li>
+<li>数据源主备容灾切换</li>
+<li>路由规则</li>
+<li>我是等等等等</li>
+</ul>
+<p>背后的本质都是在做分布式系统运行时行为特征（飞行姿态）的调整。</p>
+<h2 id="每一个分布式系统都应该有一个动态配置管理系统"><a href="#每一个分布式系统都应该有一个动态配置管理系统" class="headerlink" title="每一个分布式系统都应该有一个动态配置管理系统"></a>每一个分布式系统都应该有一个动态配置管理系统</h2><p>是的，你一定注意到了，这里的说法跟图片上的有点不一样，这里想强调的是，未必都需要配置中心，在一个分布式系统规模还较小时，比如一个公司就二个应用集群，那无论你是用配置文件+auto-reload还是用redis，zookeeper什么都可以，这个动态配置管理系统不一定要是一个独立存在的，可以跟其它的系统，例如注册中心，甚至作为消息中间件的一个子系统都没有关系。但是重要的是知道一定要有这么一个东西，它给自己的系统提供了动态调整行为的能力，而配置管理系统基本固有的特性一定要实现。</p>
+<h2 id="动态配置和静态配置的区别"><a href="#动态配置和静态配置的区别" class="headerlink" title="动态配置和静态配置的区别"></a>动态配置和静态配置的区别</h2><p>曾经我也傻傻分不清楚其区别是啥，这很正常。动态和静态这是一个相对的概念，海枯石烂，永远不变的那不叫配置，可能是撩妹的鬼话,即使这个配置可能是放在一个看起来很像配置文件的文本里，配置一定是可能修改其值的，而是否是动态配置主要是看这个配置是不是跟应用的版本构建发布(build-deploy lifetime)强绑定的。如果一个配置项，跟软件的版本构建是不耦合的，在应用进程运行时，可能需要变更配置值的就是动态配置，哪怕是变更频率可能非常低，也许你设计了一个配置项，发现最后下来3年也没变更过一次，那也是动态配置，相反，配置变更只发生在软件版本构建和发布的那个点，那么就是静态配置，哪怕你构建很频繁，1个小时就来一回，那也是个静态配置，举个简单的例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">build-version = 3.4.6-1569965</span><br></pre></td></tr></table></figure>
+<p>这个配置项，永远只在某个软件版本被构建出来时会变更其值，一旦这个版本被构建出来，并且在程序运行时，是一定没有变更诉求的，这就是一个跟构建绑定的静态配置。而文章开始时举得logLevel的例子，则是一个动态配置的例子。</p>
+<p>所以看一下你的系统的配置项，你会发现动态配置其实更多，而跟行为演进相关的几乎都是动态配置。</p>
+<h2 id="为什么是淘宝"><a href="#为什么是淘宝" class="headerlink" title="为什么是淘宝"></a>为什么是淘宝</h2><p>我在进来阿里做Diamond之后，思考过一个有意思的事情，为什么独立的配置中心这个东西会首先出现在淘宝? 你去国内著名的竞价排名搜索引擎百度上搜”配置中心”，你会发现信息不是特别多，但是排在前面的都是XDiamond, SuperDiamond这种Diamond一族, 反正我们没有为让配置中心跟Diamond这个名字关联给百度付过1毛钱，所以这个搜索结果应该是个自然结果，侧面也反应了在国内说起配置中心在生产上大规模运用是独此一家，别无分号。</p>
+<p>而在业界，如下图，Spring Boot/Cloud微服务将注册中心(discovery service)和配置中心(configuration service)提出来还处在布道阶段,</p>
+<p><img src="/assets/images/2016/09/28/config-center/006.png" alt=""></p>
+<p>而且从Spring的实现方式的技术局限性来看，应该是还没有哪个公司基于这个配置中心的方案在生产上实际支持大规模分布式系统，毕竟，翻遍所有blog和文章，还没有哪个老外开始提到，这个基于git的方案应该怎么去做多数据中心以及容灾相关的非功能性需求。</p>
+<p>回到那个问题，为什么是淘宝，我们都知道在国内业界淘宝率先开启了去IOE,全面采用MYSQL，在这个过程中，在国内，大规模的系统性的解决分库分表这个命题的毫无疑问是阿里以及阿里中间件，在这个过程中，诞生了业内著名的TDDL.而与TDDL关联的一个核心问题是，分库分表之后，这多个库的数据源的配置信息存放在哪里，并对应用屏蔽多库这个事实? 好吧后面的事情也许你知道了，放在配置中心里! 但还是要提的是曾经并没有Diamond, 都在注册中心（ConfigServer）里，后来Diamond从ConfigServer分了出来，这个过程，很多人看到的是数据是持久化和非持久化的区别以及当时产品的稳定性方面的考量，直到今天也还是如此，但是，通过这么多年实践和演进下来，才恍然大悟，拆分的背后其实是服务发现(Service Discovery)和动态配置管理服务(Dynamic Configuration Management)根本就是两个不同的东西，而在当时可能仅是一种直觉。</p>
+<h2 id="莫道君行早，更有早行人"><a href="#莫道君行早，更有早行人" class="headerlink" title="莫道君行早，更有早行人"></a>莫道君行早，更有早行人</h2><p>有时候我们会因为在某个领域我们走的早一点而产生一点点的”优越感”和“虚荣感”, 曾经我们以为Dynamic Configuration For Distributed System这个领域的实践我们不能说在业界独占鳌头，但是绝对位居前列。但是下面这两个老哥再次提醒我们，技术人踏实前行，不要有不必要的想法:</p>
+<p><img src="/assets/images/2016/09/28/config-center/007.png" alt=""></p>
+<p>这两位老哥在1985年4月，在IEEE TRANSACTIONS ON SOFTWARE ENGINEERING 上发表了一篇名为 Dynamic Configuration for Distributed Systems的论文(Paper)，奶奶的，1985年！！什么概念，当时我4岁，还在玩泥巴,穿开裆裤。而Diamond现在的主力技术架构研发同学都还没出生呢！！我们能做的,只能是向这两位前辈再次致敬！</p>
+<p>在这篇论文中，虽然从现在的观点来看，当时人们对分布式系统的认识跟现在有很大的区别，但是其中的问题识别的非常的准确:</p>
+<p>“….Dynamic systemc onfiguration is the ability to modify and extend a system while it is running. The facility is a requirement in large distributed systems where it may not be possible or economic to stop the entire system to allow modification to part of its hardware or software. It is also useful during production of the system to aid incremental integration of component parts, and during operation to aid system evolution.The paper introduces a model of the configuration process which permits dynamic incremental modification and extension. Using this model we determine the properties required by languages and their execution environments to support dynamic configuration…”</p>
+<p>并且很清晰的区分了静态配置和动态配置的基本模型:</p>
+<p><img src="/assets/images/2016/09/28/config-center/008.png" alt=""></p>
+<h2 id="配置与环境"><a href="#配置与环境" class="headerlink" title="配置与环境"></a>配置与环境</h2><p>另一个值得从技术上玩味的是关于“配置”的“环境”属性，这个表达可能有点抽象，比较难理解，这有点像技术上常提的一个叫Context的概念，很多Component会关联一个Context，Component+Context才是一个完整的运行时故事。环境恰恰也是热帖中大家可能会产生的疑问之一，为何Diamond会暴露这么多的环境让应用去选择? 而进一步对中间件更熟稔一点的人会问，在单元化场景中，为何注册中心是一个大集群模式，而配置中心又是一个小集群模式?</p>
+<p>另一方面，多个环境恰恰也是加重分布式系统需要依赖一个独立的配置管理系统的要素之一，可以说哪个公司的环境越复杂，分布式应用和服务越多，哪个公司诞生出独立的配置中心系统的可能性也就越大。</p>
+<p>举几个容易理解的表述，来帮助理解配置的环境属性，</p>
+<blockquote>
+<p>“在开发环境中将logLevel设置为DEBUG,在预发环境logLevel设置为INFO,生产环境里logLevel设置为WARNING”</p>
+<p>“在日常环境执行线程池的最大线程数应该设置为15，而生产环境上这个值应该大一点，默认设为150”</p>
+<p>“在线上环境中，中心机房，应用数据源需要连接A库，而S机房，应用应该就近连接使用B库”</p>
+<p>“只有在T环境，双向同步开关才应该关闭”</p>
+<p>“这次的改动有点大，新的特性仅在线上的H单元把该特性开放出来，其它的单元环境先不要开放出来”</p>
+</blockquote>
+<p>是的，相信你一定发现了，我们的某个配置项，其具体的值域的定义往往跟具体的环境相关联，现实中相当一部分配置在不同的环境必须设定不同的值，但是也有相当的另一部分配置在不同的环境要设定为完全一致的值。所以从某个应用的视角看，其100个配置项，可能有50个是每个环境要不同的值的，而另50个是不区分环境，所有环境其配置值都是需要完全一致的。这种异化给配置管理系统的设计带来了复杂性，而且这个最终语义的解释，很显然不应该在配置中心系统本身，应该交给应用，配置管理系统应该做的是提供方便的交互方式保证这两种不同的一致性诉求同时得到很好的满足，这种诉求分为3个方面，如下示意图:</p>
+<p>是的，相信你一定发现了，我们的某个配置项，其具体的值域的定义往往跟具体的环境相关联，现实中相当一部分配置在不同的环境必须设定不同的值，但是也有相当的另一部分配置在不同的环境要设定为完全一致的值。所以从某个应用的视角看，其100个配置项，可能有50个是每个环境要不同的值的，而另50个是不区分环境，所有环境其配置值都是需要完全一致的。这种异化给配置管理系统的设计带来了复杂性，而且这个最终语义的解释，很显然不应该在配置中心系统本身，应该交给应用，配置管理系统应该做的是提供方便的交互方式保证这两种不同的一致性诉求同时得到很好的满足，这种诉求分为3个方面，如下示意图:</p>
+<p><img src="/assets/images/2016/09/28/config-center/009.png" alt=""></p>
+<p>Diamond 这三个能力都有提供，其中1，2一般都是在配置中心的提供的客户端类库和OPS中体现。其中3这个实现是比较困难的，因为多个环境之间一般来说，都是有一些诸如远距离网络或者网络隔离之类的物理约束的，要做分布式一致性以及诸如分区容忍性之类的考量，目前Diamond只支持线上多单元一致性约束规则，但是因为历史原因大家没有真正用起来，规则本身的抽象度也不够好，不够通用。现在我们正在做改造，未来会将一致性规则做的更通用，后面会引导大家用起来，这样对于那些多环境保持一致的那些配置项，环境复杂性就可以对应用屏蔽掉，如果一个应用的配置项全是要各环境一致的，那么你就有福了，天空飘来五个字，”这么多环境就不是个事”。</p>
+<p>另外，一个配置中心也应该具备的能力是配置集的导出\导入功能，可以让应用将A环境中的配置集方便的导出和导入到环境B中的能力，这对3个场景都有重大意义，一个场景是线上的配置值是经过实践验证的，现在在日常或者预发新建了应用环境，希望将线上的配置copy到线下用起来，第二个是，线下的应用终于调通要发预发或线上了，调较好的配置希望一下子发到线上去，当然这个根据我们的经验，一定要慎重，第三个是新建站或者机房，应用需要在新的机房将所有配置迁移过去，Diamond很快就会将这种能力开放出来。</p>
+<p><img src="/assets/images/2016/09/28/config-center/010.png" alt=""></p>
+<p>理解了上面讲的这些，相信你就更能理解Spring Framework 里的两把刷子(抽象） Environment 和 PropertySource 是咋回事了, 详细参见:</p>
+<p>Spring 3.1 M1: Unified Property Management</p>
+<p><a href="https://spring.io/blog/2011/02/15/spring-3-1-m1-unified-property-management/" target="_blank" rel="noopener">https://spring.io/blog/2011/02/15/spring-3-1-m1-unified-property-management/</a></p>
+<h2 id="配置的三个属性"><a href="#配置的三个属性" class="headerlink" title="配置的三个属性"></a>配置的三个属性</h2><ul>
+<li>环境属性</li>
+<li>稀疏变更属性</li>
+<li>快速传播</li>
+</ul>
+<p>环境属性我们上文已经讨论过。</p>
+<p>稀疏变更讲的是配置的变更基本上都是稀疏的，因为系统的行为不可能非常频繁的需要动态调整，你每100毫秒调整一次系统的行为，估计系统要对你骂娘了。</p>
+<p>而快速传播讲的是配置不变则已，一变往往要求目标集群的所有节点要几乎同时收到变更，然后几乎整齐划一的统一调整行为。切库的场景来讲，主备切换之后，应用集群写新的主库这个行为切换的稀稀拉拉，整个收敛了一天，应用肯定是受不了的，而这个属性决定了对配置中心对配置变更推送SLA的高要求。</p>
+<h2 id="配置中心-Diamond-和注册中心-ConfigServer-的不同"><a href="#配置中心-Diamond-和注册中心-ConfigServer-的不同" class="headerlink" title="配置中心(Diamond)和注册中心(ConfigServer)的不同"></a>配置中心(Diamond)和注册中心(ConfigServer)的不同</h2><p>在我们的眼里，用土话讲，这就是乌龟与王八的区别，想用拜金一点的话讲，这就是金条和钻石的区别，说的洋气一点这叫Apple and Pear，但是当初起的名字的给我们带来了大麻烦，现在我们的服务注册中心现在叫Config Server, 你说坑不坑。不过很多中间件产品的名字同时承载了一段8年的历史，这名字也体现中间件持续做技术产品，坚持就是一种力量的信念在里面，n代人持续发展一个产品，说实话，只管生不管养的现象在中间件不能说没有，但确实是很少的。1个8年的产品就像八岁的孩子，已经上小学了，硬要给它改个名字，从朱屎山改成朱宝山，他的同学认不认还要打个非常大的问号，而且还要跑到派出所重新上户口，也是个麻烦事。</p>
+<p>所以产品的取名字有大学问和大恐怖，大家取名之前一定要找算命先生给好好算一算，本来我在成为码农之前那也是仙风道骨，江湖人送外号郭半仙，那时候可以钉钉发个红包找我算一下。但成为码农之后嘛，就特么不说了，说起来全是泪，以前get到的很多技能点全丢了，现在就瞅着电脑和代码最顺眼。</p>
+<p>2者具体的不同，参见未来会写的&lt;&lt;应用配置中心和服务注册中心究竟有什么不一样?&gt;&gt;</p>
+<h2 id="关于配置，业界最新动态"><a href="#关于配置，业界最新动态" class="headerlink" title="关于配置，业界最新动态"></a>关于配置，业界最新动态</h2><p>业界著名的专职配置中心产品几乎没有（Diamond傲娇ing~）, 基本都是在用git, redis, zookeeper, consul 这些凑活着搞一下，所以要了解配置中心的同学，直接了解Diamond就可以了。:-)</p>
+<p>但是针对于配置管理的客户端编程类库这一块有一些类库牛吹得是很大的，感兴趣的同学可以了解一下:</p>
+<ul>
+<li>Apache Commons Configuration （<a href="https://commons.apache.org/proper/commons-configuration/" target="_blank" rel="noopener">https://commons.apache.org/proper/commons-configuration/</a>）</li>
+</ul>
+<p>这个类库是在是太繁琐了，用起来总感觉有点杀鸡用牛刀，力用的太大的感觉。</p>
+<ul>
+<li>owner （<a href="http://owner.aeonbits.org/" target="_blank" rel="noopener">http://owner.aeonbits.org/</a>）</li>
+</ul>
+<p>简单易上手，特性看起来很多，但是在很多关键常用的特性反倒是没有。</p>
+<ul>
+<li>cfg4j (<a href="http://www.cfg4j.org/" target="_blank" rel="noopener">http://www.cfg4j.org/</a>)</li>
+</ul>
+<p>简单易上手，cfg4j 支持跟多种后端集成，做配置中心的解决方案，api设计也非常的不错，我们正在设计的新diamond annotation api的时候借鉴了不少其想法。</p>
+<ul>
+<li>Spring Framework (<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#__propertysource" target="_blank" rel="noopener">http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#__propertysource</a>)</li>
+</ul>
+<p>Spring的东西一般都还是很不错的，如果你的应用本身在用Spring，毫无疑问，就这个了，用上面的那些类库实在没有必要。</p>
+<ul>
+<li>Spring Cloud Config Server</li>
+</ul>
+<p><img src="/assets/images/2016/09/28/config-center/011.png" alt=""></p>
+<p>如果你仔细读一下其内容，而你又了解Diamond的话，你会发现这就是Diamond这些年在解决的问题啊，Spring 终于从大量配置文件逐渐走向了配置中心（externalized configuration in a distributed system），而这一次我们走在了前面。</p>
+<p>看看owner 的宣传，</p>
+<p><img src="/assets/images/2016/09/28/config-center/012.png" alt=""></p>
+<p>Java 他妈 properties reinvented！ Java Properties的重新发明！ 屌不屌?! 我僧僧的觉得，我们中国码农有时候就是差了这种提炼和升华的能力，刚入行时觉得维护和修改前人留下的烂代码实在是个很苦逼，很Low的事情，但是Martin Fowler把这叫做”重构”，然后还写了一本书，然后我们读了之后，居然还觉得他妈的，讲的真的非常的有道理！把改烂代码变成叫重构之后，有了理论指导，突然觉得这真是个高逼格的事情！</p>
+<h2 id="配置-configuration-与元数据-metadata"><a href="#配置-configuration-与元数据-metadata" class="headerlink" title="配置(configuration)与元数据(metadata)"></a>配置(configuration)与元数据(metadata)</h2><p>很多人没有这种这两个概念的区分，但是对于配置中心，二者其实是有微妙的差别的.</p>
+<p>配置如前文有阐述，配置的修改基本上都是由人来驱动，并且在ops上实现变更。</p>
+<p><img src="/assets/images/2016/09/28/config-center/013.png" alt=""></p>
+<p>而元数据的本质是一小段程序元数据，它很多时候是程序产生，程序消费，由程序通过调用Diamond的客户端api来实现变更，中间不会有ops 或者人的介入。</p>
+<p><img src="/assets/images/2016/09/28/config-center/014.png" alt=""></p>
+<p>知道这个有什么意义？毫无疑问，配置这种需求选型比较明确，而元数据这种，可以选的pub-sub系统太多了，诸如消息队列产品，分布式coordinator产品如zookeeper, 带pub-sub 能力的k-v store 如Redis等等都可以，所以如果是元数据这种，选什么需要慎重，其间运用之妙，存乎一心，要充分评估和把握自己的需求。</p>
+<p>Diamond 不光是应用配置存储，其目前存储的数据，很大一部分是metadata，所以Diamond 其实也是一个元数据存储中心。</p>
+<h2 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h2><p>这么长的文章，你居然能坚持看到这里，说明你是真正的、脱离了低级趣味的，纯粹的码农，猿类中的精英！配置中心，它没有高精尖的技术，难懂的算法，海量的数据，做这个东西只需要一个精神就够了。</p>
+<p><img src="/assets/images/2016/09/28/config-center/015.png" alt=""></p>
+<p>owner之前一直在搞配置文件的支持，现在owner也开始转型搞跟zookeeper集成之类的，做配置中心的解决方案了，所以本文开头说业界正在走向配置中心解决方案不是在忽悠，是确实是这个趋势。</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://jm.taobao.org/2016/09/28/an-article-about-config-center/" target="_blank" rel="noopener">一篇好TM长的关于配置中心的文章</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Configuration/" rel="tag"># Configuration</a>
+          
+            <a href="/tags/Diamond/" rel="tag"># Diamond</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/2016-09-14-neural-network-zoo/" rel="next" title="The Neural Network Zoo">
+                <i class="fa fa-chevron-left"></i> The Neural Network Zoo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-09-29-distributed-system-mutually-exclusive-idempotence-cerberus-gtis/" rel="prev" title="分布式系统互斥性与幂等性问题的分析与解决">
+                分布式系统互斥性与幂等性问题的分析与解决 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

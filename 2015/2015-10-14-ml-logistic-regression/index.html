@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1、总述逻辑回归是应用非常广泛的一个分类机器学习算法，它将数据拟合到一个logit函数(或者叫做logistic函数)中，从而能够完成对事件发生的概率进行预测。 2、由来要说逻辑回归，我们得追溯到线性回归，想必大家对线性回归都有一定的了解，即对于多维空间中存在的样本点，我们用特征的线性组合去拟合空间中点的分布和轨迹。如下图所：  线性回归能对连续值结果进行预测，而现实生活中常见的另外一类问题是，分">
+<meta name="keywords" content="Machine-Learning,Logistic-Regression">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习系列(1)_逻辑回归初步">
+<meta property="og:url" content="http://hyperj.github.com/2015/2015-10-14-ml-logistic-regression/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="1、总述逻辑回归是应用非常广泛的一个分类机器学习算法，它将数据拟合到一个logit函数(或者叫做logistic函数)中，从而能够完成对事件发生的概率进行预测。 2、由来要说逻辑回归，我们得追溯到线性回归，想必大家对线性回归都有一定的了解，即对于多维空间中存在的样本点，我们用特征的线性组合去拟合空间中点的分布和轨迹。如下图所：  线性回归能对连续值结果进行预测，而现实生活中常见的另外一类问题是，分">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/001.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/002.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/003.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/004.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/005.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/006.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/007.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/008.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/009.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/010.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/011.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/012.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/013.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/014.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/015.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/016.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/017.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/018.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/019.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/020.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/021.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/022.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/023.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/024.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/025.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/026.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/027.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/028.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习系列(1)_逻辑回归初步">
+<meta name="twitter:description" content="1、总述逻辑回归是应用非常广泛的一个分类机器学习算法，它将数据拟合到一个logit函数(或者叫做logistic函数)中，从而能够完成对事件发生的概率进行预测。 2、由来要说逻辑回归，我们得追溯到线性回归，想必大家对线性回归都有一定的了解，即对于多维空间中存在的样本点，我们用特征的线性组合去拟合空间中点的分布和轨迹。如下图所：  线性回归能对连续值结果进行预测，而现实生活中常见的另外一类问题是，分">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2015/10/14/ml-logistic-regression/001.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2015/2015-10-14-ml-logistic-regression/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习系列(1)_逻辑回归初步 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2015/2015-10-14-ml-logistic-regression/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">机器学习系列(1)_逻辑回归初步
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-10-14 00:00:00" itemprop="dateCreated datePublished" datetime="2015-10-14T00:00:00+08:00">2015-10-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine-Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1、总述"><a href="#1、总述" class="headerlink" title="1、总述"></a>1、总述</h2><p>逻辑回归是应用非常广泛的一个分类机器学习算法，它将数据拟合到一个logit函数(或者叫做logistic函数)中，从而能够完成对事件发生的概率进行预测。</p>
+<h2 id="2、由来"><a href="#2、由来" class="headerlink" title="2、由来"></a>2、由来</h2><p>要说逻辑回归，我们得追溯到线性回归，想必大家对线性回归都有一定的了解，即对于多维空间中存在的样本点，我们用特征的线性组合去拟合空间中点的分布和轨迹。如下图所：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/001.png" alt=""></p>
+<p>线性回归能对连续值结果进行预测，而现实生活中常见的另外一类问题是，分类问题。最简单的情况是是与否的二分类问题。比如说医生需要判断病人是否生病，银行要判断一个人的信用程度是否达到可以给他发信用卡的程度，邮件收件箱要自动对邮件分类为正常邮件和垃圾邮件等等。</p>
+<p>当然，我们最直接的想法是，既然能够用线性回归预测出连续值结果，那根据结果设定一个阈值是不是就可以解决这个问题了呢？事实是，对于很标准的情况，确实可以的，这里我们套用Andrew Ng老师的课件中的例子，下图中X为数据点肿瘤的大小，Y为观测结果是否是恶性肿瘤。通过构建线性回归模型，如hθ(x)所示，构建线性回归模型后，我们设定一个阈值0.5，预测hθ(x)≥0.5的这些点为恶性肿瘤，而hθ(x)&lt;0.5为良性肿瘤。</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/002.png" alt=""></p>
+<p>但很多实际的情况下，我们需要学习的分类数据并没有这么精准，比如说上述例子中突然有一个不按套路出牌的数据点出现，如下图所示：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/003.png" alt=""></p>
+<p>你看，现在你再设定0.5，这个判定阈值就失效了，而现实生活的分类问题的数据，会比例子中这个更为复杂，而这个时候我们借助于线性回归+阈值的方式，已经很难完成一个鲁棒性很好的分类器了。</p>
+<p>在这样的场景下，逻辑回归就诞生了。它的核心思想是，如果线性回归的结果输出是一个连续值，而值的范围是无法限定的，那我们有没有办法把这个结果值映射为可以帮助我们判断的结果呢。而如果输出结果是 (0,1) 的一个概率值，这个问题就很清楚了。我们在数学上找了一圈，还真就找着这样一个简单的函数了，就是很神奇的sigmoid函数(如下)：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/004.png" alt=""></p>
+<p>如果把sigmoid函数图像画出来，是如下的样子：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/005.png" alt=""></p>
+<p>从函数图上可以看出，函数y=g(z)在z=0的时候取值为1/2，而随着z逐渐变小，函数值趋于0，z逐渐变大的同时函数值逐渐趋于1，而这正是一个概率的范围。</p>
+<p>所以我们定义线性回归的预测函数为Y=WTX，那么逻辑回归的输出Y= g(WTX)，其中y=g(z)函数正是上述sigmoid函数(或者简单叫做S形函数)。</p>
+<h2 id="3、判定边界"><a href="#3、判定边界" class="headerlink" title="3、判定边界"></a>3、判定边界</h2><p>我们现在再来看看，为什么逻辑回归能够解决分类问题。这里引入一个概念，叫做判定边界，可以理解为是用以对不同类别的数据分割的边界，边界的两旁应该是不同类别的数据。</p>
+<p>从二维直角坐标系中，举几个例子，大概是如下这个样子：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/006.png" alt=""></p>
+<p>有时候是这个样子：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/007.png" alt=""></p>
+<p>甚至可能是这个样子：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/008.png" alt=""></p>
+<p>上述三幅图中的红绿样本点为不同类别的样本，而我们划出的线，不管是直线、圆或者是曲线，都能比较好地将图中的两类样本分割开来。这就是我们的判定边界，下面我们来看看，逻辑回归是如何根据样本点获得这些判定边界的。</p>
+<p>我们依旧借用Andrew Ng教授的课程中部分例子来讲述这个问题。</p>
+<p>回到sigmoid函数，我们发现：</p>
+<p>当g(z)≥0.5时, z≥0;</p>
+<p>对于hθ(x)=g(θTX)≥0.5, 则θTX≥0, 此时意味着预估y=1;</p>
+<p>反之，当预测y = 0时，θTX&lt;0;</p>
+<p>所以我们认为θTX =0是一个决策边界，当它大于0或小于0时，逻辑回归模型分别预测不同的分类结果。</p>
+<p>先看第一个例子hθ(x)=g(θ0+θ1X1+θ2X2)，其中θ0 ,θ1 ,θ2分别取-3, 1, 1。则当−3+X1+X2≥0时, y = 1; 则X1+X2=3是一个决策边界，图形表示如下，刚好把图上的两类点区分开来：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/009.png" alt=""></p>
+<p>例1只是一个线性的决策边界，当hθ(x)更复杂的时候，我们可以得到非线性的决策边界，例如：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/010.png" alt=""></p>
+<p>这时当x12+x22≥1时，我们判定y=1，这时的决策边界是一个圆形，如下图所示：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/011.png" alt=""></p>
+<p>所以我们发现，理论上说，只要我们的hθ(x)设计足够合理，准确的说是g(θTx)中θTx足够复杂，我们能在不同的情形下，拟合出不同的判定边界，从而把不同的样本点分隔开来。</p>
+<h2 id="4、代价函数与梯度下降"><a href="#4、代价函数与梯度下降" class="headerlink" title="4、代价函数与梯度下降"></a>4、代价函数与梯度下降</h2><p>我们通过对判定边界的说明，知道会有合适的参数θ使得θTx=0成为很好的分类判定边界，那么问题就来了，我们如何判定我们的参数θ是否合适，有多合适呢？更进一步，我们有没有办法去求得这样的合适参数θ呢？</p>
+<p>这就是我们要提到的代价函数与梯度下降了。</p>
+<p>所谓的代价函数Cost Function，其实是一种衡量我们在这组参数下预估的结果和实际结果差距的函数，比如说线性回归的代价函数定义为:</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/012.png" alt=""></p>
+<p>当然我们可以和线性回归类比得到一个代价函数，实际就是上述公式中hθ(x)取为逻辑回归中的g(θTx)，但是这会引发代价函数为“非凸”函数的问题，简单一点说就是这个函数有很多个局部最低点，如下图所示：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/013.png" alt=""></p>
+<p>而我们希望我们的代价函数是一个如下图所示，碗状结构的凸函数，这样我们算法求解到局部最低点，就一定是全局最小值点。</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/014.png" alt=""></p>
+<p>因此，上述的Cost Function对于逻辑回归是不可行的，我们需要其他形式的Cost Function来保证逻辑回归的成本函数是凸函数。</p>
+<p>我们跳过大量的数学推导，直接出结论了，我们找到了一个适合逻辑回归的代价函数:</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/015.png" alt=""></p>
+<p>Andrew Ng老师解释了一下这个代价函数的合理性，我们首先看当y=1的情况：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/016.png" alt=""></p>
+<p>如果我们的类别y = 1, 而判定的hθ(x)=1，则Cost = 0，此时预测的值和真实的值完全相等，代价本该为0；而如果判断hθ(x)→0，代价-&gt;∞，这很好地惩罚了最后的结果。</p>
+<p>而对于y=0的情况，如下图所示，也同样合理：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/017.png" alt=""></p>
+<p>下面我们说说梯度下降，梯度下降算法是调整参数θ使得代价函数J(θ)取得最小值的最基本方法之一。从直观上理解，就是我们在碗状结构的凸函数上取一个初始值，然后挪动这个值一步步靠近最低点的过程，如下图所示：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/018.png" alt=""></p>
+<p>我们先简化一下逻辑回归的代价函数：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/019.png" alt=""></p>
+<p>从数学上理解，我们为了找到最小值点，就应该朝着下降速度最快的方向(导函数/偏导方向)迈进，每次迈进一小步，再看看此时的下降最快方向是哪，再朝着这个方向迈进，直至最低点。</p>
+<p>用迭代公式表示出来的最小化J(θ)的梯度下降算法如下：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/020.png" alt=""></p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/021.png" alt=""></p>
+<h2 id="5、代码与实现"><a href="#5、代码与实现" class="headerlink" title="5、代码与实现"></a>5、代码与实现</h2><p>我们来一起看两个具体数据上做逻辑回归分类的例子，其中一份数据为线性判定边界，另一份为非线性。</p>
+<p>示例1。</p>
+<p>第一份数据为data1.txt，部分内容如下：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/022.png" alt=""></p>
+<p>我们先来看看数据在空间的分布，代码如下。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> loadtxt, where  </span><br><span class="line"><span class="keyword">from</span> pylab <span class="keyword">import</span> scatter, show, legend, xlabel, ylabel  </span><br><span class="line">  </span><br><span class="line"><span class="comment">#load the dataset  </span></span><br><span class="line">data = loadtxt(<span class="string">'/home/HanXiaoyang/data/data1.txt'</span>, delimiter=<span class="string">','</span>)  </span><br><span class="line">  </span><br><span class="line">X = data[:, <span class="number">0</span>:<span class="number">2</span>]  </span><br><span class="line">y = data[:, <span class="number">2</span>]  </span><br><span class="line">  </span><br><span class="line">pos = where(y == <span class="number">1</span>)  </span><br><span class="line">neg = where(y == <span class="number">0</span>)  </span><br><span class="line">scatter(X[pos, <span class="number">0</span>], X[pos, <span class="number">1</span>], marker=<span class="string">'o'</span>, c=<span class="string">'b'</span>)  </span><br><span class="line">scatter(X[neg, <span class="number">0</span>], X[neg, <span class="number">1</span>], marker=<span class="string">'x'</span>, c=<span class="string">'r'</span>)  </span><br><span class="line">xlabel(<span class="string">'Feature1/Exam 1 score'</span>)  </span><br><span class="line">ylabel(<span class="string">'Feature2/Exam 2 score'</span>)  </span><br><span class="line">legend([<span class="string">'Fail'</span>, <span class="string">'Pass'</span>])  </span><br><span class="line">show()</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/023.png" alt=""></p>
+<p>下面我们写好计算sigmoid函数、代价函数、和梯度下降的程序：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid</span><span class="params">(X)</span>:</span>  </span><br><span class="line">    <span class="string">'''''Compute sigmoid function '''</span>  </span><br><span class="line">    den =<span class="number">1.0</span>+ e **(<span class="number">-1.0</span>* X)  </span><br><span class="line">    gz =<span class="number">1.0</span>/ den  </span><br><span class="line">    <span class="keyword">return</span> gz  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compute_cost</span><span class="params">(theta,X,y)</span>:</span>  </span><br><span class="line">    <span class="string">'''''computes cost given predicted and actual values'''</span>  </span><br><span class="line">    m = X.shape[<span class="number">0</span>]<span class="comment">#number of training examples  </span></span><br><span class="line">    theta = reshape(theta,(len(theta),<span class="number">1</span>))  </span><br><span class="line">      </span><br><span class="line">    J =(<span class="number">1.</span>/m)*(-transpose(y).dot(log(sigmoid(X.dot(theta))))- transpose(<span class="number">1</span>-y).dot(log(<span class="number">1</span>-sigmoid(X.dot(theta)))))  </span><br><span class="line">      </span><br><span class="line">    grad = transpose((<span class="number">1.</span>/m)*transpose(sigmoid(X.dot(theta))- y).dot(X))  </span><br><span class="line">    <span class="comment">#optimize.fmin expects a single value, so cannot return grad  </span></span><br><span class="line">    <span class="keyword">return</span> J[<span class="number">0</span>][<span class="number">0</span>]<span class="comment">#,grad  </span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compute_grad</span><span class="params">(theta, X, y)</span>:</span>  </span><br><span class="line">    <span class="string">'''''compute gradient'''</span>  </span><br><span class="line">    theta.shape =(<span class="number">1</span>,<span class="number">3</span>)  </span><br><span class="line">    grad = zeros(<span class="number">3</span>)  </span><br><span class="line">    h = sigmoid(X.dot(theta.T))  </span><br><span class="line">    delta = h - y  </span><br><span class="line">    l = grad.size  </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(l):  </span><br><span class="line">        sumdelta = delta.T.dot(X[:, i])  </span><br><span class="line">        grad[i]=(<span class="number">1.0</span>/ m)* sumdelta *<span class="number">-1</span>  </span><br><span class="line">    theta.shape =(<span class="number">3</span>,)  </span><br><span class="line">    <span class="keyword">return</span>  grad</span><br></pre></td></tr></table></figure>
+<p>我们用梯度下降算法得到的结果判定边界是如下的样子：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/024.png" alt=""></p>
+<p>最后我们使用我们的判定边界对training data做一个预测，然后比对一下准确率：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(theta, X)</span>:</span>  </span><br><span class="line">    <span class="string">'''''Predict label using learned logistic regression parameters'''</span>  </span><br><span class="line">    m, n = X.shape  </span><br><span class="line">    p = zeros(shape=(m,<span class="number">1</span>))  </span><br><span class="line">    h = sigmoid(X.dot(theta.T))  </span><br><span class="line">    <span class="keyword">for</span> it <span class="keyword">in</span> range(<span class="number">0</span>, h.shape[<span class="number">0</span>]):  </span><br><span class="line">        <span class="keyword">if</span> h[it]&gt;<span class="number">0.5</span>:  </span><br><span class="line">            p[it,<span class="number">0</span>]=<span class="number">1</span>  </span><br><span class="line">        <span class="keyword">else</span>:  </span><br><span class="line">            p[it,<span class="number">0</span>]=<span class="number">0</span>  </span><br><span class="line">    <span class="keyword">return</span> p  </span><br><span class="line"><span class="comment">#Compute accuracy on our training set  </span></span><br><span class="line">p = predict(array(theta), it)  </span><br><span class="line"><span class="keyword">print</span><span class="string">'Train Accuracy: %f'</span>%((y[where(p == y)].size / float(y.size))*<span class="number">100.0</span>)</span><br></pre></td></tr></table></figure>
+<p>计算出来的结果是89.2%</p>
+<p>示例2.</p>
+<p>第二份数据为data2.txt，部分内容如下：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/025.png" alt=""></p>
+<p>我们同样把数据的分布画出来，如下：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/026.png" alt=""></p>
+<p>我们发现在这个例子中，我们没有办法再用一条直线把两类样本点近似分开了，所以我们打算试试多项式的判定边界，那么我们先要对给定的两个feature做一个多项式特征的映射。比如说，我们做了如下的一个映射：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/027.png" alt=""></p>
+<p>代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map_feature</span><span class="params">(x1, x2)</span>:</span>  </span><br><span class="line">    <span class="string">''''' </span></span><br><span class="line"><span class="string">    Maps the two input features to polonomial features. </span></span><br><span class="line"><span class="string">    Returns a new feature array with more features of </span></span><br><span class="line"><span class="string">    X1, X2, X1 ** 2, X2 ** 2, X1*X2, X1*X2 ** 2, etc... </span></span><br><span class="line"><span class="string">    '''</span>  </span><br><span class="line">    x1.shape =(x1.size,<span class="number">1</span>)  </span><br><span class="line">    x2.shape =(x2.size,<span class="number">1</span>)  </span><br><span class="line">    degree =<span class="number">6</span>  </span><br><span class="line">    mapped_fea = ones(shape=(x1[:,<span class="number">0</span>].size,<span class="number">1</span>))  </span><br><span class="line">    m, n = mapped_fea.shape  </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, degree +<span class="number">1</span>):  </span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i +<span class="number">1</span>):  </span><br><span class="line">            r =(x1 **(i - j))*(x2 ** j)  </span><br><span class="line">            mapped_fea = append(&lt;span style="font-family: Arial, Helvetica, sans-serif;"&gt;mapped_fea&lt;/span&gt;&lt;span style="font-family: Arial, Helvetica, sans-serif;"&gt;, r, axis=1)&lt;/span&gt;  </span><br><span class="line">    <span class="keyword">return</span> mapped_fea  </span><br><span class="line">mapped_fea = map_feature(X[:,<span class="number">0</span>], X[:,<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<p>接着做梯度下降：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost_function_reg</span><span class="params">(theta, X, y, l)</span>:</span>  </span><br><span class="line">    <span class="string">'''''Compute the cost and partial derivatives as grads </span></span><br><span class="line"><span class="string">    '''</span>  </span><br><span class="line">    h = sigmoid(X.dot(theta))  </span><br><span class="line">    thetaR = theta[<span class="number">1</span>:,<span class="number">0</span>]  </span><br><span class="line">    J =(<span class="number">1.0</span>/ m)*((-y.T.dot(log(h)))-((<span class="number">1</span>- y.T).dot(log(<span class="number">1.0</span>- h)))) \  </span><br><span class="line">            +(l /(<span class="number">2.0</span>* m))*(thetaR.T.dot(thetaR))  </span><br><span class="line">    delta = h - y  </span><br><span class="line">    sum_delta = delta.T.dot(X[:,<span class="number">1</span>])  </span><br><span class="line">    grad1 =(<span class="number">1.0</span>/ m)* sumdelta  </span><br><span class="line">    XR = X[:,<span class="number">1</span>:X.shape[<span class="number">1</span>]]  </span><br><span class="line">    sum_delta = delta.T.dot(XR)  </span><br><span class="line">    grad =(<span class="number">1.0</span>/ m)*(sum_delta + l * thetaR)  </span><br><span class="line">    out = zeros(shape=(grad.shape[<span class="number">0</span>], grad.shape[<span class="number">1</span>]+<span class="number">1</span>))  </span><br><span class="line">    out[:,<span class="number">0</span>]= grad1  </span><br><span class="line">    out[:,<span class="number">1</span>:]= grad  </span><br><span class="line">    <span class="keyword">return</span> J.flatten(), out.T.flatten()  </span><br><span class="line">m, n = X.shape  </span><br><span class="line">y.shape =(m,<span class="number">1</span>)  </span><br><span class="line">it = map_feature(X[:,<span class="number">0</span>], X[:,<span class="number">1</span>])  </span><br><span class="line"><span class="comment">#Initialize theta parameters  </span></span><br><span class="line">initial_theta = zeros(shape=(it.shape[<span class="number">1</span>],<span class="number">1</span>))  </span><br><span class="line"><span class="comment">#Use regularization and set parameter lambda to 1  </span></span><br><span class="line">l =<span class="number">1</span>  </span><br><span class="line"><span class="comment"># Compute and display initial cost and gradient for regularized logistic  </span></span><br><span class="line"><span class="comment"># regression  </span></span><br><span class="line">cost, grad = cost_function_reg(initial_theta, it, y, l)  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decorated_cost</span><span class="params">(theta)</span>:</span>  </span><br><span class="line">    <span class="keyword">return</span> cost_function_reg(theta, it, y, l)  </span><br><span class="line"><span class="keyword">print</span> fmin_bfgs(decorated_cost, initial_theta, maxfun=<span class="number">500</span>)</span><br></pre></td></tr></table></figure>
+<p>接着在数据点上画出判定边界：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#Plot Boundary  </span></span><br><span class="line">u = linspace(<span class="number">-1</span>,<span class="number">1.5</span>,<span class="number">50</span>)  </span><br><span class="line">v = linspace(<span class="number">-1</span>,<span class="number">1.5</span>,<span class="number">50</span>)  </span><br><span class="line">z = zeros(shape=(len(u), len(v)))  </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(u)):  </span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(len(v)):  </span><br><span class="line">        z[i, j]=(map_feature(array(u[i]), array(v[j])).dot(array(theta)))  </span><br><span class="line">z = z.T  </span><br><span class="line">contour(u, v, z)  </span><br><span class="line">title(<span class="string">'lambda = %f'</span>% l)  </span><br><span class="line">xlabel(<span class="string">'Microchip Test 1'</span>)  </span><br><span class="line">ylabel(<span class="string">'Microchip Test 2'</span>)  </span><br><span class="line">legend([<span class="string">'y = 1'</span>,<span class="string">'y = 0'</span>,<span class="string">'Decision boundary'</span>])  </span><br><span class="line">show()  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(theta, X)</span>:</span>  </span><br><span class="line">    <span class="string">'''''Predict whether the label </span></span><br><span class="line"><span class="string">    is 0 or 1 using learned logistic </span></span><br><span class="line"><span class="string">    regression parameters '''</span>  </span><br><span class="line">    m, n = X.shape  </span><br><span class="line">    p = zeros(shape=(m,<span class="number">1</span>))  </span><br><span class="line">    h = sigmoid(X.dot(theta.T))  </span><br><span class="line">    <span class="keyword">for</span> it <span class="keyword">in</span> range(<span class="number">0</span>, h.shape[<span class="number">0</span>]):  </span><br><span class="line">        <span class="keyword">if</span> h[it]&gt;<span class="number">0.5</span>:  </span><br><span class="line">            p[it,<span class="number">0</span>]=<span class="number">1</span>  </span><br><span class="line">        <span class="keyword">else</span>:  </span><br><span class="line">            p[it,<span class="number">0</span>]=<span class="number">0</span>  </span><br><span class="line">    <span class="keyword">return</span> p  </span><br><span class="line"><span class="comment">#% Compute accuracy on our training set  </span></span><br><span class="line">p = predict(array(theta), it)  </span><br><span class="line"><span class="keyword">print</span><span class="string">'Train Accuracy: %f'</span>%((y[where(p == y)].size / float(y.size))*<span class="number">100.0</span>)</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下图所示：</p>
+<p><img src="/assets/images/2015/10/14/ml-logistic-regression/028.png" alt=""></p>
+<p>我们发现我们得到的这条曲线确实将两类点区分开来了。</p>
+<h2 id="6、总结"><a href="#6、总结" class="headerlink" title="6、总结"></a>6、总结</h2><p>最后我们总结一下逻辑回归。它始于输出结果为有实际意义的连续值的线性回归，但是线性回归对于分类的问题没有办法准确而又具备鲁棒性地分割，因此我们设计出了逻辑回归这样一个算法，它的输出结果表征了某个样本属于某类别的概率。</p>
+<p>逻辑回归的成功之处在于，将原本输出结果范围可以非常大的θTX 通过sigmoid函数映射到(0,1)，从而完成概率的估测。</p>
+<p>而直观地在二维空间理解逻辑回归，是sigmoid函数的特性，使得判定的阈值能够映射为平面的一条判定边界，当然随着特征的复杂化，判定边界可能是多种多样的样貌，但是它能够较好地把两类样本点分隔开，解决分类问题。</p>
+<p>求解逻辑回归参数的传统方法是梯度下降，构造为凸函数的代价函数后，每次沿着偏导方向(下降速度最快方向)迈进一小部分，直至N次迭代后到达最低点。</p>
+<h2 id="7、补充"><a href="#7、补充" class="headerlink" title="7、补充"></a>7、补充</h2><p>本文的2份数据分别为<a href="/assets/images/2015/10/14/ml-logistic-regression/data1.txt">data1.txt</a>和<a href="/assets/images/2015/10/14/ml-logistic-regression/data2.txt">data2.txt</a>，欢迎大家自己动手尝试。</p>
+<p>关于逻辑回归的完整ipython notebook示例代码可以在我的github上(<a href="https://github.com/HanXiaoyang/ML_examples/tree/master/logistic_regression)下载到，欢迎指正。" target="_blank" rel="noopener">https://github.com/HanXiaoyang/ML_examples/tree/master/logistic_regression)下载到，欢迎指正。</a></p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://blog.csdn.net/han_xiaoyang/article/details/49123419" target="_blank" rel="noopener">机器学习系列(1)_逻辑回归初步</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine-Learning</a>
+          
+            <a href="/tags/Logistic-Regression/" rel="tag"># Logistic-Regression</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-10-09-introduction-succinct-project/" rel="next" title="Introduction to the Succinct project">
+                <i class="fa fa-chevron-left"></i> Introduction to the Succinct project
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-10-22-ml-logistic-regression-2/" rel="prev" title="机器学习系列(2)_从初等数学视角解读逻辑回归">
+                机器学习系列(2)_从初等数学视角解读逻辑回归 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

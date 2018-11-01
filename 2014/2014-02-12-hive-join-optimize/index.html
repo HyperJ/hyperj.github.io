@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="由于 hive 与传统关系型数据库面对的业务场景及底层技术架构都有着很大差异，因此，传统数据库领域的一些技能放到 Hive 中可能已不再适用。关于 hive 的优化与原理、应用的文章，前面也陆陆续续的介绍了一些，但大多都偏向理论层面，本文就介绍一个实例，从实例中一步步加深对 hive 调优的认识与意识。 1、需求需求我做了简化，很简单，两张表做个 join，求指定城市，每天的 pv，用传统的 RD">
+<meta name="keywords" content="Hive,SQL,Join">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一例 Hive join 优化实战">
+<meta property="og:url" content="http://hyperj.github.com/2014/2014-02-12-hive-join-optimize/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="由于 hive 与传统关系型数据库面对的业务场景及底层技术架构都有着很大差异，因此，传统数据库领域的一些技能放到 Hive 中可能已不再适用。关于 hive 的优化与原理、应用的文章，前面也陆陆续续的介绍了一些，但大多都偏向理论层面，本文就介绍一个实例，从实例中一步步加深对 hive 调优的认识与意识。 1、需求需求我做了简化，很简单，两张表做个 join，求指定城市，每天的 pv，用传统的 RD">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一例 Hive join 优化实战">
+<meta name="twitter:description" content="由于 hive 与传统关系型数据库面对的业务场景及底层技术架构都有着很大差异，因此，传统数据库领域的一些技能放到 Hive 中可能已不再适用。关于 hive 的优化与原理、应用的文章，前面也陆陆续续的介绍了一些，但大多都偏向理论层面，本文就介绍一个实例，从实例中一步步加深对 hive 调优的认识与意识。 1、需求需求我做了简化，很简单，两张表做个 join，求指定城市，每天的 pv，用传统的 RD">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2014/2014-02-12-hive-join-optimize/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一例 Hive join 优化实战 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2014/2014-02-12-hive-join-optimize/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">一例 Hive join 优化实战
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-02-12 00:00:00" itemprop="dateCreated datePublished" datetime="2014-02-12T00:00:00+08:00">2014-02-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Hive/" itemprop="url" rel="index"><span itemprop="name">Hive</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由于 hive 与传统关系型数据库面对的业务场景及底层技术架构都有着很大差异，因此，传统数据库领域的一些技能放到 Hive 中可能已不再适用。关于 hive 的优化与原理、应用的文章，前面也陆陆续续的介绍了一些，但大多都偏向理论层面，本文就介绍一个实例，从实例中一步步加深对 hive 调优的认识与意识。</p>
+<h2 id="1、需求"><a href="#1、需求" class="headerlink" title="1、需求"></a>1、需求</h2><p>需求我做了简化，很简单，两张表做个 join，求指定城市，每天的 pv，用传统的 RDBMS SQL 写出来就这样的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> t.statdate,</span><br><span class="line">       c.cname,</span><br><span class="line">       <span class="keyword">count</span>(t.cookieid)</span><br><span class="line"><span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line"><span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> (t.area1= c.cname</span><br><span class="line">                                <span class="keyword">OR</span> t.area2 =c.cname</span><br><span class="line">                                <span class="keyword">OR</span> t.area3 = c.cname)</span><br><span class="line"><span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span> <span class="keyword">and</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">  <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> t.statdate,</span><br><span class="line">         c.cname;</span><br></pre></td></tr></table></figure>
+<p>怎么样？根据 SQL 看懂需求没问题吧？</p>
+<h2 id="2、非等值-join-问题"><a href="#2、非等值-join-问题" class="headerlink" title="2、非等值 join 问题"></a>2、非等值 join 问题</h2><p>然后把这条 SQL 贴到 hive 中去执行，然后你会发现报错了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FAILED: SemanticException [Error 10019]: Line 5:32 OR not supported in JOIN currently &apos;cname&apos;</span><br></pre></td></tr></table></figure>
+<p>这是因为 hive 受限于 MapReduce 算法模型，只支持 equi-joins（等值 join），要实现上述的非等值 join，你可以采用笛卡儿积（ full Cartesian product ）来实现：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> t.statdate,</span><br><span class="line">       c.cname,</span><br><span class="line">       <span class="keyword">count</span>(t.cookieid)</span><br><span class="line"><span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line"><span class="keyword">JOIN</span> ecdata.ext_trackflow t</span><br><span class="line"><span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">  <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">  <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">  <span class="keyword">AND</span> (t.area1= c.cname</span><br><span class="line">       <span class="keyword">OR</span> t.area2 =c.cname</span><br><span class="line">       <span class="keyword">OR</span> t.area3 = c.cname)</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> t.statdate,</span><br><span class="line">         c.cname;</span><br></pre></td></tr></table></figure>
+<p>然后再拿着这条语句执行下。</p>
+<h2 id="3、优化：reduce-side-join-VS-Cartesian-product"><a href="#3、优化：reduce-side-join-VS-Cartesian-product" class="headerlink" title="3、优化：reduce side join VS Cartesian product"></a>3、优化：reduce side join VS Cartesian product</h2><p>如果你真的把这条语句放到 Hive 上执行，然后恰好你有张表还非常大，那么恭喜你。。。集群管理员估计会找你的麻烦了。。。</p>
+<p>友情提示：笛卡儿积这种语句在 Hive 下慎用，大数据场景下的 m * n 映射结果你懂的。。。对此，Hive 特意提供了一个环境变量：hive.mapred.mode=strict; 防止笛卡儿积的执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FAILED: SemanticException [Error 10052]: In strict mode, cartesian product is not allowed. If you really want to perform the operation, set hive.mapred.mode=nonstrict</span><br></pre></td></tr></table></figure>
+<p>从 2 中的观察得知我们在 on 后面跟 join 条件，走的是 reduce side join，如果你在 where 后跟则是走 Cartesian product，但是这里单条 sql 又没法实现 reduce side join，还有没有其它办法呢？</p>
+<h2 id="4、改写非等值-join：union-all"><a href="#4、改写非等值-join：union-all" class="headerlink" title="4、改写非等值 join：union all"></a>4、改写非等值 join：union all</h2><p>既然不允许非等值 join，那我们换一下思路，多个子查询 union all，然后汇总：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> dt,</span><br><span class="line">       <span class="keyword">name</span>,</span><br><span class="line">       <span class="keyword">count</span>(cid)</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">  (<span class="keyword">SELECT</span> t.statdate dt,</span><br><span class="line">          c.cname <span class="keyword">name</span>,</span><br><span class="line">          t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area1 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> t.statdate dt,</span><br><span class="line">                    c.cname <span class="keyword">name</span>,</span><br><span class="line">                    t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area2 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> t.statdate dt,</span><br><span class="line">                    c.cname <span class="keyword">name</span>,</span><br><span class="line">                    t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area3 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span>) tmp_trackflow</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> dt,</span><br><span class="line">         <span class="keyword">name</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="5、优化：map-side-join"><a href="#5、优化：map-side-join" class="headerlink" title="5、优化：map side join"></a>5、优化：map side join</h2><p>上述语句走的是 reduce side join，从我们的需求及业务得知，tmpdb.city 是一张字典表，数据量很小，因此我们可以试试把上述的语句改写成 mapjoin：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> dt,</span><br><span class="line">       <span class="keyword">name</span>,</span><br><span class="line">       <span class="keyword">count</span>(cid)</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">  (<span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                            c.cname <span class="keyword">name</span>,</span><br><span class="line">                            t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area1 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                                      c.cname <span class="keyword">name</span>,</span><br><span class="line">                                      t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area2 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                                      c.cname <span class="keyword">name</span>,</span><br><span class="line">                                      t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area3 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span>) tmp_trackflow</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> dt,</span><br><span class="line">         <span class="keyword">name</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="6、优化无极限：开启-parallel-和-控制-reduce-个数"><a href="#6、优化无极限：开启-parallel-和-控制-reduce-个数" class="headerlink" title="6、优化无极限：开启 parallel 和 控制 reduce 个数"></a>6、优化无极限：开启 parallel 和 控制 reduce 个数</h2><p>上述语句执行时，你可以看到执行计划和状态信息，以及结合你的 union all 语句可知，三个 union 语句之间没有依赖关系，其实是可以并行执行的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">explain SQL...</span><br><span class="line">...</span><br><span class="line">STAGE DEPENDENCIES:</span><br><span class="line">  Stage-11 is a root stage</span><br><span class="line">  Stage-1 depends on stages: Stage-11</span><br><span class="line">  Stage-2 depends on stages: Stage-1</span><br><span class="line">  Stage-3 depends on stages: Stage-2, Stage-6, Stage-9</span><br><span class="line">  Stage-12 is a root stage</span><br><span class="line">  Stage-5 depends on stages: Stage-12</span><br><span class="line">  Stage-6 depends on stages: Stage-5</span><br><span class="line">  Stage-13 is a root stage</span><br><span class="line">  Stage-8 depends on stages: Stage-13</span><br><span class="line">  Stage-9 depends on stages: Stage-8</span><br><span class="line">  Stage-0 is a root stage</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>我们在 SQL 前加上如下环境变量选项：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> mapred.reduce.tasks=<span class="number">60</span>;</span><br><span class="line"><span class="keyword">set</span> hive.exec.parallel=<span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+<p>让执行计划中的 Stage-11、Stage-12、Stage-13 并行执行，并控制好 reduce task 个数。</p>
+<p>完整的语句如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">hive -e "</span><br><span class="line"><span class="keyword">SET</span> mapred.reduce.tasks=<span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> hive.exec.parallel=<span class="literal">TRUE</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> dt,</span><br><span class="line">       <span class="keyword">name</span>,</span><br><span class="line">       <span class="keyword">count</span>(cid)</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">  (<span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                            c.cname <span class="keyword">name</span>,</span><br><span class="line">                            t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area1 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                                      c.cname <span class="keyword">name</span>,</span><br><span class="line">                                      t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area2 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span></span><br><span class="line">   <span class="keyword">UNION</span> ALL <span class="keyword">SELECT</span> <span class="comment">/*+ MAPJOIN(c) */</span> t.statdate dt,</span><br><span class="line">                                      c.cname <span class="keyword">name</span>,</span><br><span class="line">                                      t.cookieid cid</span><br><span class="line">   <span class="keyword">FROM</span> tmpdb.city c</span><br><span class="line">   <span class="keyword">JOIN</span> ecdata.ext_trackflow t <span class="keyword">ON</span> t.area3 =c.cname</span><br><span class="line">   <span class="keyword">WHERE</span> t.statdate&gt;=<span class="string">'20140818'</span></span><br><span class="line">     <span class="keyword">AND</span> t.statdate&lt;=<span class="string">'20140824'</span></span><br><span class="line">     <span class="keyword">AND</span> platform=<span class="string">'pc'</span>) tmp_trackflow</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> dt,</span><br><span class="line">         <span class="keyword">name</span>;</span><br><span class="line"></span><br><span class="line">" &gt; a1.txt</span><br></pre></td></tr></table></figure>
+<p>最后的优化效果是：2 中的语句三个小时没出结果。。。5 比 4 快 8 倍左右，6 比 5 快 2 倍左右，最终 10min 出结果。</p>
+<h2 id="7、最后的问题："><a href="#7、最后的问题：" class="headerlink" title="7、最后的问题："></a>7、最后的问题：</h2><p>在 6 的语句执行的时候你会发现，其扫描了 三遍 源文件。而 hive 本身是对 union all 的 join 做了优化的，当多个 union all 子查询同一张表时，只扫描一次源文件，但这里为什么会三个子查询各扫描一次呢？</p>
+<p>可能是这里的 union all 子查询使用了 join 的缘故，导致 hive 的 union all 执行计划优化失效了。</p>
+<p>关于这块怎么能优化成只扫描一次源文件，或者你有更好的优化方案，欢迎留言交流。</p>
+<h2 id="8、关于-hive-中的-笛卡尔集（-full-Cartesian-product-）"><a href="#8、关于-hive-中的-笛卡尔集（-full-Cartesian-product-）" class="headerlink" title="8、关于 hive 中的 笛卡尔集（ full Cartesian product ）"></a>8、关于 hive 中的 笛卡尔集（ full Cartesian product ）</h2><p>在JION接连查询中没有ON连接key，而通过WHERE条件语句会产生笛卡尔集。</p>
+<p>Hive本身是不支持笛卡尔集的，不能用select T1.<em>, T2.</em> from table1, table2这种语法。但有时候确实需要用到笛卡尔集的时候，可以用下面的语法来实现同样的效果：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> T1.*, T2.* <span class="keyword">from</span> table1 T1 <span class="keyword">join</span> table2 T2 <span class="keyword">where</span> <span class="number">1</span>=<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>注意在Hive的Strict模式下不能用这种语法，因为这样会产生笛卡尔集，而这种模式禁止产生笛卡尔集。需要先用set hive.mapred.mode=nonstrict;设为非strict模式就可以用了，或者将where改为on连接。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> T1.*, T2.* <span class="keyword">from</span> table1 T1 <span class="keyword">join</span> table2 T2 <span class="keyword">on</span>  T1.id=T2.id;</span><br></pre></td></tr></table></figure>
+<h2 id="9、关于Strict-Mode"><a href="#9、关于Strict-Mode" class="headerlink" title="9、关于Strict Mode"></a>9、关于Strict Mode</h2><p>Hive中的严格模式可以防止用户发出（可以有问题）的查询无意中造成不良的影响。 将hive.mapred.mode设置成strict可以禁止三种类型的查询：</p>
+<p>1）、在一个分区表上，如果没有在WHERE条件中指明具体的分区，那么这是不允许的，换句话说，不允许在分区表上全表扫描。这种限制的原因是分区表通常会持非常大的数据集并且可能数据增长迅速，对这样的一个大表做全表扫描会消耗大量资源，必须要再WHERE过滤条件中具体指明分区才可以执行成功的查询。</p>
+<p>2）、第二种是禁止执行有ORDER BY的排序要求但没有LIMIT语句的HiveQL查询。因为ORDER BY全局查询会导致有一个单一的reducer对所有的查询结果排序，如果对大数据集做排序，这将导致不可预期的执行时间，必须要加上limit条件才可以执行成功的查询。</p>
+<p>3）、第三种是禁止产生笛卡尔集。在JION接连查询中没有ON连接key而通过WHERE条件语句会产生笛卡尔集，需要改为JOIN…ON语句。</p>
+<h2 id="10、Refer："><a href="#10、Refer：" class="headerlink" title="10、Refer："></a>10、Refer：</h2><p>[1] Hive Query- Joining two tables on three joining conditions with OR operator</p>
+<p><a href="http://stackoverflow.com/questions/16272804/hive-query-joining-two-tables-on-three-joining-conditions-with-or-operator" target="_blank" rel="noopener">http://stackoverflow.com/questions/16272804/hive-query-joining-two-tables-on-three-joining-conditions-with-or-operator</a></p>
+<p>[2] LanguageManual JoinOptimization</p>
+<p><a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+JoinOptimization" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/Hive/LanguageManual+JoinOptimization</a></p>
+<p>[3] hive 执行计划</p>
+<p><a href="http://yychao.iteye.com/blog/1749562" target="_blank" rel="noopener">http://yychao.iteye.com/blog/1749562</a></p>
+<p>[4] Hive SQL解析/执行计划生成流程分析</p>
+<p><a href="http://yanbohappy.sinaapp.com/?p=265" target="_blank" rel="noopener">http://yanbohappy.sinaapp.com/?p=265</a></p>
+<p>[5] 数据仓库中的SQL性能优化（Hive篇）</p>
+<p><a href="http://www.zihou.me/html/2014/02/12/9207.html" target="_blank" rel="noopener">http://www.zihou.me/html/2014/02/12/9207.html</a></p>
+<p>[6] Hive优化以及执行原理</p>
+<p><a href="http://www.smartcitychina.cn/upload/2014-01/14012015376829.pdf" target="_blank" rel="noopener">http://www.smartcitychina.cn/upload/2014-01/14012015376829.pdf</a></p>
+<p>[7] Hive作业优化总结</p>
+<p><a href="http://my.oschina.net/yangzhiyuan/blog/262910" target="_blank" rel="noopener">http://my.oschina.net/yangzhiyuan/blog/262910</a></p>
+<p>[8] Hive连接产生笛卡尔集</p>
+<p><a href="http://blog.javachen.com/2013/10/17/cartesian-product-in-hive-inner-join/#" target="_blank" rel="noopener">http://blog.javachen.com/2013/10/17/cartesian-product-in-hive-inner-join/#</a></p>
+<hr>
+<ul>
+<li>Author: <a href="https://my.oschina.net/leejun2005/blog" target="_blank" rel="noopener">xrzs</a></li>
+<li>Source: <a href="https://oschina.net" target="_blank" rel="noopener">开源中国</a></li>
+<li>Link: <a href="https://my.oschina.net/leejun2005/blog/307812" target="_blank" rel="noopener">一例 Hive join 优化实战</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hive/" rel="tag"># Hive</a>
+          
+            <a href="/tags/SQL/" rel="tag"># SQL</a>
+          
+            <a href="/tags/Join/" rel="tag"># Join</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/2014-01-23-mt-confhub/" rel="next" title="数据开放平台的配置管理">
+                <i class="fa fa-chevron-left"></i> 数据开放平台的配置管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/2014-02-14-hive-sql-to-mapreduce/" rel="prev" title="Hive SQL 的编译过程">
+                Hive SQL 的编译过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

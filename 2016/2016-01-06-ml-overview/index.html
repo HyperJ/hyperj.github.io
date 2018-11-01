@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1.引言提起笔来写这篇博客，突然有点愧疚和尴尬。愧疚的是，工作杂事多，加之懒癌严重，导致这个系列一直没有更新，向关注该系列的同学们道个歉。尴尬的是，按理说，机器学习介绍与算法一览应该放在最前面写，详细的应用建议应该在讲完机器学习常用算法之后写，突然莫名奇妙在中间插播这么一篇，好像有点打乱主线。  老话说『亡羊补牢，为时未晚』，前面开头忘讲的东西，咱在这块儿补上。我们先带着大家过一遍传统机器学习算法">
+<meta name="keywords" content="Machine-Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习系列(4)_机器学习算法一览，应用建议与解决思路">
+<meta property="og:url" content="http://hyperj.github.com/2016/2016-01-06-ml-overview/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="1.引言提起笔来写这篇博客，突然有点愧疚和尴尬。愧疚的是，工作杂事多，加之懒癌严重，导致这个系列一直没有更新，向关注该系列的同学们道个歉。尴尬的是，按理说，机器学习介绍与算法一览应该放在最前面写，详细的应用建议应该在讲完机器学习常用算法之后写，突然莫名奇妙在中间插播这么一篇，好像有点打乱主线。  老话说『亡羊补牢，为时未晚』，前面开头忘讲的东西，咱在这块儿补上。我们先带着大家过一遍传统机器学习算法">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptml_algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Regression-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Instance-based-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Decision-Tree-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Bayesian-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Clustering-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Assoication-Rule-Learning-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Artificial-Neural-Network-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Deep-Learning-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Dimensional-Reduction-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/Ensemble-Algorithms.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptsklearn_ml_cheat_sheet.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_concept6_rows.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptpairlot_distrib.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptcov.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_1.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_2.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_concept1114.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptbest_2.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptregularization.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptauto_%20regularization.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptl1_regularization.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_3.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptdata_visualization.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptnon-linear-feature.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptcomplex_model.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptSGDClassifier.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/8-8.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptrandom_projection.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptPCA.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptt-SNE.png">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptloss_function.png">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习系列(4)_机器学习算法一览，应用建议与解决思路">
+<meta name="twitter:description" content="1.引言提起笔来写这篇博客，突然有点愧疚和尴尬。愧疚的是，工作杂事多，加之懒癌严重，导致这个系列一直没有更新，向关注该系列的同学们道个歉。尴尬的是，按理说，机器学习介绍与算法一览应该放在最前面写，详细的应用建议应该在讲完机器学习常用算法之后写，突然莫名奇妙在中间插播这么一篇，好像有点打乱主线。  老话说『亡羊补牢，为时未晚』，前面开头忘讲的东西，咱在这块儿补上。我们先带着大家过一遍传统机器学习算法">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2016/01/06/ml-overview/ml_conceptml_algorithms.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2016/2016-01-06-ml-overview/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习系列(4)_机器学习算法一览，应用建议与解决思路 | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2016/2016-01-06-ml-overview/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">机器学习系列(4)_机器学习算法一览，应用建议与解决思路
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-01-06 00:00:00" itemprop="dateCreated datePublished" datetime="2016-01-06T00:00:00+08:00">2016-01-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Machine-Learning/" itemprop="url" rel="index"><span itemprop="name">Machine-Learning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1.引言"></a>1.引言</h2><p>提起笔来写这篇博客，突然有点愧疚和尴尬。愧疚的是，工作杂事多，加之懒癌严重，导致这个系列一直没有更新，向关注该系列的同学们道个歉。尴尬的是，按理说，机器学习介绍与算法一览应该放在最前面写，详细的应用建议应该在讲完机器学习常用算法之后写，突然莫名奇妙在中间插播这么一篇，好像有点打乱主线。 </p>
+<p>老话说『亡羊补牢，为时未晚』，前面开头忘讲的东西，咱在这块儿补上。我们先带着大家过一遍传统机器学习算法，基本思想和用途。把问题解决思路和方法应用建议提前到这里的想法也很简单，希望能提前给大家一些小建议，对于某些容易出错的地方也先给大家打个预防针，这样在理解后续相应机器学习算法之后，使用起来也有一定的章法。</p>
+<h2 id="2-机器学习算法简述"><a href="#2-机器学习算法简述" class="headerlink" title="2.机器学习算法简述"></a>2.机器学习算法简述</h2><p>按照不同的分类标准，可以把机器学习的算法做不同的分类。</p>
+<h3 id="2-1-从机器学习问题角度分类"><a href="#2-1-从机器学习问题角度分类" class="headerlink" title="2.1 从机器学习问题角度分类"></a>2.1 从机器学习问题角度分类</h3><p>我们先从机器学习问题本身分类的角度来看，我们可以分成下列类型的算法：</p>
+<p><strong>监督学习算法</strong></p>
+<p>机器学习中有一大部分的问题属于『监督学习』的范畴，简单口语化地说明，这类问题中，给定的训练样本中，每个样本的输入x都对应一个确定的结果y，我们需要训练出一个模型(数学上看是一个x→y的映射关系f)，在未知的样本x′给定后，我们能对结果y′做出预测。</p>
+<p>这里的预测结果如果是离散值(很多时候是类别类型，比如邮件分类问题中的垃圾邮件/普通邮件，比如用户会/不会购买某商品)，那么我们把它叫做分类问题(classification problem)；如果预测结果是连续值(比如房价，股票价格等等)，那么我们把它叫做回归问题(regression problem)。</p>
+<p>有一系列的机器学习算法是用以解决监督学习问题的，比如最经典的用于分类问题的朴素贝叶斯、逻辑回归、支持向量机等等；比如说用于回归问题的线性回归等等。</p>
+<p><strong>无监督学习</strong></p>
+<p>有另外一类问题，给我们的样本并没有给出『标签/标准答案』，就是一系列的样本。而我们需要做的事情是，在一些样本中抽取出通用的规则。这叫做『无监督学习』。包括关联规则和聚类算法在内的一系列机器学习算法都属于这个范畴。</p>
+<p><strong>半监督学习</strong></p>
+<p>这类问题给出的训练数据，有一部分有标签，有一部分没有标签。我们想学习出数据组织结构的同时，也能做相应的预测。此类问题相对应的机器学习算法有自训练(Self-Training)、直推学习(Transductive Learning)、生成式模型(Generative Model)等。</p>
+<p>总体说来，最常见是前两类问题，而对应前两类问题的一些机器学习算法如下：</p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptml_algorithms.png" alt=""></p>
+<h3 id="2-2-从算法的功能角度分类"><a href="#2-2-从算法的功能角度分类" class="headerlink" title="2.2 从算法的功能角度分类"></a>2.2 从算法的功能角度分类</h3><p>我们也可以从算法的共性(比如功能，运作方式)角度对机器学习算法分类。下面我们根据算法的共性去对它们归个类。不过需要注意的是，我们下面的归类方法可能对分类和回归有比较强的倾向性，而这两类问题也是最常遇到的。</p>
+<h4 id="2-2-1-回归算法-Regression-Algorithms"><a href="#2-2-1-回归算法-Regression-Algorithms" class="headerlink" title="2.2.1 回归算法(Regression Algorithms)"></a>2.2.1 回归算法(Regression Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Regression-Algorithms.png" alt=""></p>
+<p>回归算法是一种通过最小化预测值与实际结果值之间的差距，而得到输入特征之间的最佳组合方式的一类算法。对于连续值预测有线性回归等，而对于离散值/类别预测，我们也可以把逻辑回归等也视作回归算法的一种，常见的回归算法如下：</p>
+<ul>
+<li>Ordinary Least Squares Regression (OLSR)</li>
+<li>Linear Regression</li>
+<li>Logistic Regression</li>
+<li>Stepwise Regression</li>
+<li>Locally Estimated Scatterplot Smoothing (LOESS)</li>
+<li>Multivariate Adaptive Regression Splines (MARS)</li>
+</ul>
+<h4 id="2-2-2-基于实例的算法-Instance-based-Algorithms"><a href="#2-2-2-基于实例的算法-Instance-based-Algorithms" class="headerlink" title="2.2.2 基于实例的算法(Instance-based Algorithms)"></a>2.2.2 基于实例的算法(Instance-based Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Instance-based-Algorithms.png" alt=""></p>
+<p>这里所谓的基于实例的算法，我指的是我们最后建成的模型，对原始数据样本实例依旧有很强的依赖性。这类算法在做预测决策时，一般都是使用某类相似度准则，去比对待预测的样本和原始样本的相近度，再给出相应的预测结果。常见的基于实例的算法有：</p>
+<ul>
+<li>k-Nearest Neighbour (kNN)</li>
+<li>Learning Vector Quantization (LVQ)</li>
+<li>Self-Organizing Map (SOM)</li>
+<li>Locally Weighted Learning (LWL)</li>
+</ul>
+<h4 id="2-2-3-决策树类算法-Decision-Tree-Algorithms"><a href="#2-2-3-决策树类算法-Decision-Tree-Algorithms" class="headerlink" title="2.2.3 决策树类算法(Decision Tree Algorithms)"></a>2.2.3 决策树类算法(Decision Tree Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Decision-Tree-Algorithms.png" alt=""></p>
+<p>决策树类算法，会基于原始数据特征，构建一颗包含很多决策路径的树。预测阶段选择路径进行决策。常见的决策树算法包括：</p>
+<ul>
+<li>Classification and Regression Tree (CART)</li>
+<li>Iterative Dichotomiser 3 (ID3)</li>
+<li>C4.5 and C5.0 (different versions of a powerful approach)</li>
+<li>Chi-squared Automatic Interaction Detection (CHAID)</li>
+<li>M5</li>
+<li>Conditional Decision Trees</li>
+</ul>
+<h4 id="2-2-4-贝叶斯类算法-Bayesian-Algorithms"><a href="#2-2-4-贝叶斯类算法-Bayesian-Algorithms" class="headerlink" title="2.2.4 贝叶斯类算法(Bayesian Algorithms)"></a>2.2.4 贝叶斯类算法(Bayesian Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Bayesian-Algorithms.png" alt=""></p>
+<p>这里说的贝叶斯类算法，指的是在分类和回归问题中，隐含使用了贝叶斯原理的算法。包括：</p>
+<ul>
+<li>Naive Bayes</li>
+<li>Gaussian Naive Bayes</li>
+<li>Multinomial Naive Bayes</li>
+<li>Averaged One-Dependence Estimators (AODE)</li>
+<li>Bayesian Belief Network (BBN)</li>
+<li>Bayesian Network (BN)</li>
+</ul>
+<h4 id="2-2-5-聚类算法-Clustering-Algorithms"><a href="#2-2-5-聚类算法-Clustering-Algorithms" class="headerlink" title="2.2.5 聚类算法(Clustering Algorithms)"></a>2.2.5 聚类算法(Clustering Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Clustering-Algorithms.png" alt=""></p>
+<p>聚类算法做的事情是，把输入样本聚成围绕一些中心的『数据团』，以发现数据分布结构的一些规律。常用的聚类算法包括：</p>
+<ul>
+<li>K-Means</li>
+<li>Hierarchical Clustering</li>
+<li>Expectation Maximisation (EM)</li>
+</ul>
+<h4 id="2-2-6-关联规则算法-Association-Rule-Learning-Algorithms"><a href="#2-2-6-关联规则算法-Association-Rule-Learning-Algorithms" class="headerlink" title="2.2.6 关联规则算法(Association Rule Learning Algorithms)"></a>2.2.6 关联规则算法(Association Rule Learning Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Assoication-Rule-Learning-Algorithms.png" alt=""></p>
+<p>关联规则算法是这样一类算法：它试图抽取出，最能解释观察到的训练样本之间关联关系的规则，也就是获取一个事件和其他事件之间依赖或关联的知识，常见的关联规则算法有：</p>
+<ul>
+<li>Apriori algorithm</li>
+<li>Eclat algorithm</li>
+</ul>
+<h4 id="2-2-7-人工神经网络类算法-Artificial-Neural-Network-Algorithms"><a href="#2-2-7-人工神经网络类算法-Artificial-Neural-Network-Algorithms" class="headerlink" title="2.2.7 人工神经网络类算法(Artificial Neural Network Algorithms)"></a>2.2.7 人工神经网络类算法(Artificial Neural Network Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Artificial-Neural-Network-Algorithms.png" alt=""></p>
+<p>这是受人脑神经元工作方式启发而构造的一类算法。需要提到的一点是，我把『深度学习』单拎出来了，这里说的人工神经网络偏向于更传统的感知算法，主要包括：</p>
+<ul>
+<li>Perceptron</li>
+<li>Back-Propagation</li>
+<li>Radial Basis Function Network (RBFN)</li>
+</ul>
+<h4 id="2-2-8-深度学习-Deep-Learning-Algorithms"><a href="#2-2-8-深度学习-Deep-Learning-Algorithms" class="headerlink" title="2.2.8 深度学习(Deep Learning Algorithms)"></a>2.2.8 深度学习(Deep Learning Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Deep-Learning-Algorithms.png" alt=""></p>
+<p>深度学习是近年来非常火的机器学习领域，相对于上面列的人工神经网络算法，它通常情况下，有着更深的层次和更复杂的结构。有兴趣的同学可以看看我们另一个系列机器学习与计算机视觉，最常见的深度学习算法包括：</p>
+<ul>
+<li>Deep Boltzmann Machine (DBM)</li>
+<li>Deep Belief Networks (DBN)</li>
+<li>Convolutional Neural Network (CNN)</li>
+<li>Stacked Auto-Encoders</li>
+</ul>
+<h4 id="2-2-9-降维算法-Dimensionality-Reduction-Algorithms"><a href="#2-2-9-降维算法-Dimensionality-Reduction-Algorithms" class="headerlink" title="2.2.9 降维算法(Dimensionality Reduction Algorithms)"></a>2.2.9 降维算法(Dimensionality Reduction Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Dimensional-Reduction-Algorithms.png" alt=""></p>
+<p>从某种程度上说，降维算法和聚类其实有点类似，因为它也在试图发现原始训练数据的固有结构，但是降维算法在试图，用更少的信息(更低维的信息)总结和描述出原始信息的大部分内容。 </p>
+<p>有意思的是，降维算法一般在数据的可视化，或者是降低数据计算空间有很大的作用。它作为一种机器学习的算法，很多时候用它先处理数据，再灌入别的机器学习算法学习。主要的降维算法包括：</p>
+<ul>
+<li>Principal Component Analysis (PCA)</li>
+<li>Principal Component Regression (PCR)</li>
+<li>Partial Least Squares Regression (PLSR)</li>
+<li>Sammon Mapping</li>
+<li>Multidimensional Scaling (MDS)</li>
+<li>Linear Discriminant Analysis (LDA)</li>
+<li>Mixture Discriminant Analysis (MDA)</li>
+<li>Quadratic Discriminant Analysis (QDA)</li>
+<li>Flexible Discriminant Analysis (FDA)</li>
+</ul>
+<h4 id="2-2-10-模型融合算法-Ensemble-Algorithms"><a href="#2-2-10-模型融合算法-Ensemble-Algorithms" class="headerlink" title="2.2.10 模型融合算法(Ensemble Algorithms)"></a>2.2.10 模型融合算法(Ensemble Algorithms)</h4><p><img src="/assets/images/2016/01/06/ml-overview/Ensemble-Algorithms.png" alt=""></p>
+<p>严格意义上来说，这不算是一种机器学习算法，而更像是一种优化手段/策略，它通常是结合多个简单的弱机器学习算法，去做更可靠的决策。拿分类问题举个例，直观的理解，就是单个分类器的分类是可能出错，不可靠的，但是如果多个分类器投票，那可靠度就会高很多。常用的模型融合增强方法包括：</p>
+<ul>
+<li>Random Forest</li>
+<li>Boosting</li>
+<li>Bootstrapped Aggregation (Bagging)</li>
+<li>AdaBoost</li>
+<li>Stacked Generalization (blending)</li>
+<li>Gradient Boosting Machines (GBM)</li>
+<li>Gradient Boosted Regression Trees (GBRT)</li>
+</ul>
+<h3 id="2-3-机器学习算法使用图谱"><a href="#2-3-机器学习算法使用图谱" class="headerlink" title="2.3 机器学习算法使用图谱"></a>2.3 机器学习算法使用图谱</h3><p>scikit-learn作为一个丰富的Python机器学习库，实现了绝大多数机器学习的算法，有相当多的人在使用，于是我这里很无耻地把machine learning cheat sheet for sklearn搬过来了，原文可以看这里。哈哈，既然讲机器学习，我们就用机器学习的语言来解释一下，这是针对实际应用场景的各种条件限制，对scikit-learn里完成的算法构建的一颗决策树，每一组条件都是对应一条路径，能找到相对较为合适的一些解决方法，具体如下：</p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptsklearn_ml_cheat_sheet.png" alt=""></p>
+<p>首先样本量如果非常少的话，其实所有的机器学习算法都没有办法从里面『学到』通用的规则和模式，so多弄点数据是王道。然后根据问题是有/无监督学习和连续值/离散值预测，分成了分类、聚类、回归和维度约减四个方法类，每个类里根据具体情况的不同，又有不同的处理方法。</p>
+<h2 id="3-机器学习问题解决思路"><a href="#3-机器学习问题解决思路" class="headerlink" title="3. 机器学习问题解决思路"></a>3. 机器学习问题解决思路</h2><p>上面带着代价走马观花过了一遍机器学习的若干算法，下面我们试着总结总结在拿到一个实际问题的时候，如果着手使用机器学习算法去解决问题，其中的一些注意点以及核心思路。主要包括以下内容：</p>
+<ul>
+<li>拿到数据后怎么了解数据(可视化)</li>
+<li>选择最贴切的机器学习算法</li>
+<li>定位模型状态(过/欠拟合)以及解决方法</li>
+<li>大量极的数据的特征分析与可视化</li>
+<li>各种损失函数(loss function)的优缺点及如何选择</li>
+</ul>
+<p>多说一句，这里写的这个小教程，主要是作为一个通用的建议和指导方案，你不一定要严格按照这个流程解决机器学习问题。</p>
+<h3 id="3-1-数据与可视化"><a href="#3-1-数据与可视化" class="headerlink" title="3.1 数据与可视化"></a>3.1 数据与可视化</h3><p>我们先使用scikit-learn的make_classification函数来生产一份分类数据，然后模拟一下拿到实际数据后我们需要做的事情。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#numpy科学计算工具箱</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="comment">#使用make_classification构造1000个样本，每个样本有20个feature</span></span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_classification</span><br><span class="line">X, y = make_classification(<span class="number">1000</span>, n_features=<span class="number">20</span>, n_informative=<span class="number">2</span>, </span><br><span class="line">                           n_redundant=<span class="number">2</span>, n_classes=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment">#存为dataframe格式</span></span><br><span class="line"><span class="keyword">from</span> pandas <span class="keyword">import</span> DataFrame</span><br><span class="line">df = DataFrame(np.hstack((X, y[:, <span class="keyword">None</span>])),columns = range(<span class="number">20</span>) + [<span class="string">"class"</span>])</span><br></pre></td></tr></table></figure>
+<p>我们生成了一份包含1000个分类数据样本的数据集，每个样本有20个数值特征。同时我们把数据存储至pandas中的DataFrame数据结构中。我们取前几行的数据看一眼：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[:<span class="number">6</span>]</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_concept6_rows.png" alt=""></p>
+<p>不幸的是，肉眼看数据，尤其是维度稍微高点的时候，很有可能看花了也看不出看不出任何线索。幸运的是，我们对于图像的理解力，比数字好太多，而又有相当多的工具可以帮助我们『可视化』数据分布。</p>
+<blockquote>
+<p>我们在处理任何数据相关的问题时，了解数据都是很有必要的，而可视化可以帮助我们更好地直观理解数据的分布和特性</p>
+</blockquote>
+<p>数据的可视化有很多工具包可以用，比如下面我们用来做数据可视化的工具包Seaborn。最简单的可视化就是数据散列分布图和柱状图，这个可以用Seanborn的pairplot来完成。以下图中2种颜色表示2种不同的类，因为20维的可视化没有办法在平面表示，我们取出了一部分维度，两两组成pair看数据在这2个维度平面上的分布状况，代码和结果如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"><span class="comment">#使用pairplot去看不同特征维度pair下数据的空间分布状况</span></span><br><span class="line">_ = sns.pairplot(df[:<span class="number">50</span>], vars=[<span class="number">8</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">14</span>, <span class="number">19</span>], hue=<span class="string">"class"</span>, size=<span class="number">1.5</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptpairlot_distrib.png" alt=""></p>
+<p>我们从散列图和柱状图上可以看出，确实有些维度的特征相对其他维度，有更好的区分度，比如第11维和14维看起来很有区分度。这两个维度上看，数据点是近似线性可分的。而12维和19维似乎呈现出了很高的负相关性。接下来我们用Seanborn中的corrplot来计算计算各维度特征之间(以及最后的类别)的相关性。代码和结果图如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">plt.figure(figsize=(<span class="number">12</span>, <span class="number">10</span>))</span><br><span class="line">_ = sns.corrplot(df, annot=<span class="keyword">False</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptcov.png" alt=""></p>
+<p>相关性图很好地印证了我们之前的想法，可以看到第11维特征和第14维特征和类别有极强的相关性，同时它们俩之间也有极高的相关性。而第12维特征和第19维特征却呈现出极强的负相关性。强相关的特征其实包含了一些冗余的特征，而除掉上图中颜色较深的特征，其余特征包含的信息量就没有这么大了，它们和最后的类别相关度不高，甚至各自之间也没什么先惯性。</p>
+<p>插一句，这里的维度只有20，所以这个相关度计算并不费太大力气，然而实际情形中，你完全有可能有远高于这个数字的特征维度，同时样本量也可能多很多，那种情形下我们可能要先做一些处理，再来实现可视化了。别着急，一会儿我们会讲到。</p>
+<h3 id="3-2-机器学习算法选择"><a href="#3-2-机器学习算法选择" class="headerlink" title="3.2 机器学习算法选择"></a>3.2 机器学习算法选择</h3><p>数据的情况我们大致看了一眼，确定一些特征维度之后，我们可以考虑先选用机器学习算法做一个baseline的系统出来了。这里我们继续参照上面提到过的机器学习算法使用图谱。 </p>
+<p>我们只有1000个数据样本，是分类问题，同时是一个有监督学习，因此我们根据图谱里教的方法，使用LinearSVC(support vector classification with linear kernel)试试。注意，LinearSVC需要选择正则化方法以缓解过拟合问题；我们这里选择使用最多的L2正则化，并把惩罚系数C设为10。我们改写一下sklearn中的学习曲线绘制函数，画出训练集和交叉验证集上的得分：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> LinearSVC</span><br><span class="line"><span class="keyword">from</span> sklearn.learning_curve <span class="keyword">import</span> learning_curve</span><br><span class="line"><span class="comment">#绘制学习曲线，以确定模型的状况</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_learning_curve</span><span class="params">(estimator, title, X, y, ylim=None, cv=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                        train_sizes=np.linspace<span class="params">(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>)</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    画出data在某模型上的learning curve.</span></span><br><span class="line"><span class="string">    参数解释</span></span><br><span class="line"><span class="string">    ----------</span></span><br><span class="line"><span class="string">    estimator : 你用的分类器。</span></span><br><span class="line"><span class="string">    title : 表格的标题。</span></span><br><span class="line"><span class="string">    X : 输入的feature，numpy类型</span></span><br><span class="line"><span class="string">    y : 输入的target vector</span></span><br><span class="line"><span class="string">    ylim : tuple格式的(ymin, ymax), 设定图像中纵坐标的最低点和最高点</span></span><br><span class="line"><span class="string">    cv : 做cross-validation的时候，数据分成的份数，其中一份作为cv集，其余n-1份作为training(默认为3份)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    plt.figure()</span><br><span class="line">    train_sizes, train_scores, test_scores = learning_curve(</span><br><span class="line">        estimator, X, y, cv=<span class="number">5</span>, n_jobs=<span class="number">1</span>, train_sizes=train_sizes)</span><br><span class="line">    train_scores_mean = np.mean(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    train_scores_std = np.std(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_mean = np.mean(test_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_std = np.std(test_scores, axis=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    plt.fill_between(train_sizes, train_scores_mean - train_scores_std,</span><br><span class="line">                     train_scores_mean + train_scores_std, alpha=<span class="number">0.1</span>,</span><br><span class="line">                     color=<span class="string">"r"</span>)</span><br><span class="line">    plt.fill_between(train_sizes, test_scores_mean - test_scores_std,</span><br><span class="line">                     test_scores_mean + test_scores_std, alpha=<span class="number">0.1</span>, color=<span class="string">"g"</span>)</span><br><span class="line">    plt.plot(train_sizes, train_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"r"</span>,</span><br><span class="line">             label=<span class="string">"Training score"</span>)</span><br><span class="line">    plt.plot(train_sizes, test_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"g"</span>,</span><br><span class="line">             label=<span class="string">"Cross-validation score"</span>)</span><br><span class="line"></span><br><span class="line">    plt.xlabel(<span class="string">"Training examples"</span>)</span><br><span class="line">    plt.ylabel(<span class="string">"Score"</span>)</span><br><span class="line">    plt.legend(loc=<span class="string">"best"</span>)</span><br><span class="line">    plt.grid(<span class="string">"on"</span>) </span><br><span class="line">    <span class="keyword">if</span> ylim:</span><br><span class="line">        plt.ylim(ylim)</span><br><span class="line">    plt.title(title)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">#少样本的情况情况下绘出学习曲线</span></span><br><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">10.0</span>), <span class="string">"LinearSVC(C=10.0)"</span>,</span><br><span class="line">                    X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.01</span>),</span><br><span class="line">                    train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_1.png" alt=""></p>
+<p>这幅图上，我们发现随着样本量的增加，训练集上的得分有一定程度的下降，交叉验证集上的得分有一定程度的上升，但总体说来，两者之间有很大的差距，训练集上的准确度远高于交叉验证集。这其实意味着我们的模型处于过拟合的状态，也即模型太努力地刻画训练集，一不小心把很多噪声的分布也拟合上了，导致在新数据上的泛化能力变差了。</p>
+<h4 id="3-2-1-过拟合的定位与解决"><a href="#3-2-1-过拟合的定位与解决" class="headerlink" title="3.2.1 过拟合的定位与解决"></a>3.2.1 过拟合的定位与解决</h4><p>问题来了，过拟合咋办？ </p>
+<p>针对过拟合，有几种办法可以处理：</p>
+<p><strong>增大样本量</strong></p>
+<p>这个比较好理解吧，过拟合的主要原因是模型太努力地去记住训练样本的分布状况，而加大样本量，可以使得训练集的分布更加具备普适性，噪声对整体的影响下降。恩，我们提高点样本量试试：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#增大一些样本量</span></span><br><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">10.0</span>), <span class="string">"LinearSVC(C=10.0)"</span>,</span><br><span class="line">                    X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.1</span>),</span><br><span class="line">                    train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_2.png" alt=""></p>
+<p>是不是发现问题好了很多？随着我们增大训练样本量，我们发现训练集和交叉验证集上的得分差距在减少，最后它们已经非常接近了。增大样本量，最直接的方法当然是想办法去采集相同场景下的新数据，如果实在做不到，也可以试试在已有数据的基础上做一些人工的处理生成新数据(比如图像识别中，我们可能可以对图片做镜像变换、旋转等等)，当然，这样做一定要谨慎，强烈建议想办法采集真实数据。</p>
+<p><strong>减少特征的量(只用我们觉得有效的特征)</strong></p>
+<p>比如在这个例子中，我们之前的数据可视化和分析的结果表明，第11和14维特征包含的信息对识别类别非常有用，我们可以只用它们。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">10.0</span>), <span class="string">"LinearSVC(C=10.0) Features: 11&amp;14"</span>, X[:, [<span class="number">11</span>, <span class="number">14</span>]], y, ylim=(<span class="number">0.8</span>, <span class="number">1.0</span>), train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_concept1114.png" alt=""></p>
+<p>从上图上可以看出，过拟合问题也得到一定程度的缓解。不过我们这是自己观察后，手动选出11和14维特征。那能不能自动进行特征组合和选择呢，其实我们当然可以遍历特征的组合样式，然后再进行特征选择(前提依旧是这里特征的维度不高，如果高的话，遍历所有的组合是一个非常非常非常耗时的过程！！)：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_selection <span class="keyword">import</span> SelectKBest, f_classif</span><br><span class="line"><span class="comment"># SelectKBest(f_classif, k=2) 会根据Anova F-value选出 最好的k=2个特征</span></span><br><span class="line"></span><br><span class="line">plot_learning_curve(Pipeline([(<span class="string">"fs"</span>, SelectKBest(f_classif, k=<span class="number">2</span>)), <span class="comment"># select two features</span></span><br><span class="line">                               (<span class="string">"svc"</span>, LinearSVC(C=<span class="number">10.0</span>))]), <span class="string">"SelectKBest(f_classif, k=2) + LinearSVC(C=10.0)"</span>, X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.0</span>), train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptbest_2.png" alt=""></p>
+<p>如果你自己跑一下程序，会发现在我们自己手造的这份数据集上，这个特征筛选的过程超级顺利，但依旧像我们之前提过的一样，这是因为特征的维度不太高。 </p>
+<p>从另外一个角度看，我们之所以做特征选择，是想降低模型的复杂度，而更不容易刻画到噪声数据的分布。从这个角度出发，我们还可以有(1)多项式你和模型中降低多项式次数 (2)神经网络中减少神经网络的层数和每层的结点数 (c)SVM中增加RBF-kernel的bandwidth等方式来降低模型的复杂度。 </p>
+<p>话说回来，即使以上提到的办法降低模型复杂度后，好像能在一定程度上缓解过拟合，但是我们一般还是不建议一遇到过拟合，就用这些方法处理，优先用下面的方法：</p>
+<p><strong>增强正则化作用(比如说这里是减小LinearSVC中的C参数)</strong></p>
+<p>正则化是我认为在不损失信息的情况下，最有效的缓解过拟合现象的方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">0.1</span>), <span class="string">"LinearSVC(C=0.1)"</span>, X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.0</span>), train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptregularization.png" alt=""></p>
+<p>调整正则化系数后，发现确实过拟合现象有一定程度的缓解，但依旧是那个问题，我们现在的系数是自己敲定的，有没有办法可以自动选择最佳的这个参数呢？可以。我们可以在交叉验证集上做grid-search查找最好的正则化系数(对于大数据样本，我们依旧需要考虑时间问题，这个过程可能会比较慢):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.grid_search <span class="keyword">import</span> GridSearchCV</span><br><span class="line">estm = GridSearchCV(LinearSVC(), </span><br><span class="line">                    param_grid=&#123;<span class="string">"C"</span>: [<span class="number">0.001</span>, <span class="number">0.01</span>, <span class="number">0.1</span>, <span class="number">1.0</span>, <span class="number">10.0</span>]&#125;)</span><br><span class="line">plot_learning_curve(estm, <span class="string">"LinearSVC(C=AUTO)"</span>, </span><br><span class="line">                    X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.0</span>),</span><br><span class="line">                    train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br><span class="line"><span class="keyword">print</span> <span class="string">"Chosen parameter on 100 datapoints: %s"</span> % estm.fit(X[:<span class="number">500</span>], y[:<span class="number">500</span>]).best_params_</span><br></pre></td></tr></table></figure>
+<p>在500个点得到的结果是：{‘C’: 0.01} </p>
+<p>使用新的C参数，我们再看看学习曲线： </p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptauto_ regularization.png" alt=""></p>
+<p>对于特征选择的部分，我打算多说几句，我们刚才看过了用sklearn.feature_selection中的SelectKBest来选择特征的过程，也提到了在高维特征的情况下，这个过程可能会非常非常慢。那我们有别的办法可以进行特征选择吗？比如说，我们的分类器自己能否甄别那些特征是对最后的结果有益的？这里有个实际工作中用到的小技巧。</p>
+<p>我们知道：</p>
+<ul>
+<li>l2正则化，它对于最后的特征权重的影响是，尽量打散权重到每个特征维度上，不让权重集中在某些维度上，出现权重特别高的特征。</li>
+<li>而l1正则化，它对于最后的特征权重的影响是，让特征获得的权重稀疏化，也就是对结果影响不那么大的特征，干脆就拿不着权重。</li>
+</ul>
+<p>那基于这个理论，我们可以把SVC中的正则化替换成l1正则化，让其自动甄别哪些特征应该留下权重。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">0.1</span>, penalty=<span class="string">'l1'</span>, dual=<span class="keyword">False</span>), </span><br><span class="line">                    <span class="string">"LinearSVC(C=0.1, penalty='l1')"</span>, X, y, ylim=(<span class="number">0.8</span>, <span class="number">1.0</span>), </span><br><span class="line">                    train_sizes=np.linspace(<span class="number">.05</span>, <span class="number">0.2</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptl1_regularization.png" alt=""></p>
+<p>好了，我们一起来看看最后特征获得的权重：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">estm = LinearSVC(C=<span class="number">0.1</span>, penalty=<span class="string">'l1'</span>, dual=<span class="keyword">False</span>)</span><br><span class="line">estm.fit(X[:<span class="number">450</span>], y[:<span class="number">450</span>])  <span class="comment"># 用450个点来训练</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Coefficients learned: %s"</span> % est.coef_</span><br><span class="line"><span class="keyword">print</span> <span class="string">"Non-zero coefficients: %s"</span> % np.nonzero(estm.coef_)[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>得到结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Coefficients learned: [[ 0.          0.          0.          0.          0.          0.01857999</span><br><span class="line">   0.          0.          0.          0.004135    0.          1.05241369</span><br><span class="line">   0.01971419  0.          0.          0.          0.         -0.05665314</span><br><span class="line">   0.14106505  0.        ]]</span><br><span class="line">Non-zero coefficients: [5 9 11 12 17 18]</span><br></pre></td></tr></table></figure>
+<p>你看，5 9 11 12 17 18这些维度的特征获得了权重，而第11维权重最大，也说明了它影响程度最大。</p>
+<h4 id="3-2-2-欠拟合定位与解决"><a href="#3-2-2-欠拟合定位与解决" class="headerlink" title="3.2.2 欠拟合定位与解决"></a>3.2.2 欠拟合定位与解决</h4><p>我们再随机生成一份数据[1000*20]的数据(但是分布和之前有变化)，重新使用LinearSVC来做分类。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#构造一份环形数据</span></span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> make_circles</span><br><span class="line">X, y = make_circles(n_samples=<span class="number">1000</span>, random_state=<span class="number">2</span>)</span><br><span class="line"><span class="comment">#绘出学习曲线</span></span><br><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">0.25</span>),<span class="string">"LinearSVC(C=0.25)"</span>,X, y, ylim=(<span class="number">0.5</span>, <span class="number">1.0</span>),train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptlearning_curve_3.png" alt=""></p>
+<p>简直烂出翔了有木有，二分类问题，我们做随机猜测，准确率都有0.5，这比随机猜测都高不了多少！！！怎么办？</p>
+<p>不要盲目动手收集更多资料，或者调整正则化参数。我们从学习曲线上其实可以看出来，训练集上的准确度和交叉验证集上的准确度都很低，这其实就对应了我们说的『欠拟合』状态。别急，我们回到我们的数据，还是可视化看看：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f = DataFrame(np.hstack((X, y[:, <span class="keyword">None</span>])), columns = range(<span class="number">2</span>) + [<span class="string">"class"</span>])</span><br><span class="line">_ = sns.pairplot(df, vars=[<span class="number">0</span>, <span class="number">1</span>], hue=<span class="string">"class"</span>, size=<span class="number">3.5</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptdata_visualization.png" alt=""></p>
+<p>你发现什么了，数据根本就没办法线性分割！！！，所以你再找更多的数据，或者调整正则化参数，都是无济于事的！！！</p>
+<p>那我们又怎么解决欠拟合问题呢？通常有下面一些方法：</p>
+<p><strong>调整你的特征(找更有效的特征！！)</strong></p>
+<p>比如说我们观察完现在的数据分布，然后我们先对数据做个映射：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加入原始特征的平方项作为新特征</span></span><br><span class="line">X_extra = np.hstack((X, X[:, [<span class="number">0</span>]]**<span class="number">2</span> + X[:, [<span class="number">1</span>]]**<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line">plot_learning_curve(LinearSVC(C=<span class="number">0.25</span>), <span class="string">"LinearSVC(C=0.25) + distance feature"</span>, X_extra, y, ylim=(<span class="number">0.5</span>, <span class="number">1.0</span>), train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptnon-linear-feature.png" alt=""></p>
+<p>卧槽，少年，这准确率，被吓尿了有木有啊！！！所以你看，选用的特征影响太大了，当然，我们这里是人工模拟出来的数据，分布太明显了，实际数据上，会比这个麻烦一些，但是在特征上面下的功夫还是很有回报的。</p>
+<p><strong>使用更复杂一点的模型(比如说用非线性的核函数)</strong></p>
+<p>我们对模型稍微调整了一下，用了一个复杂一些的非线性rbf kernel：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"><span class="comment"># <span class="doctag">note:</span> we use the original X without the extra feature</span></span><br><span class="line">plot_learning_curve(SVC(C=<span class="number">2.5</span>, kernel=<span class="string">"rbf"</span>, gamma=<span class="number">1.0</span>), <span class="string">"SVC(C=2.5, kernel='rbf', gamma=1.0)"</span>,X, y, ylim=(<span class="number">0.5</span>, <span class="number">1.0</span>), train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptcomplex_model.png" alt=""></p>
+<p>你看，效果依旧很赞。</p>
+<h3 id="3-3-关于大数据样本集和高维特征空间"><a href="#3-3-关于大数据样本集和高维特征空间" class="headerlink" title="3.3 关于大数据样本集和高维特征空间"></a>3.3 关于大数据样本集和高维特征空间</h3><p>我们在小样本的toy dataset上，怎么捣鼓都有好的方法。但是当数据量和特征样本空间膨胀非常厉害时，很多东西就没有那么好使了，至少是一个很耗时的过程。举个例子说，我们现在重新生成一份数据集，但是这次，我们生成更多的数据，更高的特征维度，而分类的类别也提高到5。</p>
+<h4 id="3-3-1-大数据情形下的模型选择与学习曲线"><a href="#3-3-1-大数据情形下的模型选择与学习曲线" class="headerlink" title="3.3.1 大数据情形下的模型选择与学习曲线"></a>3.3.1 大数据情形下的模型选择与学习曲线</h4><p>在上面提到的那样一份数据上，我们用LinearSVC可能就会有点慢了，我们注意到机器学习算法使用图谱推荐我们使用SGDClassifier。其实本质上说，这个模型也是一个线性核函数的模型，不同的地方是，它使用了随机梯度下降做训练，所以每次并没有使用全部的样本，收敛速度会快很多。再多提一点，SGDClassifier对于特征的幅度非常敏感，也就是说，我们在把数据灌给它之前，应该先对特征做幅度调整，当然，用sklearn的StandardScaler可以很方便地完成这一点。</p>
+<p>SGDClassifier每次只使用一部分(mini-batch)做训练，在这种情况下，我们使用交叉验证(cross-validation)并不是很合适，我们会使用相对应的progressive validation：简单解释一下，estimator每次只会拿下一个待训练batch在本次做评估，然后训练完之后，再在这个batch上做一次评估，看看是否有优化。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#生成大样本，高纬度特征数据</span></span><br><span class="line">X, y = make_classification(<span class="number">200000</span>, n_features=<span class="number">200</span>, n_informative=<span class="number">25</span>, n_redundant=<span class="number">0</span>, n_classes=<span class="number">10</span>, class_sep=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#用SGDClassifier做训练，并画出batch在训练前后的得分差</span></span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> SGDClassifier</span><br><span class="line">est = SGDClassifier(penalty=<span class="string">"l2"</span>, alpha=<span class="number">0.001</span>)</span><br><span class="line">progressive_validation_score = []</span><br><span class="line">train_score = []</span><br><span class="line"><span class="keyword">for</span> datapoint <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">199000</span>, <span class="number">1000</span>):</span><br><span class="line">    X_batch = X[datapoint:datapoint+<span class="number">1000</span>]</span><br><span class="line">    y_batch = y[datapoint:datapoint+<span class="number">1000</span>]</span><br><span class="line">    <span class="keyword">if</span> datapoint &gt; <span class="number">0</span>:</span><br><span class="line">        progressive_validation_score.append(est.score(X_batch, y_batch))</span><br><span class="line">    est.partial_fit(X_batch, y_batch, classes=range(<span class="number">10</span>))</span><br><span class="line">    <span class="keyword">if</span> datapoint &gt; <span class="number">0</span>:</span><br><span class="line">        train_score.append(est.score(X_batch, y_batch))</span><br><span class="line"></span><br><span class="line">plt.plot(train_score, label=<span class="string">"train score"</span>)</span><br><span class="line">plt.plot(progressive_validation_score, label=<span class="string">"progressive validation score"</span>)</span><br><span class="line">plt.xlabel(<span class="string">"Mini-batch"</span>)</span><br><span class="line">plt.ylabel(<span class="string">"Score"</span>)</span><br><span class="line">plt.legend(loc=<span class="string">'best'</span>)  </span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p>得到如下的结果： </p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptSGDClassifier.png" alt=""></p>
+<p>从这个图上的得分，我们可以看出在50个mini-batch迭代之后，数据上的得分就已经变化不大了。但是好像得分都不太高，所以我们猜测一下，这个时候我们的数据，处于欠拟合状态。我们刚才在小样本集合上提到了，如果欠拟合，我们可以使用更复杂的模型，比如把核函数设置为非线性的，但遗憾的是像rbf核函数是没有办法和SGDClassifier兼容的。因此我们只能想别的办法了，比如这里，我们可以把SGDClassifier整个替换掉了，用多层感知神经网来完成这个任务，我们之所以会想到多层感知神经网，是因为它也是一个用随机梯度下降训练的算法，同时也是一个非线性的模型。当然根据机器学习算法使用图谱，也可以使用核估计(kernel-approximation)来完成这个事情。</p>
+<h4 id="3-3-2-大数据量下的可视化"><a href="#3-3-2-大数据量下的可视化" class="headerlink" title="3.3.2 大数据量下的可视化"></a>3.3.2 大数据量下的可视化</h4><p>大样本数据的可视化是一个相对比较麻烦的事情，一般情况下我们都要用到降维的方法先处理特征。我们找一个例子来看看，可以怎么做，比如我们数据集取经典的『手写数字集』，首先找个方法看一眼这个图片数据集。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#直接从sklearn中load数据集</span></span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_digits</span><br><span class="line">digits = load_digits(n_class=<span class="number">6</span>)</span><br><span class="line">X = digits.data</span><br><span class="line">y = digits.target</span><br><span class="line">n_samples, n_features = X.shape</span><br><span class="line"><span class="keyword">print</span> <span class="string">"Dataset consist of %d samples with %d features each"</span> % (n_samples, n_features)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制数字示意图</span></span><br><span class="line">n_img_per_row = <span class="number">20</span></span><br><span class="line">img = np.zeros((<span class="number">10</span> * n_img_per_row, <span class="number">10</span> * n_img_per_row))</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(n_img_per_row):</span><br><span class="line">    ix = <span class="number">10</span> * i + <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(n_img_per_row):</span><br><span class="line">        iy = <span class="number">10</span> * j + <span class="number">1</span></span><br><span class="line">        img[ix:ix + <span class="number">8</span>, iy:iy + <span class="number">8</span>] = X[i * n_img_per_row + j].reshape((<span class="number">8</span>, <span class="number">8</span>))</span><br><span class="line"></span><br><span class="line">plt.imshow(img, cmap=plt.cm.binary)</span><br><span class="line">plt.xticks([])</span><br><span class="line">plt.yticks([])</span><br><span class="line">_ = plt.title(<span class="string">'A selection from the 8*8=64-dimensional digits dataset'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/8-8.png" alt=""></p>
+<p>我们总共有1083个训练样本，包含手写数字(0,1,2,3,4,5)，每个样本图片中的像素点平铺开都是64位，这个维度显然是没办法直接可视化的。下面我们基于scikit-learn的示例教程对特征用各种方法做降维处理，再可视化。</p>
+<p><strong>随机投射</strong></p>
+<p>我们先看看，把数据随机投射到两个维度上的结果：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#import所需的package</span></span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> (manifold, decomposition, random_projection)</span><br><span class="line">rp = random_projection.SparseRandomProjection(n_components=<span class="number">2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义绘图函数</span></span><br><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> offsetbox</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_embedding</span><span class="params">(X, title=None)</span>:</span></span><br><span class="line">    x_min, x_max = np.min(X, <span class="number">0</span>), np.max(X, <span class="number">0</span>)</span><br><span class="line">    X = (X - x_min) / (x_max - x_min)</span><br><span class="line"></span><br><span class="line">    plt.figure(figsize=(<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line">    ax = plt.subplot(<span class="number">111</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(X.shape[<span class="number">0</span>]):</span><br><span class="line">        plt.text(X[i, <span class="number">0</span>], X[i, <span class="number">1</span>], str(digits.target[i]),</span><br><span class="line">                 color=plt.cm.Set1(y[i] / <span class="number">10.</span>),</span><br><span class="line">                 fontdict=&#123;<span class="string">'weight'</span>: <span class="string">'bold'</span>, <span class="string">'size'</span>: <span class="number">12</span>&#125;)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> hasattr(offsetbox, <span class="string">'AnnotationBbox'</span>):</span><br><span class="line">        <span class="comment"># only print thumbnails with matplotlib &gt; 1.0</span></span><br><span class="line">        shown_images = np.array([[<span class="number">1.</span>, <span class="number">1.</span>]])  <span class="comment"># just something big</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(digits.data.shape[<span class="number">0</span>]):</span><br><span class="line">            dist = np.sum((X[i] - shown_images) ** <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> np.min(dist) &lt; <span class="number">4e-3</span>:</span><br><span class="line">                <span class="comment"># don't show points that are too close</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            shown_images = np.r_[shown_images, [X[i]]]</span><br><span class="line">            imagebox = offsetbox.AnnotationBbox(</span><br><span class="line">                offsetbox.OffsetImage(digits.images[i], cmap=plt.cm.gray_r),</span><br><span class="line">                X[i])</span><br><span class="line">            ax.add_artist(imagebox)</span><br><span class="line">    plt.xticks([]), plt.yticks([])</span><br><span class="line">    <span class="keyword">if</span> title <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        plt.title(title)</span><br><span class="line"></span><br><span class="line"><span class="comment">#记录开始时间</span></span><br><span class="line">start_time = time.time()</span><br><span class="line">X_projected = rp.fit_transform(X)</span><br><span class="line">plot_embedding(X_projected, <span class="string">"Random Projection of the digits (time: %.3fs)"</span> % (time.time() - start_time))</span><br></pre></td></tr></table></figure>
+<p>结果如下： </p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptrandom_projection.png" alt=""></p>
+<p><strong>PCA降维</strong></p>
+<p>在维度约减/降维领域有一个非常强大的算法叫做PCA(Principal Component Analysis，主成分分析)，它能将原始的绝大多数信息用维度远低于原始维度的几个主成分表示出来。PCA在我们现在的数据集上效果还不错，我们来看看用PCA对原始特征降维至2维后，原始样本在空间的分布状况：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> (manifold, decomposition, random_projection)</span><br><span class="line"><span class="comment">#TruncatedSVD 是 PCA的一种实现</span></span><br><span class="line">X_pca = decomposition.TruncatedSVD(n_components=<span class="number">2</span>).fit_transform(X)</span><br><span class="line"><span class="comment">#记录时间</span></span><br><span class="line">start_time = time.time()</span><br><span class="line">plot_embedding(X_pca,<span class="string">"Principal Components projection of the digits (time: %.3fs)"</span> % (time.time() - start_time))</span><br></pre></td></tr></table></figure>
+<p>得到的结果如下： </p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptPCA.png" alt=""></p>
+<p>我们可以看出，效果还不错，不同的手写数字在2维平面上，显示出了区域集中性。即使它们之间有一定的重叠区域。</p>
+<p>如果我们用一些非线性的变换来做降维操作，从原始的64维降到2维空间，效果更好，比如这里我们用到一个技术叫做t-SNE，sklearn的manifold对其进行了实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> (manifold, decomposition, random_projection)</span><br><span class="line"><span class="comment">#降维</span></span><br><span class="line">tsne = manifold.TSNE(n_components=<span class="number">2</span>, init=<span class="string">'pca'</span>, random_state=<span class="number">0</span>)</span><br><span class="line">start_time = time.time()</span><br><span class="line">X_tsne = tsne.fit_transform(X)</span><br><span class="line"><span class="comment">#绘图</span></span><br><span class="line">plot_embedding(X_tsne,</span><br><span class="line">               <span class="string">"t-SNE embedding of the digits (time: %.3fs)"</span> % (time.time() - start_time))</span><br></pre></td></tr></table></figure>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptt-SNE.png" alt=""></p>
+<p>我们发现结果非常的惊人，似乎这个非线性变换降维过后，仅仅2维的特征，就可以将原始数据的不同类别，在平面上很好地划分开。不过t-SNE也有它的缺点，一般说来，相对于线性变换的降维，它需要更多的计算时间。也不太适合在大数据集上全集使用。</p>
+<h3 id="3-4-损失函数的选择"><a href="#3-4-损失函数的选择" class="headerlink" title="3.4 损失函数的选择"></a>3.4 损失函数的选择</h3><p>损失函数的选择对于问题的解决和优化，非常重要。我们先来看一眼各种不同的损失函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.plot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment"># 改自http://scikit-learn.org/stable/auto_examples/linear_model/plot_sgd_loss_functions.html</span></span><br><span class="line">xmin, xmax = <span class="number">-4</span>, <span class="number">4</span></span><br><span class="line">xx = np.linspace(xmin, xmax, <span class="number">100</span>)</span><br><span class="line">plt.plot([xmin, <span class="number">0</span>, <span class="number">0</span>, xmax], [<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="string">'k-'</span>,</span><br><span class="line">         label=<span class="string">"Zero-one loss"</span>)</span><br><span class="line">plt.plot(xx, np.where(xx &lt; <span class="number">1</span>, <span class="number">1</span> - xx, <span class="number">0</span>), <span class="string">'g-'</span>,</span><br><span class="line">         label=<span class="string">"Hinge loss"</span>)</span><br><span class="line">plt.plot(xx, np.log2(<span class="number">1</span> + np.exp(-xx)), <span class="string">'r-'</span>,</span><br><span class="line">         label=<span class="string">"Log loss"</span>)</span><br><span class="line">plt.plot(xx, np.exp(-xx), <span class="string">'c-'</span>,</span><br><span class="line">         label=<span class="string">"Exponential loss"</span>)</span><br><span class="line">plt.plot(xx, -np.minimum(xx, <span class="number">0</span>), <span class="string">'m-'</span>,</span><br><span class="line">         label=<span class="string">"Perceptron loss"</span>)</span><br><span class="line"></span><br><span class="line">plt.ylim((<span class="number">0</span>, <span class="number">8</span>))</span><br><span class="line">plt.legend(loc=<span class="string">"upper right"</span>)</span><br><span class="line">plt.xlabel(<span class="string">r"Decision function $f(x)$"</span>)</span><br><span class="line">plt.ylabel(<span class="string">"$L(y, f(x))$"</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p>得到结果图像如下：</p>
+<p><img src="/assets/images/2016/01/06/ml-overview/ml_conceptloss_function.png" alt=""></p>
+<p>不同的损失函数有不同的优缺点：</p>
+<ul>
+<li>0-1损失函数(zero-one loss)非常好理解，直接对应分类问题中判断错的个数。但是比较尴尬的是它是一个非凸函数，这意味着其实不是那么实用。</li>
+<li>hinge loss(SVM中使用到的)的健壮性相对较高(对于异常点/噪声不敏感)。但是它没有那么好的概率解释。</li>
+<li>log损失函数(log-loss)的结果能非常好地表征概率分布。因此在很多场景，尤其是多分类场景下，如果我们需要知道结果属于每个类别的置信度，那这个损失函数很适合。缺点是它的健壮性没有那么强，相对hinge loss会对噪声敏感一些。</li>
+<li>多项式损失函数(exponential loss)(AdaBoost中用到的)对离群点/噪声非常非常敏感。但是它的形式对于boosting算法简单而有效。</li>
+<li>感知损失(perceptron loss)可以看做是hinge loss的一个变种。hinge loss对于判定边界附近的点(正确端)惩罚力度很高。而perceptron loss，只要样本的判定类别结果是正确的，它就是满意的，而不管其离判定边界的距离。优点是比hinge loss简单，缺点是因为不是max-margin boundary，所以得到模型的泛化能力没有hinge loss强。</li>
+</ul>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><p>全文到此就结束了。先走马观花看了一遍机器学习的算法，然后给出了对应scikit-learn的『秘密武器』机器学习算法使用图谱，紧接着从了解数据(可视化)、选择机器学习算法、定位过/欠拟合及解决方法、大量极的数据可视化和损失函数优缺点与选择等方面介绍了实际机器学习问题中的一些思路和方法。本文和文章机器学习系列(3)_逻辑回归应用之Kaggle泰坦尼克之灾都提及了一些处理实际机器学习问题的思路和方法，有相似和互补之处，欢迎大家参照着看。</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://blog.csdn.net/han_xiaoyang/article/details/50469334" target="_blank" rel="noopener">机器学习系列(4)_机器学习算法一览，应用建议与解决思路</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine-Learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-11-12-ml-logistic-regression-3/" rel="next" title="机器学习系列(3)_逻辑回归应用之Kaggle泰坦尼克之灾">
+                <i class="fa fa-chevron-left"></i> 机器学习系列(3)_逻辑回归应用之Kaggle泰坦尼克之灾
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/2016-01-20-nlp-basis/" rel="prev" title="从破译外星人文字浅谈自然语言处理的基础">
+                从破译外星人文字浅谈自然语言处理的基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/hyperj-black.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/assets/images/hyperj-black.png?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="为了方便企业选择合适的大数据测试基准，本文将在分析总结现有成果的基础，进一步讨论大数据测试基准应该具有的要素；并以此为基础，对比现有的大数据测试基准；然后重点讨论TPC-DS测试基准。 【编者按】基于业内对大数据技术的需求，各种基于开源技术的商业产品得到了长足的发展。然而对于用户来说，如何才能客观地比较不同的数据管理系统，基准测试的研究也被提了出来。本文中，谭磊讲解了大数据测试基准应该具有的要素，">
+<meta name="keywords" content="BigData,Benchmark,TPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析大数据基准测试——TPC-H or TPC-DS">
+<meta property="og:url" content="http://hyperj.github.com/2015/2015-05-14-bigdata-tpc-benchmarks/index.html">
+<meta property="og:site_name" content="HyperJ&#39;s Blog!">
+<meta property="og:description" content="为了方便企业选择合适的大数据测试基准，本文将在分析总结现有成果的基础，进一步讨论大数据测试基准应该具有的要素；并以此为基础，对比现有的大数据测试基准；然后重点讨论TPC-DS测试基准。 【编者按】基于业内对大数据技术的需求，各种基于开源技术的商业产品得到了长足的发展。然而对于用户来说，如何才能客观地比较不同的数据管理系统，基准测试的研究也被提了出来。本文中，谭磊讲解了大数据测试基准应该具有的要素，">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/1.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/2.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/3.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/4.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/5.jpg">
+<meta property="og:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/6.jpg">
+<meta property="og:updated_time" content="2018-03-11T10:08:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="解析大数据基准测试——TPC-H or TPC-DS">
+<meta name="twitter:description" content="为了方便企业选择合适的大数据测试基准，本文将在分析总结现有成果的基础，进一步讨论大数据测试基准应该具有的要素；并以此为基础，对比现有的大数据测试基准；然后重点讨论TPC-DS测试基准。 【编者按】基于业内对大数据技术的需求，各种基于开源技术的商业产品得到了长足的发展。然而对于用户来说，如何才能客观地比较不同的数据管理系统，基准测试的研究也被提了出来。本文中，谭磊讲解了大数据测试基准应该具有的要素，">
+<meta name="twitter:image" content="http://hyperj.github.com/assets/images/2015/05/14/bigdata-tpc-benchmarks/1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hyperj.github.com/2015/2015-05-14-bigdata-tpc-benchmarks/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>解析大数据基准测试——TPC-H or TPC-DS | HyperJ's Blog!</title>
+  
+
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?35d7ac00b108e4e02793e4abb6d9f575";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HyperJ's Blog!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">Knowledge makes me travel through time and space.</h1>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-work">
+    <a href="/work/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Work</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-projects">
+    <a href="/projects/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Projects</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-collections">
+    <a href="/collections/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-list"></i> <br>Collections</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-specials">
+    <a href="/specials/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-check-square"></i> <br>Specials</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-translations">
+    <a href="/translations/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-exchange"></i> <br>Translations</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-links">
+    <a href="/links/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-link"></i> <br>Links</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-books">
+    <a href="/books/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-book"></i> <br>Books</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hyperj.github.com/2015/2015-05-14-bigdata-tpc-benchmarks/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="HyperJ">
+      <meta itemprop="description" content="Knowledge makes me travel through time and space.">
+      <meta itemprop="image" content="/assets/images/hyperj-black.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HyperJ's Blog!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">解析大数据基准测试——TPC-H or TPC-DS
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-05-14 00:00:00" itemprop="dateCreated datePublished" datetime="2015-05-14T00:00:00+08:00">2015-05-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-03-11 18:08:30" itemprop="dateModified" datetime="2018-03-11T18:08:30+08:00">2018-03-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Benchmark/" itemprop="url" rel="index"><span itemprop="name">Benchmark</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>为了方便企业选择合适的大数据测试基准，本文将在分析总结现有成果的基础，进一步讨论大数据测试基准应该具有的要素；并以此为基础，对比现有的大数据测试基准；然后重点讨论TPC-DS测试基准。</p>
+<p>【编者按】基于业内对大数据技术的需求，各种基于开源技术的商业产品得到了长足的发展。然而对于用户来说，如何才能客观地比较不同的数据管理系统，基准测试的研究也被提了出来。本文中，谭磊讲解了大数据测试基准应该具有的要素，并以此为基础对比了现有的大数据测试基准，然后重点讨论TPC-DS测试基准。</p>
+<p>以下为原文</p>
+<p>随着开源Hapdoop、Map/Reduce、Spark、HDFS、HBASE等技术的商用化，大数据管理技术得到了突飞猛进的发展。一般来说，大数据具有3V特性，即Volume（海量）、Velocity（高速）和Variety（多样）[1]。TPC联合主席、Cisco高级工程师Raghunath Nambiar进一步认为大数据还面临Value（价值）和Veracity（精确）的挑战。如何客观地比较不同数据管理系统，即大数据测试基准的选择，成为一个重要的研究课题。</p>
+<p>事务性能管理委员会(TPC)是目前最知名的数据管理系统评测基准标准化组织。在过去二十多年间，该机构发布了多款数据库评测基准，如TPC-A、TPC-D、TPC-H和TPC-DS，在业界得到了广泛应用[2]。BigBench和BigFrame是对TPC-DS进行多样化的数据扩充的测试基准。近年来，Apache开源社区针对Map/reduce架构开发了多款性能测试用例，如TestDFSIO、teraSort。国内对大数据测试基准的研究起步较晚，尚未建立起权威的测试基准。目前由中国信息通信研究院牵头，联合中科院计算所及国内外知名公司和机构共同制定的大数据测试基准正在金罗密布的测试中[3]。</p>
+<p>为了方便企业选择合适的大数据测试基准，本文将在分析总结现有成果的基础，进一步讨论大数据测试基准应该具有的要素；并以此为基础，对比现有的大数据测试基准；然后重点讨论TPC-DS测试基准。</p>
+<h3 id="大数据测试基准的选择"><a href="#大数据测试基准的选择" class="headerlink" title="大数据测试基准的选择"></a>大数据测试基准的选择</h3><p>企业在选择大数据测试基准时，首先应考虑基准与其自身业务的相关性。</p>
+<ol>
+<li>与其自身业务的相关性</li>
+</ol>
+<p>它主要描述测试基准设定的应用场景是否与企业的实际业务场景类似，如基于社交网络应用的评测基准与银行系统的应用场景就没有什么相关性。不相关的基准，测试结果再好，也没有实际意义。相关性还要考虑测试基准所采用的数据模型是否代表数据仓库的发展方向，如基于星型模型的开发要比基于传统的关系模型开发更加有效。</p>
+<p>当然，一套行之有效的大数据测试基准包含许多其它要素。Jim Gray及金澈清等学者[4]已经对度量选取、模拟数据生成器、工作负载设定、审计等要素进行了详细论述。除此之外，本文还认为测试基准的健壮性、SQL标准的兼容性和通用性/可移植性也是重要的要素。</p>
+<ol start="2">
+<li>模拟数据生成要具有真实性</li>
+</ol>
+<p>它描述了测试基准是否仿真真实应用场景，所产生的模拟数据是否与真实数据相似。</p>
+<ol start="3">
+<li>工作负载的设定具有可扩展性</li>
+</ol>
+<p>它描述该评测基准是否适用于不同规模的计算机系统，许多评测基准会使用标度因子来决定模拟数据的规模，通过调整标度因子来得到不同规模的工作负载。</p>
+<ol start="4">
+<li>度量的选取的可理解性</li>
+</ol>
+<p>它衡量该评测基准是否易于为用户理解，不易为用户理解的基准的可信程度也较低。</p>
+<ol start="5">
+<li>客观性与公正性</li>
+</ol>
+<p>众所周知，在竞技比赛中，一个人不能既是运动员又是裁判员。测试基准好比竞技比赛中的裁判员，应该由中立的第三方机构制定。事实也证明，在各个领域最受欢迎的测试基准都是有第三方机构设计的。过去20多年的经历证明TPC系列基准是数据库领域最为广泛接受的基准。除此之外，第三方机构的审计也是保证证评测结果的客观性与公正性的重要手段。</p>
+<ol start="6">
+<li>健壮性</li>
+</ol>
+<p>测试基准要足够健壮，不能轻易被“hack”，这对测试结果的公平性非常重要。例如对TPC-H的前身TPC-D，通过物理化视图，Oracle的性能比Micosoft的SQLServer高100倍，这些显然是不公平的。因此TPC组织规定TPC-H测试中物理化视图是不和法的。但是除非是专业人员，一般用户很难判定测试过程中视图有没有被物理化。TPC-DS在健壮行方面要好很多，因为它的SQL本身比较复杂，也比较多，Hack起来相对困难，并且只hack几个SQL对整体性能提高有限。</p>
+<ol start="7">
+<li>SQL标准兼容性</li>
+</ol>
+<p>SQL是ANSI为统一各个数据库厂商之间的编程差异定义的标准，已发布SQL86、SQL92、SQL99、SQL2003等版本。这些标准已经被主流的商用（例如Oracle、DB2、SQL server）以及开源的数据库产品（例如MySQL、mSQL和PostgreSQL）的广泛采用。对整个数据库产业的发展起到了巨大的推动作用。大数据是个新兴的领域，它的发展不能完全抛弃原有的应用。如果不能全面支持SQL标准，现有系统的移植非常困难，学习曲线就会变长。</p>
+<ol start="8">
+<li>通用性/可迁移性</li>
+</ol>
+<p>通用性描述是否可在不同数据库系统和架构上实现指定的评测基准。测试基准不应该规定实现的细节，而只需要定义测试规范。DBMS只要遵循规范得到正确的结果，就是合理的测试，无论其基于Map/Reduce、Spark还是其他的技术，也不管其底层存储是用HDFS、HBASE还是其他方式。</p>
+<h3 id="大数据测试基准对比"><a href="#大数据测试基准对比" class="headerlink" title="大数据测试基准对比"></a>大数据测试基准对比</h3><p>经过30几年的研究，传统数据库测试基准的研究已经相当成熟，在各个领域出现了行之有效的测试基准。随着大数据应用的发展，大数据测试基准的研究最近几年逐渐兴起，但大都是在传统的测试基准的基础进行裁剪、扩充、综合。金澈清等学者[4]对数据库基准的发展概述如图1所示。 </p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/1.jpg" alt=""></p>
+<p>本文重点关注被列为大数据测试基准的相关基准、BigFrame[5]以及TPC-DS，对其它的基准本文不再赘述，有兴趣的读者请参阅文[4]。</p>
+<ol>
+<li>Map/reduce性能测试</li>
+</ol>
+<p>如文[4]中所述，MRBench、HiBench、TestDFSIO、Sort/teraSort只是针对Map/Reduce框架，目的是评测运行Map/Reduce框架的集群的性能。CALDA基准尝试比较不同架构在数据管理方面的性能。这些测试过于简单，无法模拟复杂的应用，也不通用。</p>
+<ol start="2">
+<li>YCSB/YCSB++/LinkBench</li>
+</ol>
+<p>这是一组针对网络应用的测试基准。YCSB（Yahoo! Cloud Serving Benchmark）及其扩展YCSB++测试查询回复的延时等云服务系统中云计算的特点，如查询回复的延时、纵向扩展和弹性加速比、并行性测试等。LinkBench是一个基于社交网络应用的评测基准。它仿真Facebook公司的图数据管理应用，包括数据特性、工作负载以及度量等。这些都是公司开发的针对自己特定应用场景的测试基准，很难在整个行业内进行推广。</p>
+<ol start="3">
+<li>BigBench</li>
+</ol>
+<p>BigBench是一款面向商品零售业的基准，它扩展了TPC-DS，综合考虑多种数据模态，增加了半结构化数据Web Log和非结构化数据Reviews。其负载的生成是TPC-DS定制化的版本。BigBench包含30个查询。BigBench基本数据模型如图2所示：</p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/2.jpg" alt=""></p>
+<ol start="4">
+<li>BigFrame</li>
+</ol>
+<p>BigFrame是一个测试基准生成器[5]，用户可以根据自己的需求定制专有测试基准。在目前实现中，其关系模型与BigBench类似，也是基于TPC-DS。同时它扩展了半结构化和非结构化的数据Tweets以及图形化数据Followee/Follower。BigFrame基本数据模型如图3所示：</p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/3.jpg" alt=""></p>
+<p>如文[5]所述，大数据与决策支持系统（DSS）并不是完全独立的，大数据也不能抛弃传统。DSS系统中，只要数据量足够大，都可以认为是大数据问题。被化为大数据测试基准的BigBench和BigFrame的大部分内容都来自于TPC-DS，从这个意义上讲，TPC-DS不但是一种结构数据的大数据测试基准，而且是其它大数据测试基准的基础。</p>
+<h3 id="TPC-DS"><a href="#TPC-DS" class="headerlink" title="TPC-DS"></a>TPC-DS</h3><p>TPC-DS测试基准是TPC组织推出的用于替代TPC-H的下一代决策支持系统测试基准。因此在讨论TPC-DS之前，先介绍一下TPC-H。</p>
+<ol>
+<li>TPC-H</li>
+</ol>
+<p>TPC-H是一款面向商品零售业的决策支持系统测试基准，它定义了8张表，22个查询，遵循SQL92。TPC-H的数据模型如图4所示。TPC-H基准的数据库模式遵循第三范式，叶晓俊教授等学者[6]认为“它的数据表数据特征单一(如数据不倾斜) ，其数据维护功能仅仅限制了潜在的对索引的过度使用，而没有测试DBMS 执行真实数据维护操作——数据提取、转换和加载(ETL) 功能的能力”。同时，新兴的数据仓库开始采用新的模型，如星型模型、雪花模型。TPC-H已经不能精准反映当今数据库系统的真实性能。为此，TPC组织推出了新一代的面向决策应用的TPC-DS 基准。</p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/4.jpg" alt=""></p>
+<ol start="2">
+<li>TPC-DS</li>
+</ol>
+<p>TPC-DS采用星型、雪花型等多维数据模式。它包含7张事实表，17张纬度表平均每张表含有18列。其工作负载包含99个SQL查询，覆盖SQL99和2003的核心部分以及OLAP。这个测试集包含对大数据集的统计、报表生成、联机查询、数据挖掘等复杂应用，测试用的数据和值是有倾斜的，与真实数据一致。可以说TPC-DS是与真实场景非常接近的一个测试集，也是难度较大的一个测试集。</p>
+<p>TPC-DS的这个特点跟大数据的分析挖掘应用非常类似。Hadoop等大数据分析技术也是对海量数据进行大规模的数据分析和深度挖掘，也包含交互式联机查询和统计报表类应用，同时大数据的数据质量也较低，数据分布是真实而不均匀的。因此TPC-DS成为客观衡量多个不同Hadoop版本以及SQL on Hadoop技术的最佳测试集。这个基准测试有以下几个主要特点：</p>
+<ul>
+<li>一共99个测试案例，遵循SQL’99和SQL 2003的语法标准，SQL案例比较复杂</li>
+<li>分析的数据量大，并且测试案例是在回答真实的商业问题</li>
+<li>测试案例中包含各种业务模型（如分析报告型，迭代式的联机分析型，数据挖掘型等）</li>
+<li>几乎所有的测试案例都有很高的IO负载和CPU计算需求</li>
+</ul>
+<p>叶晓俊等学者对这些查询的分部总结如表1所示[6]。典型的Store_Sales的数据模型如图5所示。这个基准测试的完整信息请参考<a href="http://www.tpc.org/tpcds/。" target="_blank" rel="noopener">http://www.tpc.org/tpcds/。</a></p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/5.jpg" alt=""></p>
+<p><img src="/assets/images/2015/05/14/bigdata-tpc-benchmarks/6.jpg" alt=""></p>
+<ol start="3">
+<li>TPC-DS认证现状</li>
+</ol>
+<p>TPC-DS以其高标准、高要求得到大家的广泛认知，理应得到广泛的应用，但是到目前为止还没有任何厂商得到TPC官方的认证。究其原因，本文认为：</p>
+<ul>
+<li>传统的数据库厂商，DBMS系统比较成熟，SQL的支持也相当完善，但是其分布式、并行处理能力欠缺，导致其性能很差。所以传统的厂商不愿意发布测试结果。</li>
+<li>新型的计算模型如Map/Reduce、spark，具有较好的并行处理能力，但是SQL的兼容性比较差，如HiveSQL、SparkSQL只支持40个SQL，从而也无法发布TPC-DS测试报告。尽管如此，各厂商还是通过非TPC官方的途径发布TPC-DS的部分测试结果，以展现其在性能方面的提升。由此可见大家对TPC-DS的程接受度。</li>
+</ul>
+<h3 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h3><p>大数据评测基准用于公平、客观地评测不同大数据库产品/平台的功能和性能，对人们选择合适的大数据分析决策系统具有重要的参考价值。随着国内外各代表性的Hadoop发行版厂商以TPC-DS为标准测评产品，TPC-DS也就逐渐成为了业界公认的大数据系统测试基准。但是随着大数据应用在各行各业的发展，测试基准也需不断与时俱进。大数据测试基准仍然面临着诸多挑战，还需要政府、学术界和工业界的紧密合作。</p>
+<p><strong>编外话</strong>：对于用户来说，产品的测试绝对不是自己可以轻易完成的事情。而为了更好地取信潜在用户，对产品做基准测试应为每个产品/服务提供商的首要工作之一。而据编者所知，国内已经有一些提供商开始从事类似方面的工作，比如星环的TPC-DS 500G的功能、性能及其兼容性测试已经得到上海市计算机软件评测实验室的认证。</p>
+<p>###参考文献</p>
+<ul>
+<li>Big data: Science in the petabyte era. Nature, 2008, 455: 1-136</li>
+<li><a href="http://www.tpc.org" target="_blank" rel="noopener">www.tpc.org</a></li>
+<li><a href="http://www.dca.org.cn" target="_blank" rel="noopener">www.dca.org.cn</a></li>
+<li>金澈清, 钱卫宁, 周敏奇, 周傲英，数据管理系统评测基准：从传统数据库到新兴大数据，计算机学报, 2014.</li>
+<li>M. Barata, etc, Survey on Big Data and Decision Support Benchmarks, LNCS 8645, 174–182, 2014.</li>
+<li>陈旦，叶晓俊，施霖, TPC-DS性能测试工具的实现, 计算机应用，第31 卷，第9期, 2011.</li>
+</ul>
+<h3 id="关于作者："><a href="#关于作者：" class="headerlink" title="关于作者："></a>关于作者：</h3><p>谭磊，复旦计算机学士、美国杜克计算机硕士。美国微软总部服务13年，是数据分析、数据挖掘、产品研发及管理、互联网广告和互联网营销方面的专家。《New Internet：大数据挖掘》《数据掘金：电商数据运营》两书作者。</p>
+<hr>
+<ul>
+<li>原文链接：<a href="http://www.csdn.net/article/2015-05-14/2824680" target="_blank" rel="noopener">解析大数据基准测试——TPC-H or TPC-DS</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"># BigData</a>
+          
+            <a href="/tags/Benchmark/" rel="tag"># Benchmark</a>
+          
+            <a href="/tags/TPC/" rel="tag"># TPC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/2015-05-05-succinct/" rel="next" title="Succinct">
+                <i class="fa fa-chevron-left"></i> Succinct
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/2015-05-27-debugging-an-apache-storm-topology/" rel="prev" title="Debugging an Apache Storm topology">
+                Debugging an Apache Storm topology <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/assets/images/hyperj-black.png" alt="HyperJ">
+            
+              <p class="site-author-name" itemprop="name">HyperJ</p>
+              <p class="site-description motion-element" itemprop="description">Knowledge makes me travel through time and space.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">182</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">202</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://gist.github.com/HyperJ/" target="_blank" title="Gist" rel="external nofollow"><i class="fa fa-fw fa-github-alt"></i>Gist</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/HyperJ" target="_blank" title="GitHub" rel="external nofollow"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.hyperj.net" target="_blank" title="Blog" rel="external nofollow"><i class="fa fa-fw fa-bookmark-o"></i>Blog</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/hyperj" target="_blank" title="Linkedin" rel="external nofollow"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/han_xiaoyang" title="寒小阳" target="_blank">寒小阳</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.csdn.net/odailidong" title="dailidong" target="_blank">dailidong</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://dmlcoding.com" title="Time渐行渐远" target="_blank">Time渐行渐远</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://91fz.org" title="程序员疯子" target="_blank">程序员疯子</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.bcmeng.com" title="编程小梦" target="_blank">编程小梦</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://hexiaoqiao.github.io" title="Hexiaoqiao" target="_blank">Hexiaoqiao</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.jianshu.com/u/90ab66c248e6" title="占小狼" target="_blank">占小狼</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2013 – <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-github"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HyperJ</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="Total Visitors">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="Total Views">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.json";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+        // ref: https://github.com/ForbesLindesay/unescape-html
+        var unescapeHtml = function(html) {
+          return String(html)
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, '\'')
+            .replace(/&#x3A;/g, ':')
+            // replace all the other &#x; chars
+            .replace(/&#(\d+);/g, function (m, p) { return String.fromCharCode(p); })
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&');
+        };
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                content = unescapeHtml(content);
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=6.4.2"></script>
+
+
+  
+
+  
+
+</body>
+</html>
