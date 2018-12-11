@@ -1,3 +1,3 @@
 # HyperJ's Site!
 
-Knowledge and imagination makes me travel through time and space.
+Knowledge and imagination make me travel through time and space.
