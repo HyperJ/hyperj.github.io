@@ -209,7 +209,7 @@
 
     function initCalendarHeatmap() {
         if (_data != null) {
-            var width = $('.jumbotron').outerWidth() - 2;
+            var width = $('.jumbotron').outerWidth() - 2 * 7;
             $('.calendar-heatmap').empty();
             var heatmap = calendarHeatmap()
                 .data(_data)
@@ -218,6 +218,7 @@
                 .SQUARE_LENGTH(width / 53 - 2)
                 .selector('.calendar-heatmap')
                 .tooltipEnabled(false)
+                .legendEnabled(false)
                 .colorRange(['#ebedf0', '#196127']);
             heatmap();
         }
