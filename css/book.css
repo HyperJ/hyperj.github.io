@@ -162,7 +162,7 @@
 	box-shadow: 1px 0 3px rgba(255, 255, 255, 0.1);
 }
 
-.bk-left h5 {
+.bk-left h6 {
 	width: 300px;
 	height: 40px;
 	-webkit-transform-origin: 0 0;
@@ -225,7 +225,7 @@
 	background-position: 25px 0px;
 }
 
-.book-1 .bk-cover h5 {
+.book-1 .bk-cover h6 {
 	position: absolute;
 	bottom: 0;
 	right: 0;
@@ -236,8 +236,8 @@
 	text-shadow: 0 -1px 0 rgba(0,0,0,0.1);
 }
 
-.book-1 .bk-cover h5 span:first-child,
-.book-1 .bk-left h5 span:first-child {
+.book-1 .bk-cover h6 span:first-child,
+.book-1 .bk-left h6 span:first-child {
 	text-transform: uppercase;
 	font-weight: 400;
 	font-size: 12px;
@@ -245,12 +245,12 @@
 	padding-bottom: 5px;
 }
 
-.book-1 .bk-cover h5 span:first-child {
+.book-1 .bk-cover h6 span:first-child {
 	display: block;
 }
 
-.book-1 .bk-cover h5 span:last-child,
-.book-1 .bk-left h5 span:last-child {
+.book-1 .bk-cover h6 span:last-child,
+.book-1 .bk-left h6 span:last-child {
 	font-family: "Big Caslon", "Book Antiqua", "Palatino .bknotype", Georgia, serif;
 }
 
@@ -258,7 +258,7 @@
 	font-family: Georgia, Times, "Times New Roman", serif;
 }
 
-.book-1 .bk-left h5 {
+.book-1 .bk-left h6 {
 	color: #fff;
 	font-size: 15px;
 	line-height: 40px;
@@ -280,7 +280,7 @@
 	background-position: 28px 98px;
 }
 
-.book-2 .bk-cover h5 {
+.book-2 .bk-cover h6 {
 	position: absolute;
 	top: 20px;
 	left: 30px;
@@ -288,8 +288,8 @@
 	text-shadow: 0 -1px 0 rgba(0,0,0,0.1);
 }
 
-.book-2 .bk-cover h5 span:first-child,
-.book-2 .bk-left h5 span:first-child {
+.book-2 .bk-cover h6 span:first-child,
+.book-2 .bk-left h6 span:first-child {
 	text-transform: uppercase;
 	font-weight: 400;
 	font-size: 12px;
@@ -297,17 +297,17 @@
 	padding-bottom: 5px;
 }
 
-.book-2 .bk-cover h5 span:first-child {
+.book-2 .bk-cover h6 span:first-child {
 	display: block;
 }
 
-.book-2 .bk-cover h5 span:last-child,
-.book-2 .bk-left h5 span:last-child,
+.book-2 .bk-cover h6 span:last-child,
+.book-2 .bk-left h6 span:last-child,
 .book-2 .bk-content p  {
 	font-family: Georgia, Times, "Times New Roman", serif;
 }
 
-.book-2 .bk-left h5 {
+.book-2 .bk-left h6 {
 	color: #fff;
 	font-size: 14px;
 	line-height: 40px;
@@ -328,7 +328,7 @@
 	background-position: 28px 98px;
 }
 
-.book-3 .bk-cover h5 {
+.book-3 .bk-cover h6 {
 	position: absolute;
 	top: 8px;
 	right: 0;
@@ -339,8 +339,8 @@
 	text-shadow: 0 -1px 0 rgba(0,0,0,0.1);
 }
 
-.book-3 .bk-cover h5 span:first-child,
-.book-3 .bk-left h5 span:first-child {
+.book-3 .bk-cover h6 span:first-child,
+.book-3 .bk-left h6 span:first-child {
 	text-transform: uppercase;
 	font-weight: 400;
 	font-size: 12px;
@@ -348,17 +348,17 @@
 	padding-bottom: 5px;
 }
 
-.book-3 .bk-cover h5 span:first-child {
+.book-3 .bk-cover h6 span:first-child {
 	display: block;
 }
 
-.book-3 .bk-cover h5 span:last-child,
-.book-3 .bk-left h5 span:last-child,
+.book-3 .bk-cover h6 span:last-child,
+.book-3 .bk-left h6 span:last-child,
 .book-3 .bk-content p  {
 	font-family: Georgia, Times, "Times New Roman", serif;
 }
 
-.book-3 .bk-left h5 {
+.book-3 .bk-left h6 {
 	color: #fff;
 	font-size: 14px;
 	line-height: 40px;
