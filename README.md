@@ -1,7 +1,6 @@
 # HyperJ's Site!
 
-**Perception, Cognition, Decision, Action**
-
+- 博学之，审问之，慎思之，明辨之，笃行之
 - 认知半径尽可能大，行动半径尽可能小，能力半径尽可能清晰
 
 ## Reference
