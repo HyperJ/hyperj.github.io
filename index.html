@@ -361,7 +361,7 @@
         }
     }
 
-    $.getJSON("https://github-contributions.vercel.app/api/v1/hyperj", function (data) {
+    $.getJSON("https://github-contributions.vercel.app/api/v1/hyperj?callback=?", function (data) {
         _data = data.contributions;
         initCalendarHeatmap();
     });
